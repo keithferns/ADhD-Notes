@@ -1,0 +1,42 @@
+//
+// Prefix header for all source files of the 'ADhD-Notes' target in the 'ADhD-Notes' project
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_3_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+
+
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import <CoreData/CoreData.h>
+    #import <QuartzCore/QuartzCore.h>
+
+    
+
+    #import "Constants.h"
+    #import "UINavigationController+NavControllerCategory.h"
+    #import "WEPopoverController.h"
+    #import "TKCalendarMonthViewController.h"
+#import "Note.h"
+#import "Event.h"
+#import "Person.h"
+#import "Memo.h"
+#import "Appointment.h"
+#import "Project.h"
+#import "Alarm.h"
+#import "ToDo.h"
+#import "Tag.h"
+#import "Folder.h"
+#import "Document.h"
+#import "Item.h"
+#import "Collection.h"
+#import "SimpleNote.h"
+#import "List.h"
+#import "Location.h"
+
+#endif

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1171" systemVersion="11D50" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Alarm" representedClassName="Alarm" syncable="YES">
+        <attribute name="reminder" attributeType="Date" syncable="YES"/>
+        <relationship name="event" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="alarms" inverseEntity="Event" syncable="YES"/>
+    </entity>
+    <entity name="Appointment" representedClassName="Appointment" parentEntity="Event" syncable="YES">
+        <attribute name="endTime" attributeType="Date" syncable="YES"/>
+        <attribute name="startTime" attributeType="Date" syncable="YES"/>
+    </entity>
+    <entity name="Collection" representedClassName="Collection" isAbstract="YES" parentEntity="Item" syncable="YES">
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="collection" inverseEntity="Item" syncable="YES"/>
+    </entity>
+    <entity name="Document" representedClassName="Document" parentEntity="Collection" syncable="YES">
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Event" representedClassName="Event" isAbstract="YES" parentEntity="Note" syncable="YES">
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventType" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="recurrence" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="recurring" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <relationship name="alarms" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Alarm" inverseName="event" inverseEntity="Alarm" syncable="YES"/>
+        <relationship name="person" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Person" inverseName="events" inverseEntity="Person" syncable="YES"/>
+        <relationship name="place" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="events" inverseEntity="Location" syncable="YES"/>
+    </entity>
+    <entity name="Folder" representedClassName="Folder" parentEntity="Collection" syncable="YES"/>
+    <entity name="Item" representedClassName="Item" isAbstract="YES" syncable="YES">
+        <attribute name="aDate" attributeType="Date" syncable="YES"/>
+        <attribute name="creationDate" attributeType="Date" syncable="YES"/>
+        <attribute name="creationDay" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="editDate" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="priority" attributeType="Integer 16" minValueString="0" maxValueString="10" defaultValueString="0" syncable="YES"/>
+        <attribute name="sectionIdentifier" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sorter" optional="YES" transient="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="collection" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Collection" inverseName="items" inverseEntity="Collection" syncable="YES"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="items" inverseEntity="Tag" syncable="YES"/>
+    </entity>
+    <entity name="List" representedClassName="List" parentEntity="Memo" syncable="YES">
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Location" representedClassName="Location" syncable="YES">
+        <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="country" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="streetAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="zipCode" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="place" inverseEntity="Event" syncable="YES"/>
+        <relationship name="notes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Note" inverseName="location" inverseEntity="Note" syncable="YES"/>
+    </entity>
+    <entity name="Memo" representedClassName="Memo" isAbstract="YES" parentEntity="Note" syncable="YES"/>
+    <entity name="Note" representedClassName="Note" isAbstract="YES" parentEntity="Item" syncable="YES">
+        <attribute name="editing" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="text" attributeType="String" syncable="YES"/>
+        <relationship name="location" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="notes" inverseEntity="Location" syncable="YES"/>
+    </entity>
+    <entity name="Person" representedClassName="Person" syncable="YES">
+        <attribute name="cellPhone" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fisrtName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="homePhone" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workPhone" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="person" inverseEntity="Event" syncable="YES"/>
+    </entity>
+    <entity name="Project" representedClassName="Project" parentEntity="Collection" syncable="YES"/>
+    <entity name="SimpleNote" representedClassName="SimpleNote" parentEntity="Memo" syncable="YES"/>
+    <entity name="Tag" representedClassName="Tag" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="tags" inverseEntity="Item" syncable="YES"/>
+    </entity>
+    <entity name="ToDo" representedClassName="ToDo" parentEntity="Event" syncable="YES"/>
+    <elements>
+        <element name="Alarm" positionX="160" positionY="192" width="128" height="75"/>
+        <element name="Appointment" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Collection" positionX="160" positionY="192" width="128" height="90"/>
+        <element name="Document" positionX="160" positionY="192" width="128" height="60"/>
+        <element name="Event" positionX="160" positionY="192" width="128" height="60"/>
+        <element name="Folder" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Item" positionX="160" positionY="192" width="128" height="120"/>
+        <element name="List" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Location" positionX="160" positionY="192" width="128" height="165"/>
+        <element name="Memo" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Note" positionX="160" positionY="192" width="128" height="210"/>
+        <element name="Person" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Project" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="SimpleNote" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Tag" positionX="160" positionY="192" width="128" height="75"/>
+        <element name="ToDo" positionX="160" positionY="192" width="128" height="45"/>
+    </elements>
+</model>
