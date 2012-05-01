@@ -11,6 +11,8 @@
 
 @interface AllItemsTableViewController ()
 
+
+
 @end
 
 @implementation AllItemsTableViewController
@@ -18,7 +20,6 @@
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
-
 
 - (void)viewDidLoad
 {
@@ -72,7 +73,7 @@
 	}
     
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:[NSEntityDescription entityForName:@"Item" inManagedObjectContext:managedObjectContext]];
+    [request setEntity:[NSEntityDescription entityForName:@"Note" inManagedObjectContext:managedObjectContext]];
     
 	NSSortDescriptor *typeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"type" ascending:YES];
 	NSSortDescriptor *textDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];// just here to test the sections and row calls
@@ -123,15 +124,7 @@
     else if (mySection == 3) {
          temp = @"Tasks";
     }
-    else if (mySection == 4) {
-         temp = @"Folders";
-    }
-    else if (mySection == 5) {
-         temp = @"Documents";
-    }
-    else if (mySection == 6) {
-         temp = @"Projects";
-    }
+   
     return temp;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -140,25 +133,73 @@
     //return 1;
 }
 
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-		[dateFormatter setDateFormat:@"dd MMMM yyyy h:mm a"];
-        //[dateFormatter setDateFormat:@"EEEE, dd MMMM yyyy h:mm a"]; //This format gives the Day of Week, followed by date and time
-
-
+	
     static NSString *CellIdentifier = @"MyCell";
-    Item *currentItem = [_fetchedResultsController objectAtIndexPath:indexPath];	
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-    cell.textLabel.text  = [dateFormatter stringFromDate: currentItem.creationDate];
+       
     
+    [self configureCell:cell atIndexPath:indexPath];
+
     return cell;
 }
+
+
+- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath{
     
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd MMMM yyyy h:mm a"];
+    //[dateFormatter setDateFormat:@"EEEE, dd MMMM yyyy h:mm a"]; //This format gives the Day of Week, followed by date and time
+    Event *currentItem = [_fetchedResultsController objectAtIndexPath:indexPath];	
+
+   UILabel *aDateLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(0,0,160,14)];
+    [aDateLabel1 setFont: [UIFont systemFontOfSize:12]];
+   UILabel *aDateLabel2 = [[UILabel alloc] initWithFrame:CGRectMake(160,0,320,14)];
+    [aDateLabel2 setFont: [UIFont systemFontOfSize:12]];
+    
+    [cell.contentView addSubview:aDateLabel1];
+    [cell.contentView addSubview:aDateLabel2];
+    
+    aDateLabel1.text  = [dateFormatter stringFromDate: currentItem.aDate];
+    aDateLabel2.text = [currentItem.aDate description];
+    
+   UILabel *creationDayLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,14,100,16)];
+   UILabel *myTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(100,14,320,16)];
+    
+    [cell.contentView addSubview:myTextLabel];
+    [cell.contentView addSubview:creationDayLabel];
+    
+    creationDayLabel.text  = currentItem.creationDay;
+    myTextLabel.text = currentItem.text;
+    
+    UILabel *creationDateLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(0,30,160,14)];
+    UILabel *creationDateLabel2 = [[UILabel alloc] initWithFrame:CGRectMake(160,30,160,14)];
+    [creationDateLabel1 setFont: [UIFont systemFontOfSize:12]];
+    
+    [creationDateLabel2 setFont: [UIFont systemFontOfSize:12]];
+    
+    [cell.contentView addSubview:creationDateLabel1];
+    [cell.contentView addSubview:creationDateLabel2];
+    
+    if ([currentItem isKindOfClass:[Memo class]]){
+        creationDateLabel1.text = [dateFormatter stringFromDate: currentItem.creationDate];
+        creationDateLabel2.text = [currentItem.creationDate description];
+    }else if([currentItem isKindOfClass:[Event class]]){
+       // creationDateLabel1.text = [dateFormatter stringFromDate: currentItem.creationDate];
+        
+        creationDateLabel1.text = [currentItem.startTime description];
+
+        creationDateLabel2.text = [currentItem.endTime description];
+    }
+    
+}
+
         
 /*
 // Override to support conditional editing of the table view.

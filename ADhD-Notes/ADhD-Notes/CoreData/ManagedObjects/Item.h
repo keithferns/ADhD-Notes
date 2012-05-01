@@ -2,7 +2,7 @@
 //  Item.h
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 4/30/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -14,17 +14,16 @@
 @interface Item : NSManagedObject
 
 @property (nonatomic, retain) NSDate * creationDate;
-@property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSNumber * sorter;
+@property (nonatomic, retain) NSString * creationDay;
 @property (nonatomic, retain) NSDate * editDate;
+@property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSNumber * priority;
-@property (nonatomic, retain) NSNumber * type;
 @property (nonatomic, retain) NSString * sectionIdentifier, *primitiveSectionIdentifier;
 @property (nonatomic, retain) NSDate * aDate, *primitiveADate;
-@property (nonatomic, retain) NSDate * creationDay;
+@property (nonatomic, retain) NSNumber * sorter;
+@property (nonatomic, retain) NSNumber * type;
 @property (nonatomic, retain) NSSet *collection;
 @property (nonatomic, retain) NSSet *tags;
-
 @end
 
 @interface Item (CoreDataGeneratedAccessors)

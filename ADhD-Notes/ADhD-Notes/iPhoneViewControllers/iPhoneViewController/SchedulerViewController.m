@@ -32,6 +32,8 @@
 @synthesize isBeingEdited;
 
 
+#pragma mark - ViewManagement
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -42,7 +44,7 @@
     self.navigationItem.rightBarButtonItem =[self.navigationController addDoneButton];
     [self.navigationItem.rightBarButtonItem setTarget:self];
     //FIXME:
-    [self.navigationItem.rightBarButtonItem setAction:@selector(saveSchedule:)];
+    [self.navigationItem.rightBarButtonItem setAction:@selector(saveSchedule)];
     
     if (toolbar == nil) {
         toolbar = [[CustomToolBar alloc] init];
@@ -156,8 +158,6 @@
     endTimeField.inputAccessoryView = self.toolbar;
     recurringField.inputAccessoryView = self.toolbar;
     locationField.inputAccessoryView = self.toolbar;
-
-
 }
 
 - (void)viewDidUnload {
@@ -183,7 +183,6 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
 
 
 - (void) addReminderFields {
@@ -336,9 +335,6 @@
 }
 
 
-
-
-
 - (void) finishedAlarmTransition{
     [tableView removeFromSuperview];
     [tagView removeFromSuperview];
@@ -348,6 +344,30 @@
     [tableView removeFromSuperview];
     [alarmView removeFromSuperview];
 }
+
+
+#pragma Mark - Dates and Times
+
+- (void) saveSchedule {
+    
+    theItem.recurring  = recurringField.text;
+        
+        //set Alarms
+        //create an alarm in NewItemOrEvent
+        //set the selected time value for this alarm here
+        //add alarm object to theAppointment
+    
+    [theItem saveSchedule];
+    
+    //Programmatically return to parentViewController//
+    [self.navigationController popViewControllerAnimated:YES];
+    
+}
+
+
+
+#pragma mark - TextField Delegate and Navigation 
+
 
 - (void) textFieldResignFirstResponder{
     switch ([isBeingEdited intValue]) {
@@ -438,10 +458,6 @@
 
 
 
-
-#pragma mark - TextField Delegate and Navigation 
-
-
 - (void) textFieldDidEndEditing:(UITextField *)textField{
     NSLog(@"Method: textfieldDidEndEditing -> currently commands");
     //
@@ -529,19 +545,22 @@
     [dateFormatter setDateFormat:@"EEE, MMM dd, yyyy"];
     
     self.dateField.text = [dateFormatter stringFromDate:[datePicker date]];
-    
+    theItem.aDate = [datePicker date];
 }
 
 - (void) timePickerChanged:(id) sender{
     NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
     [timeFormatter setDateFormat:@"h:mm a"];
     if ([isBeingEdited intValue] == 2) {
+        
         self.startTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
+        theItem.startTime = [timePicker date];
+        
     }
     else if ([isBeingEdited intValue] == 3){
         self.endTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
+        theItem.endTime  = [timePicker date];
     }
-    
 }
 
 
@@ -744,78 +763,6 @@
     }
     [self textFieldBecomeFirstResponder];
 }
-
-
-
-#pragma mark - DATA 
-
-- (void) saveSchedule:(id)sender {
-    
-    NSLog(@"CalendarViewController: Saving Schedule");
-    
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
-    [gregorian setLocale:[NSLocale currentLocale]];
-    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    //[gregorian setTimeZone:[NSTimeZone systemTimeZone]];
-    
-    //GET DATE COMPONENTS FROM DATEPICKER
-    NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[datePicker date]];  
-    NSLog(@"DatePicker date is %@", [datePicker date]);
-    [timeComponents setYear:[timeComponents year]];
-    [timeComponents setMonth:[timeComponents month]];
-    [timeComponents setDay:[timeComponents day]];
-    
-    NSDate *tempDate= [gregorian dateFromComponents:timeComponents];
-    NSDate *selectedDate = [tempDate dateByAddingTimeInterval:kTimeZoneOffset];     
-    
-    NSLog(@"the selectedDate is %@", selectedDate);
-    
-    if (theItem.theToDo == nil && theItem.theAppointment !=nil) {
-        //set the Appointment date
-        
-        [theItem.theAppointment setADate:selectedDate];
-        
-        
-        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
-        [timeFormatter setDateFormat:@"h:mm a"];
-        
-        selectedDate = [timeFormatter dateFromString:startTimeField.text];
-        [theItem.theAppointment setStartTime:selectedDate];
-        
-        selectedDate = [timeFormatter dateFromString:endTimeField.text];
-        
-        [theItem.theAppointment setEndTime:selectedDate];
-        
-        NSLog(@"this appointment date is %@",theItem.theAppointment.aDate);
-        NSLog(@"this appointment startTime is %@",theItem.theAppointment.startTime);
-        NSLog(@"this appointment endTime is %@",theItem.theAppointment.endTime);
-        
-        
-    }
-    
-    else if (theItem.theToDo != nil && theItem.theAppointment == nil){
-        
-        // set the To Do due date
-        
-        theItem.theToDo.aDate = selectedDate; 
-        NSLog(@"this todo date is %@", theItem.theToDo.aDate);
-        //set Recurrence.
-        theItem.theToDo.recurrence = recurringField.text;
-        
-        //set Alarms
-        //create an alarm in NewItemOrEvent
-        //set the selected time value for this alarm here
-        //add alarm object to theAppointment
-        
-    }
-    //Programmatically return to parentViewController//
-    
-    [self.theItem saveNewItem];
-    [self.navigationController popViewControllerAnimated:YES];
-    
-    return;
-}
-
 
 
 

@@ -2,7 +2,7 @@
 //  Event.m
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 4/30/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -14,12 +14,14 @@
 
 @implementation Event
 
-@dynamic eventType;
 @dynamic category;
+@dynamic eventType;
 @dynamic recurrence;
 @dynamic recurring;
+@dynamic startTime;
+@dynamic endTime;
 @dynamic alarms;
-@dynamic place;
 @dynamic person;
+@dynamic place;
 
 @end

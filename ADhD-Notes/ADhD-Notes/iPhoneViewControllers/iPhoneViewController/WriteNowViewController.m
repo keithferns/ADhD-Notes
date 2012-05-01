@@ -46,34 +46,18 @@
 
 - (void)viewDidLoad{
     [super viewDidLoad];    
+    
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyyMMdd"];
+    
+    NSLog(@"Today's date is %@", [formatter stringFromDate:[NSDate date]]);
+     
+    
+    NSLog(@"Today's date is %@", [formatter dateFromString:@"20120430"]);
 
-    NSDate *startDate = [NSDate date];
-    
-    NSLog(@"The date is %@", [NSDate date]);
-    
-    NSLog(@"The date description with locale is %@", [startDate descriptionWithLocale:[NSLocale currentLocale]]);
-    
-    
-    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
-    [dateformatter setDateFormat: @"MM/dd/yyyy hh:mm"];
-    
-    NSString *temp = [dateformatter stringFromDate:[NSDate date]];
-    
-    NSLog(@"The date is %@", temp);
-    
-    NSLog(@"The date after formatting and reverting is %@", [dateformatter dateFromString:temp]);
-    
-    [NSTimeZone timeZoneForSecondsFromGMT:-14400];
-    NSTimeZone *timezone = [NSTimeZone localTimeZone];
-    
-    NSLog(@"The offset is %d",[timezone secondsFromGMT]);
 
     
-    
-    
-    if (listArray == nil){
-        listArray = [[NSMutableArray alloc] init];
-    }
     
     /*-- Point current instance of the MOC to the main managedObjectContext --*/
 	if (managedObjectContext == nil) { 
@@ -152,13 +136,6 @@
         tableView.dataSource = self;
     }
     
-    if (theItem == nil) {
-        NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
-        [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
-        theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
-        theItem.addingContext = addingContext; // pass adding MOC to the delegate instance.
-        theItem.text = self.textView.text;
-    }
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -196,8 +173,10 @@
         case 1:
             [textView removeFromSuperview];
             NSLog (@"Adding TextField");
+            if (listArray == nil){
+                listArray = [[NSMutableArray alloc] init];
+            }
             if (textField.superview == nil) {
-
                 [topView addSubview:textField];
                 [topView addSubview: tableView];
             }
@@ -248,7 +227,6 @@
 
 }
 
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     NSInteger temp = [listArray count] - indexPath.row - 1;
@@ -264,9 +242,6 @@
     
     return cell;
 }
-
-
-
 
 #pragma mark - Responding to keyboard notifications
 
@@ -337,15 +312,22 @@
 }
 
 - (void) presentScheduler: (id) sender {
-    NSLog(@"WriteNowViewController -> pushing SchedulerViewController");
     [actionsPopover dismissPopoverAnimated:YES];
+    
+    if (theItem == nil) {
+        NSLog(@"WriteNowViewController:presentScheduler - Creating theItem");
+        NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
+        [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
+        theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
+        theItem.addingContext = addingContext; // pass adding MOC to the delegate instance.
+    }
     
     switch ([sender tag]) {
         case 0:
-            [self makeNewItemOrEvent:2];
+            theItem.type = [NSNumber numberWithInt:2];
             break;
         case 1:
-            [self makeNewItemOrEvent:3];
+            theItem.type = [NSNumber numberWithInt:3];
             break;
         default:
             break;
@@ -356,30 +338,27 @@
 
     scheduleViewController.theItem = self.theItem;
     [self.navigationController pushViewController:scheduleViewController animated:YES];
+    NSLog(@"WriteNowViewController -> Pushed SchedulerViewController");
+
 }
      
 
 - (void) presentArchiver: (id) sender {
-    NSLog(@"WriteNowViewController -> pushing ArchiveViewController");
     
     [actionsPopover dismissPopoverAnimated:YES];   
     
     if (theItem == nil) {//CASE: User entered text and touches one of the buttons
-    //GET INDEX OF Segmented Control
-        //if index is 0
-        [self makeNewItemOrEvent:0];
-        //else if index is 1
-        [self makeNewItemOrEvent:1];
+        [self saveItem];
     }
-    [self saveItem];
     
     ArchiveViewController *archiveViewController = [[ArchiveViewController alloc] init];
     archiveViewController.hidesBottomBarWhenPushed = YES;
     archiveViewController.saving = YES;
     //archiveViewController.theItem = self.theItem;
     [self.navigationController pushViewController:archiveViewController animated:YES];
-}
+    NSLog(@"WriteNowViewController -> Pushed ArchiveViewController");
 
+}
 
 
 - (void) sendItem:(id)sender {
@@ -389,11 +368,14 @@
 
 #pragma mark - Data Management
 
-- (void) makeNewItemOrEvent: (NSInteger) type {
+
+- (void) saveItem {
+    
     [actionsPopover dismissPopoverAnimated:YES];
+    
     if ([textView isFirstResponder]){
         if (![textView hasText]) {
-        return;
+            return;
         }
     }
     if ([self.textView hasText] && self.textView.superview !=nil){
@@ -401,53 +383,48 @@
         self.navigationItem.rightBarButtonItem =  [self.navigationController addEditButton];
         self.navigationItem.rightBarButtonItem.target = self;
     }
-
+    
     if (theItem == nil) {
+        NSLog(@"WriteNowViewController:saveItem - Creating theItem");
         NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
         [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
         theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
         theItem.addingContext = addingContext; // pass adding MOC to the delegate instance.
+    
     }
         
+    if (theItem.type == nil){
+        if (segmentedControl.selectedSegmentIndex == 0) {
+            theItem.type = [NSNumber numberWithInt:0];
+            NSLog(@"Item:SimpleNote");
+            }
+        else if (segmentedControl.selectedSegmentIndex == 1){
+        theItem.type = [NSNumber numberWithInt:1];
+            NSLog(@"Item:list");
+            }
+    }
+    theItem.text = self.textView.text;
+
+
     theItem.text = self.textView.text;
     
-    switch (type) {
-        case 0://SimpleNote
-            theItem.type = [NSNumber numberWithInt:0];
+    switch ([theItem.type intValue]) {
+        case 0: 
             [theItem createNewSimpleNote];
             break;
-        case 1://List
-            theItem.type = [NSNumber numberWithInt:1];
+        case 1: 
             [theItem createNewList];
             break;
-        case 2://appointment
-            theItem.type = [NSNumber numberWithInt:2];
+        case 2:
             [theItem createNewAppointment];
             break;
-        case 3://todo 
-            theItem.type = [NSNumber numberWithInt:3];
+        case 3:
             [theItem createNewToDo];
             break;
         default:
             break;
     }
     
-    NSLog(@"Making new item");
-}
-
-- (void) saveItem {
-        if (theItem == nil) {
-            if (segmentedControl.selectedSegmentIndex == 0) {
-            
-                [self makeNewItemOrEvent:0];
-                }
-            else if (segmentedControl.selectedSegmentIndex == 1){
-                [self makeNewItemOrEvent:1];    
-                NSLog(@"Save Item:list");
-                }
-            }
-        
-        theItem.text = self.textView.text;
         [theItem saveNewItem];
         
         //Change state of view
@@ -458,25 +435,26 @@
 }
      
 - (void) startNewItem:(id) sender{//Called by Left Nav ADD_ITEM Button.
-    if ([textView hasText]){
-        if (theItem == nil){
-            [self makeNewItemOrEvent:0];
-            }
-        else if (theItem != nil) {
-            //if (![textView.text isEqualToString:theItem.theNote.text]){
-            //Check if the text has changed, if yes then save the text to current note.
-            //NOTE: this string comparison may be costly. Find better way or dispense if possible                
-            theItem.text = self.textView.text;
+
+    if (theItem == nil) {
+        [self saveItem];
         }
-    [self saveItem];
-    }
     
     //clear the current instance of theItem
     self.theItem = nil;
-    //Clear the TV and make TV first responder
-    self.textView.text = nil;
-    [self.textView setEditable:YES];
-    [self.textView becomeFirstResponder];
+    
+    if (segmentedControl.selectedSegmentIndex == 0) {
+        self.textView.text = nil;
+        [self.textView setEditable:YES];
+        [self.textView becomeFirstResponder];
+        }
+    else if (segmentedControl.selectedSegmentIndex == 1){
+        self.textField.text = nil;
+        [self.textField becomeFirstResponder];
+        [self.listArray removeAllObjects];
+        [tableView reloadData];
+    }
+    
     //remove the nav Buttons
     self.navigationItem.leftBarButtonItem = nil;
     self.navigationItem.rightBarButtonItem = nil;
@@ -485,7 +463,6 @@
     toolbar.fourthButton.enabled = NO;
 }
     
-
 
 #pragma mark - calendar actions
 

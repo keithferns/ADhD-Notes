@@ -39,7 +39,7 @@
 @property (nonatomic, retain) NSDate * editDate;
 @property (nonatomic, retain) NSNumber * priority;
 @property (nonatomic, retain) NSNumber * type;
-@property (nonatomic, retain) NSDate * aDate;
+@property (nonatomic, retain) NSDate * aDate, *startTime, *endTime;
 @property (nonatomic, retain) NSSet *collection;
 @property (nonatomic, retain) NSSet *tags;
 @property (nonatomic, retain) NSString *recurring;
@@ -62,6 +62,9 @@
 - (void) createNewFolder;
 - (void) createNewDocument;
 - (void) createNewProject;
+
+
+- (void) saveSchedule;
 
 - (void) addDateField;
 - (void) updateSelectedDate:(NSDate *)date;

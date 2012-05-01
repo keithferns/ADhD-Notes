@@ -8,6 +8,7 @@
 
 #import "NewItemOrEvent.h"
 #import "NSCalendar+CalendarCalculations.h"
+#import "Constants.h"
 
 @implementation NewItemOrEvent
 
@@ -17,11 +18,52 @@
 @synthesize addingContext;//note this MOC is an adding MOC passed from the parent.
 @synthesize eventType;
 
-@synthesize collection, priority, aDate, text, name, tags, sorter, editDate, type;
+@synthesize collection, priority, text, name, tags, sorter, type;
+
+@synthesize aDate, startTime, endTime, editDate;
 
 
+#pragma mark - DATA 
+
+- (void) saveSchedule {
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
+    [gregorian setLocale:[NSLocale currentLocale]];
+    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
+
+    //Convert the Appointment Date
+    NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:self.aDate];  
+    [timeComponents setYear:[timeComponents year]];
+    [timeComponents setMonth:[timeComponents month]];
+    [timeComponents setDay:[timeComponents day]];
+    
+    NSDate *tempDate= [gregorian dateFromComponents:timeComponents];
+    //self.aDate = [tempDate dateByAddingTimeInterval:kTimeZoneOffset];
+    self.aDate = tempDate;
+    NSLog(@"the New aDate is %@", self.aDate);
+
+    //Convert Start Time. 
+    
+    timeComponents = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:self.startTime];
+    int thehours = [timeComponents hour];
+    int theminutes = [timeComponents minute];
+    NSTimeInterval theTI = thehours*60*60 + theminutes*60;
+    
+    self.startTime = [self.aDate dateByAddingTimeInterval: theTI];
+
+    NSLog(@"the startTime is %@", self.startTime);
+
+    
+    //Convert End Time
+    timeComponents = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:self.endTime];
+    thehours = [timeComponents hour];
+    theminutes = [timeComponents minute];
+    theTI = thehours*60*60 + theminutes*60;
+    self.endTime = [self.aDate dateByAddingTimeInterval: theTI];
+    NSLog(@"the endTime is %@", self.endTime);
 
 
+}
 
 #pragma mark - CREATE NEW ITEMS
 
@@ -56,11 +98,15 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
                 
     theAppointment = [[Appointment alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
     theAppointment.text = self.text;
-    theList.type = [NSNumber numberWithInt:2];
+    theAppointment.type = [NSNumber numberWithInt:2];
+    theAppointment.aDate = self.aDate;
+    theAppointment.startTime = self.startTime;
+    theAppointment.endTime = self.endTime;
+    theAppointment.recurrence = self.recurring;
     
     NSLog(@"Creating New Appointment");
                 
-    }
+}
     
 - (void) createNewToDo{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"ToDo" inManagedObjectContext:addingContext];
@@ -68,9 +114,12 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
     theToDo = [[ToDo alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
                 
     theToDo.text = self.text;
-    theList.type = [NSNumber numberWithInt:2];
-           
-    }
+    theToDo.type = [NSNumber numberWithInt:3];
+    theToDo.aDate = self.aDate;
+    theToDo.startTime = self.startTime;
+    theToDo.endTime = self.endTime;
+    theToDo.recurrence = self.recurring;        
+}
 
  
 - (void) createNewFolder{

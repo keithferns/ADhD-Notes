@@ -2,7 +2,7 @@
 //  Item.m
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 4/30/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -13,15 +13,15 @@
 
 @implementation Item
 
-@dynamic creationDate;
-@dynamic name;
-@dynamic sorter;
-@dynamic editDate;
-@dynamic priority;
-@dynamic type;
-@dynamic sectionIdentifier, primitiveSectionIdentifier;
 @dynamic aDate, primitiveADate;
+@dynamic creationDate;
 @dynamic creationDay;
+@dynamic editDate;
+@dynamic name;
+@dynamic priority;
+@dynamic sectionIdentifier, primitiveSectionIdentifier;
+@dynamic sorter;
+@dynamic type;
 @dynamic collection;
 @dynamic tags;
 
@@ -35,22 +35,28 @@
     [self setValue:[NSDate date] forKey:@"creationDate"];
     [self setValue:[NSDate date] forKey:@"editDate"];
     
+    //Set localTime for Creation Day as a string
+    
+    //NSTimeInterval timeZoneOffset = [[NSTimeZone localTimeZone] secondsFromGMT];
+    
+    //NSDate *localTime = [[NSDate date] dateByAddingTimeInterval:timeZoneOffset];
+    
+    //NSCalendar * calendar = [NSCalendar currentCalendar];
+    /*
+    NSDateComponents *components = [calendar components:(NSYearCalendarUnit |NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:localTime];
+    
+    NSString *localTimeString = [NSString stringWithFormat:@"%d", ([components year] * 1000000) + ([components month] *1000) + [components day]];    
+    */
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyyMMdd"];
+    NSString *temp = [formatter stringFromDate:[NSDate date]];
+    [self setValue:temp forKey:@"creationDay"];
+    
+
     //FIXME:
     
-    
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
-    [gregorian setLocale:[NSLocale currentLocale]];
-    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    
-    NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[self creationDate]];  
-    
-    [timeComponents setYear:[timeComponents year]];
-    [timeComponents setMonth:[timeComponents month]];
-    [timeComponents setDay:[timeComponents day]];
-    
-    //[self setValue:[gregorian dateFromComponents:timeComponents] forKey:@"creationDateDay"];
-    
-    [self setValue:[gregorian dateFromComponents:timeComponents] forKey:@"aDate"];
+ 
 }
 
 #pragma mark Transient Properties
@@ -65,15 +71,22 @@
     //kvo read notifications - used to maintain inverse relationships (?). each read access has to be wrapped in this willAccessValueForKey and didAccessValueForKey method pairs. in this case to get the value for tmp
     
     if (!tmp) {
-        /*organizing sections by date, month and year.  
-         the section identifier is a string representing the number (year * 1000000 + month * 1000 + date);
-         this will always maintain chronological order regardless of month name
-         */
+        /*
+         //organizing sections by date, month and year.  
+         //the section identifier is a string representing the number (year * 1000000 + month * 1000 + date);
+         //this will always maintain chronological order regardless of month name
+         
         NSCalendar * calendar = [NSCalendar currentCalendar];
         
         NSDateComponents *components = [calendar components:(NSYearCalendarUnit |NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[self aDate]];
         
         tmp = [NSString stringWithFormat:@"%d", ([components year] * 1000000) + ([components month] *1000) + [components day]];
+        
+        */
+        
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"yyyyMMdd"];
+        tmp = [formatter stringFromDate:[self aDate]];
         
         [self setPrimitiveSectionIdentifier:tmp];
     }
@@ -104,8 +117,6 @@
     return [NSSet setWithObject: @"aDate"];
     
 }
-
-
 
 
 

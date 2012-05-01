@@ -26,7 +26,8 @@
 
     if (tvc == nil){
         tvc = [[AllItemsTableViewController alloc] init];
-        tvc.tableView.frame = CGRectMake (0, 44, 320, 380);
+        tvc.tableView.frame = CGRectMake (0, 44, 320, 400);
+        tvc.tableView.rowHeight = 50.00;
     }
     [self.view addSubview:tvc.tableView];
 }

@@ -2,7 +2,7 @@
 //  Appointment.m
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 4/30/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -10,9 +10,6 @@
 
 
 @implementation Appointment
-
-@dynamic startTime;
-@dynamic endTime;
 
 
 
@@ -22,6 +19,7 @@
     [self setValue:[NSNumber numberWithInt:2] forKey:@"type"];
     
 }
+
 
 
 @end

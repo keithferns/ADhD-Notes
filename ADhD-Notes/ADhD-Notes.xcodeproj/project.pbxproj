@@ -12,16 +12,13 @@
 		530BADA21541E58E0001A30A /* Alarm.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADA11541E58E0001A30A /* Alarm.m */; };
 		530BADA81541E58F0001A30A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADA71541E58F0001A30A /* Person.m */; };
 		530BADAC1541E5DB0001A30A /* Note.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADAB1541E5DB0001A30A /* Note.m */; };
-		530BADB21541E6010001A30A /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADB11541E6010001A30A /* Event.m */; };
 		530BADB51541E6010001A30A /* Memo.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADB41541E6010001A30A /* Memo.m */; };
 		530BADB81541E61C0001A30A /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADB71541E61C0001A30A /* Folder.m */; };
 		530BADBB1541E61C0001A30A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBA1541E61C0001A30A /* Project.m */; };
 		530BADBE1541E61C0001A30A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBD1541E61C0001A30A /* Document.m */; };
-		530BADC11541E6360001A30A /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC01541E6360001A30A /* Appointment.m */; };
 		530BADC41541E6360001A30A /* ToDo.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC31541E6360001A30A /* ToDo.m */; };
 		530BADC71541E6420001A30A /* List.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC61541E6420001A30A /* List.m */; };
 		530BADCA1541E6420001A30A /* SimpleNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC91541E6420001A30A /* SimpleNote.m */; };
-		530BADCD1541E9DE0001A30A /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADCC1541E9DD0001A30A /* Item.m */; };
 		530BADD01541F2B50001A30A /* Collection.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADCF1541F2B30001A30A /* Collection.m */; };
 		530BADD71541F45F0001A30A /* TapDetectingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADD61541F45F0001A30A /* TapDetectingView.m */; };
 		532658A61540A8E600238AA1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 532658A51540A8E600238AA1 /* UIKit.framework */; };
@@ -133,6 +130,9 @@
 		5383AD951541429D0083A240 /* NewItemOrEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AD941541429D0083A240 /* NewItemOrEvent.m */; };
 		538DED3E15478E68000F460D /* SchedulerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED3D15478E68000F460D /* SchedulerViewController.m */; };
 		538DED491549F065000F460D /* CalendarTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED481549F065000F460D /* CalendarTableViewController.m */; };
+		53C93328154EED5D00145938 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C93327154EED5D00145938 /* Appointment.m */; };
+		53C9332B154EEE2700145938 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332A154EEE2700145938 /* Item.m */; };
+		53C9332E154EEEAF00145938 /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332D154EEEAF00145938 /* Event.m */; };
 		53EA8FC1154A4DE20036AE2D /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */; };
 		53EA8FC2154A4DE20036AE2D /* FoldersTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FC0154A4DE20036AE2D /* FoldersTableViewController.m */; };
 		53EA8FCC154A4E780036AE2D /* FolderDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FCB154A4E780036AE2D /* FolderDetailViewController.m */; };
@@ -160,8 +160,6 @@
 		530BADA71541E58F0001A30A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = CoreData/ManagedObjects/Person.m; sourceTree = "<group>"; };
 		530BADAA1541E5DB0001A30A /* Note.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Note.h; path = CoreData/ManagedObjects/Note.h; sourceTree = "<group>"; };
 		530BADAB1541E5DB0001A30A /* Note.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Note.m; path = CoreData/ManagedObjects/Note.m; sourceTree = "<group>"; };
-		530BADB01541E6010001A30A /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = CoreData/ManagedObjects/Event.h; sourceTree = "<group>"; };
-		530BADB11541E6010001A30A /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Event.m; path = CoreData/ManagedObjects/Event.m; sourceTree = "<group>"; };
 		530BADB31541E6010001A30A /* Memo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Memo.h; path = CoreData/ManagedObjects/Memo.h; sourceTree = "<group>"; };
 		530BADB41541E6010001A30A /* Memo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Memo.m; path = CoreData/ManagedObjects/Memo.m; sourceTree = "<group>"; };
 		530BADB61541E61C0001A30A /* Folder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Folder.h; path = CoreData/ManagedObjects/Folder.h; sourceTree = "<group>"; };
@@ -170,16 +168,12 @@
 		530BADBA1541E61C0001A30A /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Project.m; path = CoreData/ManagedObjects/Project.m; sourceTree = "<group>"; };
 		530BADBC1541E61C0001A30A /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Document.h; path = CoreData/ManagedObjects/Document.h; sourceTree = "<group>"; };
 		530BADBD1541E61C0001A30A /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Document.m; path = CoreData/ManagedObjects/Document.m; sourceTree = "<group>"; };
-		530BADBF1541E6360001A30A /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Appointment.h; path = CoreData/ManagedObjects/Appointment.h; sourceTree = "<group>"; };
-		530BADC01541E6360001A30A /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Appointment.m; path = CoreData/ManagedObjects/Appointment.m; sourceTree = "<group>"; };
 		530BADC21541E6360001A30A /* ToDo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToDo.h; path = CoreData/ManagedObjects/ToDo.h; sourceTree = "<group>"; };
 		530BADC31541E6360001A30A /* ToDo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ToDo.m; path = CoreData/ManagedObjects/ToDo.m; sourceTree = "<group>"; };
 		530BADC51541E6420001A30A /* List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = List.h; path = CoreData/ManagedObjects/List.h; sourceTree = "<group>"; };
 		530BADC61541E6420001A30A /* List.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = List.m; path = CoreData/ManagedObjects/List.m; sourceTree = "<group>"; };
 		530BADC81541E6420001A30A /* SimpleNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleNote.h; path = CoreData/ManagedObjects/SimpleNote.h; sourceTree = "<group>"; };
 		530BADC91541E6420001A30A /* SimpleNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleNote.m; path = CoreData/ManagedObjects/SimpleNote.m; sourceTree = "<group>"; };
-		530BADCB1541E9DD0001A30A /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = CoreData/ManagedObjects/Item.h; sourceTree = "<group>"; };
-		530BADCC1541E9DD0001A30A /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = CoreData/ManagedObjects/Item.m; sourceTree = "<group>"; };
 		530BADCE1541F2AF0001A30A /* Collection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Collection.h; path = CoreData/ManagedObjects/Collection.h; sourceTree = "<group>"; };
 		530BADCF1541F2B30001A30A /* Collection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Collection.m; path = CoreData/ManagedObjects/Collection.m; sourceTree = "<group>"; };
 		530BADD51541F45F0001A30A /* TapDetectingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TapDetectingView.h; path = "ADhD-Notes/TapkuLibrary/TapDetectingView.h"; sourceTree = "<group>"; };
@@ -347,6 +341,12 @@
 		538DED3D15478E68000F460D /* SchedulerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SchedulerViewController.m; path = iPhoneViewControllers/iPhoneViewController/SchedulerViewController.m; sourceTree = "<group>"; };
 		538DED471549F065000F460D /* CalendarTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.h; sourceTree = "<group>"; };
 		538DED481549F065000F460D /* CalendarTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalendarTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.m; sourceTree = "<group>"; };
+		53C93326154EED5C00145938 /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Appointment.h; path = CoreData/ManagedObjects/Appointment.h; sourceTree = "<group>"; };
+		53C93327154EED5D00145938 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Appointment.m; path = CoreData/ManagedObjects/Appointment.m; sourceTree = "<group>"; };
+		53C93329154EEE2700145938 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = CoreData/ManagedObjects/Item.h; sourceTree = "<group>"; };
+		53C9332A154EEE2700145938 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = CoreData/ManagedObjects/Item.m; sourceTree = "<group>"; };
+		53C9332C154EEEAF00145938 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = CoreData/ManagedObjects/Event.h; sourceTree = "<group>"; };
+		53C9332D154EEEAF00145938 /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Event.m; path = CoreData/ManagedObjects/Event.m; sourceTree = "<group>"; };
 		53EA8FBD154A4DE20036AE2D /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilesTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.h; sourceTree = "<group>"; };
 		53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilesTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.m; sourceTree = "<group>"; };
 		53EA8FBF154A4DE20036AE2D /* FoldersTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FoldersTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FoldersTableViewController.h; sourceTree = "<group>"; };
@@ -394,18 +394,20 @@
 		530BADA91541E5A50001A30A /* ManagedObjects */ = {
 			isa = PBXGroup;
 			children = (
+				53C93329154EEE2700145938 /* Item.h */,
+				53C9332A154EEE2700145938 /* Item.m */,
+				53C9332C154EEEAF00145938 /* Event.h */,
+				53C9332D154EEEAF00145938 /* Event.m */,
+				53C93326154EED5C00145938 /* Appointment.h */,
+				53C93327154EED5D00145938 /* Appointment.m */,
 				530BADCE1541F2AF0001A30A /* Collection.h */,
 				530BADCF1541F2B30001A30A /* Collection.m */,
-				530BADCB1541E9DD0001A30A /* Item.h */,
-				530BADCC1541E9DD0001A30A /* Item.m */,
 				530BADC81541E6420001A30A /* SimpleNote.h */,
 				530BADC91541E6420001A30A /* SimpleNote.m */,
 				530BADC51541E6420001A30A /* List.h */,
 				530BADC61541E6420001A30A /* List.m */,
 				530BADC21541E6360001A30A /* ToDo.h */,
 				530BADC31541E6360001A30A /* ToDo.m */,
-				530BADBF1541E6360001A30A /* Appointment.h */,
-				530BADC01541E6360001A30A /* Appointment.m */,
 				530BADBC1541E61C0001A30A /* Document.h */,
 				530BADBD1541E61C0001A30A /* Document.m */,
 				530BADB91541E61C0001A30A /* Project.h */,
@@ -414,8 +416,6 @@
 				530BADB71541E61C0001A30A /* Folder.m */,
 				530BADB31541E6010001A30A /* Memo.h */,
 				530BADB41541E6010001A30A /* Memo.m */,
-				530BADB01541E6010001A30A /* Event.h */,
-				530BADB11541E6010001A30A /* Event.m */,
 				530BADAA1541E5DB0001A30A /* Note.h */,
 				530BADAB1541E5DB0001A30A /* Note.m */,
 				530BADA61541E58F0001A30A /* Person.h */,
@@ -1034,16 +1034,13 @@
 				530BADA21541E58E0001A30A /* Alarm.m in Sources */,
 				530BADA81541E58F0001A30A /* Person.m in Sources */,
 				530BADAC1541E5DB0001A30A /* Note.m in Sources */,
-				530BADB21541E6010001A30A /* Event.m in Sources */,
 				530BADB51541E6010001A30A /* Memo.m in Sources */,
 				530BADB81541E61C0001A30A /* Folder.m in Sources */,
 				530BADBB1541E61C0001A30A /* Project.m in Sources */,
 				530BADBE1541E61C0001A30A /* Document.m in Sources */,
-				530BADC11541E6360001A30A /* Appointment.m in Sources */,
 				530BADC41541E6360001A30A /* ToDo.m in Sources */,
 				530BADC71541E6420001A30A /* List.m in Sources */,
 				530BADCA1541E6420001A30A /* SimpleNote.m in Sources */,
-				530BADCD1541E9DE0001A30A /* Item.m in Sources */,
 				530BADD01541F2B50001A30A /* Collection.m in Sources */,
 				530BADD71541F45F0001A30A /* TapDetectingView.m in Sources */,
 				538DED3E15478E68000F460D /* SchedulerViewController.m in Sources */,
@@ -1052,6 +1049,9 @@
 				53EA8FC2154A4DE20036AE2D /* FoldersTableViewController.m in Sources */,
 				53EA8FCC154A4E780036AE2D /* FolderDetailViewController.m in Sources */,
 				53EA8FD0154B00BB0036AE2D /* AllItemsTableViewController.m in Sources */,
+				53C93328154EED5D00145938 /* Appointment.m in Sources */,
+				53C9332B154EEE2700145938 /* Item.m in Sources */,
+				53C9332E154EEEAF00145938 /* Event.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

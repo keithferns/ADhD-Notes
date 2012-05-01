@@ -192,8 +192,6 @@
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
     [gregorian setLocale:[NSLocale currentLocale]];
     [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    //[gregorian setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-    //FIXME: Better way of setting the current timezone as the default and not as xx hours from GMT
     
     NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];    
     [timeComponents setYear:[timeComponents year]];
@@ -330,26 +328,36 @@
 	
 	id <NSFetchedResultsSectionInfo> theSection = [[_fetchedResultsController sections] objectAtIndex:section];
     
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyyMMdd"];
+	
+    NSDate *temp  = [formatter dateFromString: [theSection name]];
+    [formatter setDateFormat:@"MMM dd, yyyy"];
+    
+    NSString *titleString = [formatter stringFromDate:temp];
+    
+	return titleString;
+    
     /*
      Section information derives from an event's sectionIdentifier, which is a string representing the number (year * 1000) + month.
      To display the section title, convert the year and month components to a string representation.
-     */
-    static NSArray *monthSymbols = nil;
-    
+
+     static NSArray *monthSymbols = nil;
     if (!monthSymbols) {
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         [formatter setCalendar:[NSCalendar currentCalendar]];
         monthSymbols = [formatter monthSymbols];
     }
-    
     NSInteger numericSection = [[theSection name] integerValue];
 	NSInteger year = numericSection / 1000000;
 	NSInteger tempmonth = numericSection - (year * 1000000);
 	NSInteger month = tempmonth/1000;
     NSInteger day = tempmonth - (month *1000);
 	NSString *titleString = [NSString stringWithFormat:@"%@ %d, %d", [monthSymbols objectAtIndex:month-1],day,year];
-	
-	return titleString;
+     return titleString;
+
+    */
+    
 }
 
 /*
@@ -383,8 +391,6 @@
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
     }   
 }
-
-
 
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {

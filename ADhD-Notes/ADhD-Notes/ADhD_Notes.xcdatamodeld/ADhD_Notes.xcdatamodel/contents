@@ -4,10 +4,7 @@
         <attribute name="reminder" attributeType="Date" syncable="YES"/>
         <relationship name="event" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="alarms" inverseEntity="Event" syncable="YES"/>
     </entity>
-    <entity name="Appointment" representedClassName="Appointment" parentEntity="Event" syncable="YES">
-        <attribute name="endTime" attributeType="Date" syncable="YES"/>
-        <attribute name="startTime" attributeType="Date" syncable="YES"/>
-    </entity>
+    <entity name="Appointment" representedClassName="Appointment" parentEntity="Event" syncable="YES"/>
     <entity name="Collection" representedClassName="Collection" isAbstract="YES" parentEntity="Item" syncable="YES">
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="collection" inverseEntity="Item" syncable="YES"/>
     </entity>
@@ -16,9 +13,11 @@
     </entity>
     <entity name="Event" representedClassName="Event" isAbstract="YES" parentEntity="Note" syncable="YES">
         <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="endTime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="eventType" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="recurrence" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="recurring" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" syncable="YES"/>
         <relationship name="alarms" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Alarm" inverseName="event" inverseEntity="Alarm" syncable="YES"/>
         <relationship name="person" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Person" inverseName="events" inverseEntity="Person" syncable="YES"/>
         <relationship name="place" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="events" inverseEntity="Location" syncable="YES"/>
@@ -27,12 +26,12 @@
     <entity name="Item" representedClassName="Item" isAbstract="YES" syncable="YES">
         <attribute name="aDate" attributeType="Date" syncable="YES"/>
         <attribute name="creationDate" attributeType="Date" syncable="YES"/>
-        <attribute name="creationDay" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="creationDay" attributeType="String" syncable="YES"/>
         <attribute name="editDate" attributeType="Date" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="priority" attributeType="Integer 16" minValueString="0" maxValueString="10" defaultValueString="0" syncable="YES"/>
         <attribute name="sectionIdentifier" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
-        <attribute name="sorter" optional="YES" transient="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="sorter" optional="YES" transient="YES" attributeType="Double" defaultValueString="0" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <relationship name="collection" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Collection" inverseName="items" inverseEntity="Collection" syncable="YES"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="items" inverseEntity="Tag" syncable="YES"/>
