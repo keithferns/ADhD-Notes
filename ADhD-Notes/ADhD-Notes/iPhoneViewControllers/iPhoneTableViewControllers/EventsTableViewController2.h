@@ -1,13 +1,29 @@
 //
 //  EventsTableViewController2.h
-//  ADhD-Notes
+//  iDoit
 //
-//  Created by Keith Fernandes on 5/2/12.
+//  Created by Keith Fernandes on 4/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface EventsTableViewController2 : UITableViewController
+@interface EventsTableViewController2 : UITableViewController <NSFetchedResultsControllerDelegate, UISearchBarDelegate, UINavigationControllerDelegate> {
+    
+    NSFetchedResultsController *_fetchedResultsController;
+    NSManagedObjectContext *managedObjectContext;
+    
+}
+
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, retain) NSDate *selectedDate;
+
+
+//- (NSFetchedResultsController *) fetchedResultsControllerWithPredicate:(NSPredicate *)aPredicate; 
+
+
+- (void) getSelectedCalendarDate: (NSNotification *) notification;
+
 
 @end

@@ -8,10 +8,17 @@
 
 #import "CalendarViewController.h"
 #import "ADhD_NotesAppDelegate.h"
+//#import "CalendarTableViewController.h"
+#import "EventsTableViewController2.h"
+#import "Constants.h"
 
 
 @interface CalendarViewController ()
-@property BOOL isSaving;
+
+@property BOOL saving;
+//@property (nonatomic, retain) CalendarTableViewController *tableViewController;
+@property (nonatomic, retain) EventsTableViewController2 *tableViewController;
+
 
 @end
 
@@ -19,13 +26,12 @@
 
 @synthesize tableViewController, segmentedControl;
 @synthesize actionsPopover;
-@synthesize isSaving;
-
+@synthesize saving, pushed, frontViewIsVisible;
 @synthesize managedObjectContext;
-
 @synthesize flipIndicatorButton;
-@synthesize frontViewIsVisible;
 @synthesize calendarView, flipperImageForDateNavigationItem, flipperView, listImageForFlipperView;
+
+#pragma mark - ViewManagement
 
 - (void)viewDidLoad
 {
@@ -45,13 +51,13 @@
     if (tableViewController == nil){
         NSLog (@"CalendarViewController:viewDidLoad: Creating New Intance of CalendarTableViewController");
         
-        tableViewController = [[CalendarTableViewController alloc]init ];
-        
-        tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height);
+        //tableViewController = [[CalendarTableViewController alloc]init ];
+        tableViewController = [[EventsTableViewController2 alloc] init];
+        tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         
         [tableViewController.tableView setSeparatorColor:[UIColor blackColor]];
         [tableViewController.tableView setSectionHeaderHeight:13];
-        tableViewController.tableView.rowHeight = 58.0;
+        tableViewController.tableView.rowHeight = kCellHeight;
         
         UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 40)];
         searchBar.tintColor = [UIColor blackColor];
@@ -64,16 +70,23 @@
         calendarView.delegate = self;
         calendarView.dataSource = self;            
         
-        calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
-        // Ensure this is the last "addSubview" because the calendar must be the top most view layer	
+       // calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
+        calendarView.frame = CGRectMake(0, 0, calendarView.frame.size.width, calendarView.frame.size.height);
+
         [self.flipperView addSubview:calendarView];
         [calendarView reload];
     }
+    /*
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.4];
     [UIView setAnimationDelegate:self];
+     */
     
-    calendarView.frame = CGRectMake(0, 0, mainFrame.size.width, mainFrame.size.height);
+    if (!pushed) {
+        UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentActionsPopover:)];
+        leftNavButton.tag = 1;
+        self.navigationItem.leftBarButtonItem = leftNavButton;
+    
     UIImage *image = self.listImageForFlipperView;
     CGSize theSize = image.size;        
     UIButton *tempButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, theSize.width, theSize.height)];    
@@ -86,7 +99,15 @@
     
     [self.navigationItem setRightBarButtonItem:flipButtonBarItem animated:YES];
     [flipIndicatorButton addTarget:self action:@selector(toggleCalendar:) forControlEvents:(UIControlEventTouchDown)];
-    [UIView commitAnimations];
+    }
+    
+    //[UIView commitAnimations];
+    
+    if (pushed) {
+        UIBarButtonItem *rightNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addDateToCurrentEvent)];
+        rightNavButton.tag = 1;
+        self.navigationItem.rightBarButtonItem = rightNavButton;
+    }
     
     /* Init and Add the Segmented Control */
     NSArray *items = [NSArray arrayWithObjects:@"Month", @"Week",@"Day", nil];
@@ -96,12 +117,8 @@
     [segmentedControl setWidth:60 forSegmentAtIndex:1];
     [segmentedControl setWidth:60 forSegmentAtIndex:2];
     [segmentedControl setSelectedSegmentIndex:0];
-    
     self.navigationItem.titleView = segmentedControl;
     
-    UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentActionsPopover:)];
-    leftNavButton.tag = 1;
-    self.navigationItem.leftBarButtonItem = leftNavButton;
 }
 
 - (void)viewDidUnload {
@@ -113,17 +130,15 @@
 
     if (!tableViewController){
         NSLog(@"CalendarViewController: viewWillAppear: CreatingNewTableViewController");
-        tableViewController = [[CalendarTableViewController alloc]init ];
-        
+        //tableViewController = [[CalendarTableViewController alloc]init ];
+        tableViewController = [[EventsTableViewController2 alloc] init];
         tableViewController.tableView.frame = CGRectMake(0,kNavBarHeight,kScreenWidth, kScreenHeight-kNavBarHeight);
     }
     if (self.calendarView.superview == nil && self.tableViewController.tableView.superview == nil){
-        self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height);
+        self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         [self.flipperView addSubview:tableViewController.tableView];
     }
 }
-
-
 
 - (UIImage *)flipperImageForDateNavigationItem {
 	// returns a 30 x 30 image to display the flipper button in the navigation bar
@@ -181,7 +196,7 @@
     if (frontViewIsVisible==YES) {
         [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:flipperView cache:YES];
         [calendarView removeFromSuperview];
-        self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height);
+        self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         [self.flipperView addSubview:tableViewController.tableView];
         
         self.navigationItem.titleView = nil;
@@ -254,9 +269,10 @@
 	NSLog(@"calendarMonthView didSelectDate: %@", d);
     //ADD DATE TO CURRENT EVENT
     
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
+
 }
+
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView monthDidChange:(NSDate *)d {
 	NSLog(@"calendarMonthView monthDidChange");	
     /*
@@ -266,7 +282,7 @@
     frame = bottomView.frame;
     frame.origin.y = topView.frame.origin.y + topView.frame.size.height;
     bottomView.frame = frame;
-    */
+     */
 }
 #pragma mark - TKCalendarMonthViewDataSource methods
 //get dates with events
@@ -388,12 +404,11 @@
      Alternately, have two different looking buttons which show depending on whether there is text or not. 
      
      */
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
     
-    //[self toggleCalendar:nil];
+    [self.navigationController popViewControllerAnimated:YES];
     return;
 }
-
-
 
 
 #pragma mark - Popover Management
@@ -421,14 +436,14 @@
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
-                if (isSaving){
+                if (saving){
                     
                     [actionsPopover presentPopoverFromRect:CGRectMake(80, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view    
                                   permittedArrowDirections:UIPopoverArrowDirectionDown
                                                   animated:YES name:@"Save"];  
                 }
-                else if (!isSaving) {
+                else if (!saving) {
                     [actionsPopover presentPopoverFromRect:CGRectMake(10, 0, 50, 40)
                                                     inView:self.view    
                                   permittedArrowDirections:UIPopoverArrowDirectionUp
@@ -449,14 +464,14 @@
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
-                if (isSaving) {
+                if (saving) {
                     
                     [actionsPopover presentPopoverFromRect:CGRectMake(190, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view
                                   permittedArrowDirections: UIPopoverArrowDirectionDown
                                                   animated:YES name:@"Plan"];
                 }
-                else if (!isSaving) {
+                else if (!saving) {
                     [actionsPopover presentPopoverFromRect:CGRectMake(280,0, 50, 40) inView:self.view
                                   permittedArrowDirections: UIPopoverArrowDirectionUp
                                                   animated:YES name:@"Organize"];

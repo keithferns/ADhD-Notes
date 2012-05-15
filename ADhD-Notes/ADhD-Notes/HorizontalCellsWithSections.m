@@ -1,38 +1,26 @@
 //
-//  HorizontalCells.m
+//  HorizontalCellsWithSections.m
 //  WriteNow
 //
 //  Created by Keith Fernandes on 11/1/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "HorizontalCells.h"
-#import "CustomTextLabel.h"
-#import "ControlVariables.h"
-#import "EventsCell.h"
-#import "WriteNowAppDelegate.h"
-#import "TasksTableViewController.h"
-#import "AppointmentsTableViewController.h"
-#import "StartScreenCustomCell.h"
+#import "HorizontalCellsWithSections.h"
+#import "Constants.h"
+#import "EventsCellWithSections.h"
 
-@implementation HorizontalCells
+@implementation HorizontalCellsWithSections
 
 @synthesize hTableView = _hTableView;
 @synthesize myObjects;
 
 
-- (void) dealloc{
-    self.hTableView = nil;
-    myObjects = nil;
-    [self.hTableView release];
-    [myObjects release];
-    [super dealloc];
-}
 
 - (id)initWithFrame:(CGRect)frame {
 
    if ((self = [super initWithFrame:frame])){
-        self.hTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, kScreenWidth)] autorelease];
+        self.hTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, kScreenWidth)];
         self.hTableView.showsVerticalScrollIndicator = NO;
         self.hTableView.showsHorizontalScrollIndicator = NO;
         self.hTableView.transform = CGAffineTransformMakeRotation(-M_PI * 0.5);
@@ -56,17 +44,19 @@
 }
 
 - (NSString *) reuseIdentifier{
-    return @"HorizontalCell";
+    return @"HorizontalCellsWithSections";
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateStyle:NSDateFormatterShortStyle];
-    EventsCell *cell = (EventsCell *) [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    EventsCellWithSections *cell = (EventsCellWithSections *) [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[EventsCell alloc] init]autorelease];
+        cell = [[EventsCellWithSections alloc] init];
     }
+    //CHANGING FROM 0 to indexpath.row
+
     if ([[myObjects objectAtIndex:0] isKindOfClass:[Appointment class]]) {
         Appointment *currentAppointment = [myObjects objectAtIndex:indexPath.row];
         CGSize itemSize=CGSizeMake(kCellWidth,kCellHeight-20);
@@ -76,10 +66,10 @@
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
        // cell.myTextLabel.text = currentAppointment.text;
-        cell.dateLabel.text = [dateFormatter stringFromDate:currentAppointment.doDate];
+        cell.dateLabel.text = [dateFormatter stringFromDate:currentAppointment.aDate];
     }
-    else if ([[myObjects objectAtIndex:0] isKindOfClass:[Task class]]) {
-        Task *currentTask = [myObjects objectAtIndex:indexPath.row];
+    else if ([[myObjects objectAtIndex:0] isKindOfClass:[ToDo class]]) {
+        ToDo *currentTask = [myObjects objectAtIndex:indexPath.row];
         CGSize itemSize=CGSizeMake(kCellWidth-4, kCellHeight-17);
         UIGraphicsBeginImageContext(itemSize);
         [currentTask.text drawInRect:CGRectMake(0, 0, itemSize.width, itemSize.height) withFont:[UIFont boldSystemFontOfSize:10]];
@@ -87,7 +77,7 @@
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
         //cell.myTextLabel.text = currentTask.text;
-        cell.dateLabel.text = [dateFormatter stringFromDate:currentTask.doDate];
+        cell.dateLabel.text = [dateFormatter stringFromDate:currentTask.aDate];
     }
     else if ([[myObjects objectAtIndex:0] isKindOfClass:[Memo class]]){
         Memo *currentMemo = [myObjects objectAtIndex:indexPath.row];
@@ -98,9 +88,8 @@
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
         //cell.myTextLabel.text = currentMemo.text;
-        cell.dateLabel.text = [dateFormatter stringFromDate:currentMemo.doDate];
+        cell.dateLabel.text = [dateFormatter stringFromDate:currentMemo.aDate];
     }
-    [dateFormatter release];
     return cell;
 }
 
@@ -109,19 +98,18 @@
     NSLog(@"Selected Row is %i", [myIndexPath row]);
     NSLog(@"Selected Section is %i", [myIndexPath section]);
     
-    id *selectedObject = (id *) [myObjects objectAtIndex:indexPath.row];
-    if ([(id)selectedObject isKindOfClass:[Appointment class]]) {
+    if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Appointment class]]) {
         NSLog(@"HUZZAH");
     }    
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:(id)selectedObject];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[myObjects objectAtIndex:indexPath.row]];
 
     if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Appointment class]]) {
         NSLog(@"Object is Appointment");
         Appointment *tempAppointment  =  [myObjects objectAtIndex:indexPath.row];
         NSLog(@"My Appointment Text is %@", tempAppointment.text);
     }
-    else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Task class]]){
+    else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[ToDo class]]){
         NSLog(@"Object is Task");
         //Task *tempTask = [myObjects objectAtIndex:indexPath.row];
     }

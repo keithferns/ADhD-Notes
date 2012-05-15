@@ -43,7 +43,7 @@
 @property (nonatomic, retain) NSSet *collection;
 @property (nonatomic, retain) NSSet *tags;
 @property (nonatomic, retain) NSString *recurring;
-
+@property (nonatomic, retain) NSArray *listArray;
 
 @property (nonatomic, retain) Appointment *theAppointment;
 @property (nonatomic, retain) ToDo *theToDo;
@@ -54,7 +54,6 @@
 @property (nonatomic, retain) Document *theDocument;
 @property (nonatomic, retain) SimpleNote *theSimpleNote;
 
-
 - (void) createNewSimpleNote;
 - (void) createNewList;
 - (void) createNewAppointment;
@@ -63,16 +62,11 @@
 - (void) createNewDocument;
 - (void) createNewProject;
 
-
 - (void) saveSchedule;
-
 - (void) addDateField;
 - (void) updateSelectedDate:(NSDate *)date;
 - (void) saveNewItem;
 - (void) deleteItem:(id)sender;
 - (void) updateText:(NSString *) currentText;
-
-
-
 
 @end

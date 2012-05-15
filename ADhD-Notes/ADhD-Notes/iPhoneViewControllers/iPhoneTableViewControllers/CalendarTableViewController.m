@@ -69,8 +69,6 @@
     //[tableView setTableHeaderView:headerView];
     //[tableView setSectionFooterHeight:0.0];
     //[tableView setSectionHeaderHeight:15.0];
-    
-    
     //[self.tableView setSeparatorColor:[UIColor blackColor]];
     //[self.tableView setSectionHeaderHeight:18];
     //self.tableView.rowHeight = kCellHeight;
@@ -174,19 +172,13 @@
 }
 
 - (NSFetchedResultsController *) fetchedResultsControllerWithPredicate: (NSPredicate *) aPredicate {
-    NSLog(@"CalendarTableViewController:fetchedResultsControllerWithPredicate --> Fetching");
     
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
-    
-    //check if an instance of fetchedResultsController exists.  If it does, return fetchedResultsController
     if (_fetchedResultsController != nil){
         return _fetchedResultsController;
     }
-    //Else create a new fetchedResultsController
-    //Create a new fetchRequest
+  
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    
-    //set the entity to retrieved by this fetchrequest
     [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
     
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
@@ -198,57 +190,31 @@
     [timeComponents setMonth:[timeComponents month]];
     [timeComponents setDay:[timeComponents day]];
     NSDate *currentDate= [gregorian dateFromComponents:timeComponents];
-    
-    NSLog(@"Current Date is %@", currentDate);
-    
+        
     if (selectedDate == nil) {
         NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aType > 0 AND aDate >= %@", currentDate];
         [request setPredicate:checkDate];
         checkDate = nil;
     }
     else {
-        NSLog(@"SelectedDate is %@", selectedDate);
         NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aType > 0 AND aDate == %@", selectedDate];
         [request setPredicate:checkDate];
         checkDate = nil;
     }
     
-    //create the sort descriptors which will sort rows in the table view
-    
     NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:YES];
-    //NSSortDescriptor *textDescriptor = [[NSSortDescriptor alloc] initWithKey:@"rNote.text" ascending:YES];
-    
-    //set the sort descriptors for the current request
-    
-    [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, nil]];
-    
-    
-    //[textDescriptor release];
-    
+    NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+        
+    [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
+        
     [request setPredicate:aPredicate];
-    
-    
-    
-    //set the batch size for the request
-    
     [request setFetchBatchSize:20];
-    
-    //Init a temp fetchedResultsController and set its fetchRequest to the current fetchRequest
-    
+        
     NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
     
-    //set the controller delegate
-    
-    [newController setDelegate:self];
-    
-    //
+    [newController setDelegate:self];    //
     self.fetchedResultsController = newController;    
-    
-    //return the fetchedResultsController 
-    
-    NSLog(@"End Fetching");    
     return _fetchedResultsController;
-    
 }                                       
 
 #pragma mark - Table view data source

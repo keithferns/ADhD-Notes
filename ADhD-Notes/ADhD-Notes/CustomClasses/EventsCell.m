@@ -13,7 +13,6 @@
 @implementation EventsCell
 
 @synthesize dateLabel;
-//@synthesize myTextLabel = _myTextLabel;
 @synthesize myTextView = _myTextView;
 
 

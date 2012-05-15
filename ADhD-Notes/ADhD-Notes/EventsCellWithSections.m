@@ -1,30 +1,24 @@
 //
-//  EventsCell.m
+//  EventsCellWithSections.m
 //  WriteNow
 //
 //  Created by Keith Fernandes on 11/1/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "EventsCell.h"
-#import "ControlVariables.h"
+#import "EventsCellWithSections.h"
+#import "Constants.h"
 
 
-@implementation EventsCell
+@implementation EventsCellWithSections
 
 @synthesize dateLabel;
 //@synthesize myTextLabel = _myTextLabel;
 @synthesize myTextView = _myTextView;
-- (void)dealloc {    
-    self.myTextView = nil;
-    self.dateLabel = nil;
-    [self.myTextView release];
-    [self.dateLabel release];
-    [super dealloc];
-}
+
 
 - (NSString *)reuseIdentifier{
-    return @"EventsCell";
+    return @"EventsCellWithSections";
 }
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
@@ -35,7 +29,7 @@
         backgroundImage.frame = CGRectMake(1, 1, kCellWidth-2, kCellHeight-2);
         self.backgroundView = backgroundImage;
         self.backgroundView.backgroundColor = [UIColor blackColor];
-        dateLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, kCellWidth-2, 20)] autorelease];
+        dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kCellWidth-2, 20)] ;
         dateLabel.backgroundColor = [UIColor clearColor];
         //dateLabel.adjustsFontSizeToFitWidth = YES;
         dateLabel.textColor = [UIColor blueColor];

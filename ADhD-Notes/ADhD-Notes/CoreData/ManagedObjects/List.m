@@ -12,6 +12,7 @@
 @implementation List
 
 @dynamic category;
+@dynamic listArray;
 
 
 - (void) awakeFromInsert{

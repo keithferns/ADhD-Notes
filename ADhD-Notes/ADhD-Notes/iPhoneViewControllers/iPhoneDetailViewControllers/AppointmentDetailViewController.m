@@ -47,7 +47,6 @@
     headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
     
     self.navigationItem.titleView = headerText;
-    [headerText release];
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
@@ -145,7 +144,7 @@ return result;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
    if (cell == nil) {
             
-           cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+           cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
     if (indexPath.section == 0){
@@ -162,8 +161,6 @@ return result;
         dateLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.aDate];
         [cell.contentView addSubview:dateLabel];
         
-        [labeldate release];
-        [dateLabel release];
         [dateFormatter setDateFormat: @"h:mm a"];
         
         UILabel *labelstarttime = [[UILabel alloc] initWithFrame:CGRectMake (5,20,50,18)];
@@ -173,11 +170,8 @@ return result;
         [cell.contentView addSubview:labelstarttime];
     
         UILabel *startTimeLabel = [[UILabel alloc] initWithFrame: CGRectMake (60,20,80,18)];
-        startTimeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.aStartTime];
+        startTimeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.startTime];
         [cell.contentView addSubview:startTimeLabel];
-        
-        [labelstarttime release];
-        [startTimeLabel release];
         
         UILabel *labelendtime = [[UILabel alloc] initWithFrame:CGRectMake (140,20,50,18)];
         labelendtime.text = @"Till:";
@@ -185,11 +179,8 @@ return result;
         [cell.contentView addSubview:labelendtime];
         
         UILabel *endTimeLabel = [[UILabel alloc] initWithFrame: CGRectMake (195,20,80,18)];
-        endTimeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.aEndTime];
+        endTimeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.endTime];
         [cell.contentView addSubview:endTimeLabel];
-       
-        [labelendtime release];
-        [endTimeLabel release];
         
         UILabel *labelplace = [[UILabel alloc] initWithFrame:CGRectMake (5,40,50,18)];
         labelplace.text = @"Place:";
@@ -197,40 +188,28 @@ return result;
         [cell.contentView addSubview:labelplace];
         
         UILabel *placeLabel = [[UILabel alloc] initWithFrame: CGRectMake (60,40,80,18)];
-        placeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.aStartTime];
+        placeLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.startTime];
         [cell.contentView addSubview:placeLabel];
-        
-        [labelplace release];
-        [placeLabel release];
-        
+                
         UILabel *labelrepeat = [[UILabel alloc] initWithFrame:CGRectMake (140,40,50,18)];
         labelrepeat.text = @"Repeats:";
         labelrepeat.enabled = NO;
         [cell.contentView addSubview:labelrepeat];
         
         UILabel *repeatLabel = [[UILabel alloc] initWithFrame: CGRectMake (195,40,80,18)];
-        repeatLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.aEndTime];
-        [cell.contentView addSubview:repeatLabel];
-        [labelrepeat release];
-        [repeatLabel release];
-        
-        
-
-        [dateFormatter release];
- 
+        repeatLabel.text = [dateFormatter stringFromDate:theItem.theAppointment.endTime];
+        [cell.contentView addSubview:repeatLabel];    
         
         }
     else if (indexPath.section == 1){
         CustomTextView *theTextView = [[CustomTextView alloc] initWithFrame:CGRectMake(0,0,300,105)];
         theTextView.editable = NO;
         
-        [theTextView setText:[[theItem.theAppointment.rNote anyObject] text]];
+        [theTextView setText:theItem.theAppointment.text];
         theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-ItalicMT" size:(14.0)];
 
         [cell.contentView addSubview: theTextView];
         
-        [theTextView release];
-
     }
     else if (indexPath.section == 2){
         UILabel *labelalarm = [[UILabel alloc] initWithFrame:CGRectMake (5,0,50,18)];
@@ -241,10 +220,7 @@ return result;
         UILabel *alarmLabel = [[UILabel alloc] initWithFrame: CGRectMake (60,0,220,18)];
         //NSString *temp = [NSString stringWithFormat:@"%@, %@, %@, %@", theItem.theMemo.rTag etc
         [cell.contentView addSubview:alarmLabel];
-        
-        [labelalarm release];
-        [alarmLabel release];
-
+       
         }
     else if (indexPath.section == 3){
         UILabel *labeltag = [[UILabel alloc] initWithFrame:CGRectMake (5,0,50,18)];
@@ -256,9 +232,7 @@ return result;
         //NSString *temp = [NSString stringWithFormat:@"%@, %@, %@, %@", theItem.theMemo.rTag etc
         [cell.contentView addSubview:tagLabel];
         
-        [labeltag release];
-        [tagLabel release];
-    }
+        }
 
     return cell;
 }

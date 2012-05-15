@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface WriteNowViewController : UIViewController <UITextViewDelegate, UITextFieldDelegate, PopoverControllerDelegate, TKCalendarMonthViewDelegate, TKCalendarMonthViewDataSource, UITableViewDelegate, UITableViewDataSource>{
+@interface WriteNowViewController : UIViewController <UITextViewDelegate, UITextFieldDelegate, PopoverControllerDelegate, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate>{
 }
 
 

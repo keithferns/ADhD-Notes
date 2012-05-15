@@ -15,4 +15,6 @@
 
 @property (nonatomic, retain) NSString * category;
 
+@property (nonatomic, retain) NSMutableArray *listArray;
+
 @end

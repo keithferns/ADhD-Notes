@@ -17,7 +17,6 @@
         <attribute name="eventType" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="recurrence" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="recurring" optional="YES" attributeType="Boolean" syncable="YES"/>
-        <attribute name="startTime" optional="YES" attributeType="Date" syncable="YES"/>
         <relationship name="alarms" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Alarm" inverseName="event" inverseEntity="Alarm" syncable="YES"/>
         <relationship name="person" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Person" inverseName="events" inverseEntity="Person" syncable="YES"/>
         <relationship name="place" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="events" inverseEntity="Location" syncable="YES"/>
@@ -53,6 +52,7 @@
     <entity name="Memo" representedClassName="Memo" isAbstract="YES" parentEntity="Note" syncable="YES"/>
     <entity name="Note" representedClassName="Note" isAbstract="YES" parentEntity="Item" syncable="YES">
         <attribute name="editing" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="text" attributeType="String" syncable="YES"/>
         <relationship name="location" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="notes" inverseEntity="Location" syncable="YES"/>
     </entity>

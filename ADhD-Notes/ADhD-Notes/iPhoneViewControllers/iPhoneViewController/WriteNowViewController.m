@@ -13,16 +13,20 @@
 #import "Constants.h"
 #import "NewItemOrEvent.h"
 #import "SchedulerViewController.h"
+#import "CalendarViewController.h"
 #import "ArchiveViewController.h"
-#import "NSDate+TKCategory.h"
+#import "TodayTableViewController.h"
+
+
+#import "ToDoDetailViewController.h"
+#import "AppointmentDetailViewController.h"
+#import "MemoDetailViewController.h"
 
 
 
 @interface WriteNowViewController ()
 
-
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain) NSMutableArray *listArray;
 @property (nonatomic,retain) UIView *topView, *bottomView; 
 @property (nonatomic, retain) CustomTextView *textView;
 @property (nonatomic, retain) UITextField *textField;
@@ -31,13 +35,16 @@
 @property (nonatomic, retain) TKCalendarMonthView *calendarView;
 @property (nonatomic, retain) NewItemOrEvent *theItem;
 @property (nonatomic, retain) UISegmentedControl *segmentedControl;
-@property (nonatomic, retain)  UITableView *tableView;
+@property (nonatomic, retain) NSMutableArray *listArray;
+@property (nonatomic, retain) UITableView *listTableView;
+@property (nonatomic, retain) TodayTableViewController *todayTableViewController;
 
 @end
 
 @implementation WriteNowViewController
 
-@synthesize textView, topView, bottomView, toolbar, actionsPopover, textField, tableView;
+@synthesize textView, topView, bottomView, toolbar, actionsPopover, textField;
+@synthesize listTableView, todayTableViewController;
 @synthesize theItem;
 @synthesize managedObjectContext, calendarView;
 @synthesize segmentedControl;
@@ -47,17 +54,7 @@
 - (void)viewDidLoad{
     [super viewDidLoad];    
     
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyyMMdd"];
-    
-    NSLog(@"Today's date is %@", [formatter stringFromDate:[NSDate date]]);
-     
-    
-    NSLog(@"Today's date is %@", [formatter dateFromString:@"20120430"]);
-
-
-    
+    self.navigationController.delegate = self;
     
     /*-- Point current instance of the MOC to the main managedObjectContext --*/
 	if (managedObjectContext == nil) { 
@@ -78,6 +75,8 @@
                forControlEvents:UIControlEventValueChanged];
     
     self.navigationItem.titleView = segmentedControl;
+    self.navigationController.navigationBar.topItem.title = @"Write Now";    
+
     
     //Init and add the top and bottom Views. These views will be used to animate the transitions of textView and the table and calendar Views. 
     if (bottomView.superview == nil && bottomView == nil) {
@@ -112,7 +111,7 @@
         textView.inputAccessoryView = toolbar;
     }    
     if (textField == nil) {
-        textField = [[UITextField alloc] initWithFrame: CGRectMake (5,0,310,30)];
+        textField = [[UITextField alloc] initWithFrame: CGRectMake (5,0,310,45)];
         
         textField.textColor = [UIColor whiteColor];
         UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
@@ -124,24 +123,39 @@
         textField.layer.borderColor = [UIColor darkGrayColor].CGColor;      
         textField.inputAccessoryView = toolbar;
         [textField setDelegate:self];
-        [textField setReturnKeyType:UIReturnKeyDone];
+        [textField setReturnKeyType:UIReturnKeyDefault];
         //[textField addTarget:self action:@selector(addToList) forControlEvents:UIControlEventEditingDidEndOnExit];
         
+        listTableView = [[UITableView alloc] initWithFrame:CGRectMake (5,50,310,topView.frame.size.height-50)];
+        listTableView.rowHeight = 30.0;
+        listTableView.tag = 1;
+        listTableView.backgroundColor = [UIColor blackColor];
+        listTableView.separatorColor = [UIColor whiteColor];
+        listTableView.delegate = self;
+        listTableView.dataSource = self;
         
-        tableView = [[UITableView alloc] initWithFrame:CGRectMake (5,35,310,topView.frame.size.height-30)];
-        tableView.rowHeight = 30.0;
-        tableView.backgroundColor = [UIColor blackColor];
-        tableView.separatorColor = [UIColor whiteColor];
-        tableView.delegate = self;
-        tableView.dataSource = self;
+        todayTableViewController = [[TodayTableViewController alloc] init];
+        [self.bottomView addSubview:todayTableViewController.tableView];
+        
     }
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:UITableViewSelectionDidChangeNotification object:nil];
     
 }
 
 - (void) viewWillAppear:(BOOL)animated {
     
+      //  [super viewWillAppear:NO];
+    
+    
+    [self.navigationController popToRootViewControllerAnimated:NO];
+    NSLog(@"WriteNowVIEWCONTROLLER - viewWillAppear");
+    
     [self.navigationController hidesBottomBarWhenPushed];
-
+    
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    
 }
 - (void)viewDidUnload
 {
@@ -178,7 +192,7 @@
             }
             if (textField.superview == nil) {
                 [topView addSubview:textField];
-                [topView addSubview: tableView];
+                [topView addSubview: listTableView];
             }
             break;
     }
@@ -188,50 +202,57 @@
 
 -(BOOL) textFieldShouldReturn:(UITextField*) textField {
 
-    NSLog(@"ADDING TO LIST");
     if (![self.textField.text isEqualToString:@""]){
     [listArray addObject:self.textField.text];
     }
     self.textField.text = nil;
 
-    NSLog (@"The List contains %d lines", [listArray count]);
-    NSLog (@"The List contains %@", listArray);
+    [listTableView reloadData];
     
-    [self.tableView reloadData];
+    if (self.navigationItem.leftBarButtonItem == nil) {
+        self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
+        self.navigationItem.rightBarButtonItem.action = @selector(saveItem);
+        self.navigationItem.rightBarButtonItem.target =self;
+        
+        self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
+        self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
+        self.navigationItem.leftBarButtonItem.target = self;    
+    }
+    
     return YES;
 }
 
 - (void) textFieldDidBeginEditing: (UITextField *) textField{
-    
-    if (self.navigationItem.leftBarButtonItem == nil) {
-            self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
-            self.navigationItem.rightBarButtonItem.action = @selector(saveItem);
-            self.navigationItem.rightBarButtonItem.target =self;
-            
-            self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
-            self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
-            self.navigationItem.leftBarButtonItem.target = self;    
-    }
+  
 }
 
 
 #pragma mark - tableView Delegate and Data Source Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
+    int sections;
+    if (tableView.tag == 1){
+        sections = 1;
+    }
+        
+    return sections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    
-    return [listArray count];
-
+    int rows;
+    if (tableView.tag == 1) {
+        NSLog (@"# of ITEMS IN LIST = %d", [listArray count]);
+    rows =  [listArray count];
+    }
+ 
+    return rows;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     NSInteger temp = [listArray count] - indexPath.row - 1;
     
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"CellIdentifier"];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CellIdentifier"];
 
     if (cell==nil){
          cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"CellIdentifier"];
@@ -397,15 +418,24 @@
         if (segmentedControl.selectedSegmentIndex == 0) {
             theItem.type = [NSNumber numberWithInt:0];
             NSLog(@"Item:SimpleNote");
+            //Change state of view
+            self.textView.userInteractionEnabled = YES; 
+            [self.textView setScrollsToTop:YES];
+            [self.textView resignFirstResponder];
             }
         else if (segmentedControl.selectedSegmentIndex == 1){
         theItem.type = [NSNumber numberWithInt:1];
+            theItem.listArray = self.listArray;
             NSLog(@"Item:list");
+            self.textField.userInteractionEnabled = YES;
+            [self.textField resignFirstResponder];
+            
+            self.navigationItem.rightBarButtonItem = nil;
+            self.navigationItem.rightBarButtonItem =  [self.navigationController addEditButton];
+            self.navigationItem.rightBarButtonItem.target = self;
+            self.navigationItem.leftBarButtonItem.target =self;
             }
     }
-    theItem.text = self.textView.text;
-
-
     theItem.text = self.textView.text;
     
     switch ([theItem.type intValue]) {
@@ -427,10 +457,7 @@
     
         [theItem saveNewItem];
         
-        //Change state of view
-        self.textView.userInteractionEnabled = YES; 
-        [self.textView setScrollsToTop:YES];
-        [self.textView resignFirstResponder];
+       
         return;
 }
      
@@ -452,7 +479,8 @@
         self.textField.text = nil;
         [self.textField becomeFirstResponder];
         [self.listArray removeAllObjects];
-        [tableView reloadData];
+        [listTableView reloadData];
+        
     }
     
     //remove the nav Buttons
@@ -462,124 +490,24 @@
     toolbar.firstButton.enabled = NO;
     toolbar.fourthButton.enabled = NO;
 }
-    
+
 
 #pragma mark - calendar actions
 
 
-- (void) toggleCalendar:(id)sender {    
+- (void) toggleCalendar:(id) sender{
     if([actionsPopover isPopoverVisible]) {
         [actionsPopover dismissPopoverAnimated:YES];
     }
+    CalendarViewController *calendarViewC = [[CalendarViewController alloc] init];
+    calendarViewC.hidesBottomBarWhenPushed = YES;
+    calendarViewC.pushed = YES;
+    [self.navigationController pushViewController: calendarViewC animated:YES];
     
-    if ([textView isFirstResponder]) {
-        //Check if textView is first responder. If it is, resign first responder and disable user interaction
-        [textView resignFirstResponder];
-        self.textView.userInteractionEnabled = NO;
-    }
-    
-    if (calendarView == nil) {
-        //Check if the calendar obect exists. If it is not in view, it should not exist. Initialize and slide into view from bottom.
-        calendarView = 	[[TKCalendarMonthView alloc] init];        
-        calendarView.delegate = self;
-        calendarView.dataSource = self;
-        [self.topView addSubview:calendarView];
-        [calendarView reload];
-        calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
-        //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-        
-        //Add Nav buttons to dismiss the calendar (left) and to add date selected from the calendar to a new event or an event that is in the process of being created. If the user taps the calendar button before inputting any text, create a new Event object and add the selected date. If there is already some text input, create a new Event object and add both the selected date and the text to the event object. 
-        self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
-        self.navigationItem.leftBarButtonItem.target = self;
-        self.navigationItem.leftBarButtonItem.action = @selector(toggleCalendar:);
-        
-        self.navigationItem.rightBarButtonItem = [self.navigationController addAddButton];
-        self.navigationItem.rightBarButtonItem.target = self;
-        self.navigationItem.rightBarButtonItem.action = @selector(addDateToCurrentEvent);
-        
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:0.5];
-        [UIView setAnimationDelegate:self];
-        
-        CGRect frame = topView.frame;
-        frame.size.height = calendarView.frame.size.height;
-        self.topView.frame = frame;
-        frame = bottomView.frame;
-        frame.origin.y = topView.frame.origin.y + topView.frame.size.height;    
-        self.bottomView.frame = frame;
-        calendarView.frame = CGRectMake(0, 0, calendarView.frame.size.width, calendarView.frame.size.height);
-        self.textView.frame = CGRectMake(0, -kTopViewRect.size.height, self.textView.frame.size.width, self.textView.frame.size.height);
-        [UIView commitAnimations];
-        NSDate *d = [NSDate date];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
-    }
-    else {
-        NSLog(@"Dismissing Calendar");
-        
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:0.5];
-        [UIView setAnimationDelegate:self];
-        [UIView setAnimationDidStopSelector:@selector(finishedCalendarTransition)];
-        if (textView.superview != nil) {
-            //check to see if the textView is below the calendar view.
-            CGRect frame = topView.frame;
-            frame.size.height = kTopViewRect.size.height+35.0;
-            self.topView.frame = frame;
-            frame = textView.frame;
-            frame.size.height = kTextViewRect.size.height+35.0;
-            frame.origin.y  = 0;
-            textView.frame = frame;
-            frame = bottomView.frame;
-            frame.origin.y = kBottomViewRect.origin.y+85;    
-            self.bottomView.frame = frame;
-        }
-        /*
-         else if (scheduleView.superview != nil){
-         //check to see if the ScheduleView is below the calendar view
-         CGRect frame = topView.frame;
-         frame.size.height = kTopViewRect.size.height+35;
-         self.topView.frame = frame;
-         frame = bottomView.frame;
-         frame.origin.y = kBottomViewRect.origin.y+85;
-         self.bottomView.frame = frame;
-         }
-         */
-        calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
-        
-        //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-        
-        [UIView commitAnimations];
-    }
+    NSDate *d = [NSDate date];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
 }
-- (void) finishedCalendarTransition{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:nil userInfo:nil]; 
-    
-    [calendarView removeFromSuperview];
-    calendarView = nil;
-    if (textView.superview !=nil) {
-        self.navigationItem.leftBarButtonItem = nil;
-        self.navigationItem.rightBarButtonItem = nil;
-        [textView becomeFirstResponder];
-        [textView setUserInteractionEnabled:YES];
-    }/*
-      
-      
-      else if (scheduleView.superview != nil){
-      //Add Cancel Button to the Nav Bar. Set it to call method to toggle text/shedule view
-      self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
-      self.navigationItem.leftBarButtonItem.target = self;
-      self.navigationItem.leftBarButtonItem.action = @selector(toggleTextAndScheduleView:);
-      
-      //Add Done Button to the Nav Bar. Set it to call method to save input and to return to editing
-      self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
-      self.navigationItem.rightBarButtonItem.target = self;
-      self.navigationItem.rightBarButtonItem.action = @selector(toggleTextAndScheduleView:);
-      
-      
-      //Call method to return control to the textfield that was editing when the calendar was called
-      [scheduleView textFieldBecomeFirstResponder];
-      }*/
-}
+
 
 #pragma mark - TextView Management - Delegate Methods
 
@@ -641,9 +569,6 @@ self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButto
 self.navigationItem.rightBarButtonItem.action = @selector(saveItem);
 self.navigationItem.rightBarButtonItem.target = self;    
 }
-
-
-
 
 #pragma mark - Popover Management
 - (void) presentActionsPopover:(id) sender{
@@ -757,144 +682,300 @@ self.navigationItem.rightBarButtonItem.target = self;
     return YES;
 }
 
+
+
+#pragma mark - Details
+
+- (void) handleTableRowSelection:(NSNotification *) notification {
+    //NOTE: Multiple messages are being posted. Apparently this is normal behavior so ignore.    
+    NSLog(@"WriteNowViewController:handleTableRowSelection - notification received");
+    
+    if ([[notification object] isKindOfClass:[Appointment class]]) {
+        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS AN APPOINTMENT");
+        Appointment *selectedAppointment = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theAppointment = selectedAppointment;
+        selectedItem.eventType = [NSNumber numberWithInt:2];
+        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theAppointment.text);
+        detailViewController.theItem = selectedItem;
+        
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    } 
+    
+    else if ([[notification object] isKindOfClass:[ToDo class]]){
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A TASK");
+        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        ToDo *selectedToDo = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theToDo = selectedToDo;
+        selectedItem.eventType = [NSNumber numberWithInt:3];
+        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theToDo.text);
+        detailViewController.theItem = selectedItem;
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }
+    else if ([[notification object] isKindOfClass:[Memo class]]){
+        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A MEMO");
+        Memo *selectedMemo = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theMemo = selectedMemo;
+        selectedItem.eventType = [NSNumber numberWithInt:1];
+        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theMemo.text);
+        detailViewController.theItem = selectedItem;
+        
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }
+}
+@end
+
+/*
 #pragma mark - TKCalendarMonthViewDelegate methods
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView didSelectDate:(NSDate *)d {
-	NSLog(@"calendarMonthView didSelectDate: %@", d);
-    //ADD DATE TO CURRENT EVENT    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
+NSLog(@"calendarMonthView didSelectDate: %@", d);
+//ADD DATE TO CURRENT EVENT    
+[[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
 }
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView monthDidChange:(NSDate *)d {
-	NSLog(@"calendarMonthView monthDidChange");	
-    
-    CGRect frame = topView.frame;
-    frame.size.height = calendarView.frame.size.height;
-    topView.frame = frame;
-    frame = bottomView.frame;
-    frame.origin.y = topView.frame.origin.y + topView.frame.size.height;
-    bottomView.frame = frame;
+NSLog(@"calendarMonthView monthDidChange");	
+
+CGRect frame = topView.frame;
+frame.size.height = calendarView.frame.size.height;
+topView.frame = frame;
+frame = bottomView.frame;
+frame.origin.y = topView.frame.origin.y + topView.frame.size.height;
+bottomView.frame = frame;
 }
 
 
 #pragma mark - TKCalendarMonthViewDataSource methods
 //get dates with events
 - (NSArray *)fetchDatesForTimedEvents{ 
-    NSLog(@"Will get array of timed event objects from store");
+NSLog(@"Will get array of timed event objects from store");
+
+NSFetchRequest *request = [[NSFetchRequest alloc] init]; 
+[request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]]; 
+NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:YES]; 
+[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]]; 
+
+//NSArray *events = [NSArray arrayWithObjects:@"1",@"2", nil];
+
+//NSPredicate *predicate = [NSPredicate predicateWithFormat:@"aType == %@" argumentArray:events];
+//[request setPredicate:predicate];
+
+// Release the datesArray, if it already exists 
+NSError *anyError = nil; 
+NSArray *results = [managedObjectContext executeFetchRequest:request error:&anyError]; 
+if( !results ) 
+{ NSLog(@"Error = %@", anyError);
+    ///deal with error
+} 
+
+NSLog(@"Did get array of timed event objects from store");
+//kjf the array data contains Event objects. need to convert this to an array which has date objects 
+NSLog(@"Number of objects in results = %d", [results count]);
+NSMutableArray *data = [[NSMutableArray alloc]init];    
+NSTimeZone *myTimeZone = [NSTimeZone localTimeZone];    
+NSInteger timeZoneOffset = [myTimeZone secondsFromGMT];
+NSLog (@"Time Zone offset is %d", timeZoneOffset);
+
+//NSMutableArray *data = [NSMutableArray arrayWithCapacity:[results count]];
+for (int i=0; i<[results count]; i++) {
     
-    NSFetchRequest *request = [[NSFetchRequest alloc] init]; 
-    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]]; 
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:YES]; 
-    [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]]; 
-    
-    //NSArray *events = [NSArray arrayWithObjects:@"1",@"2", nil];
-    
-    //NSPredicate *predicate = [NSPredicate predicateWithFormat:@"aType == %@" argumentArray:events];
-    //[request setPredicate:predicate];
-    
-    // Release the datesArray, if it already exists 
-    NSError *anyError = nil; 
-    NSArray *results = [managedObjectContext executeFetchRequest:request error:&anyError]; 
-    if( !results ) 
-    { NSLog(@"Error = %@", anyError);
-        ///deal with error
+    if ([[results objectAtIndex:i] isKindOfClass:[Appointment class]]){
+        Appointment *tempAppointment = [results objectAtIndex:i];
+        [data addObject:tempAppointment.aDate];
+        // [data addObject:[tempAppointment.aDate dateByAddingTimeInterval:timeZoneOffset]];
     } 
-    
-    NSLog(@"Did get array of timed event objects from store");
-    //kjf the array data contains Event objects. need to convert this to an array which has date objects 
-    NSLog(@"Number of objects in results = %d", [results count]);
-    NSMutableArray *data = [[NSMutableArray alloc]init];    
-    NSTimeZone *myTimeZone = [NSTimeZone localTimeZone];    
-    NSInteger timeZoneOffset = [myTimeZone secondsFromGMT];
-    NSLog (@"Time Zone offset is %d", timeZoneOffset);
-    
-    //NSMutableArray *data = [NSMutableArray arrayWithCapacity:[results count]];
-    for (int i=0; i<[results count]; i++) {
-        
-        if ([[results objectAtIndex:i] isKindOfClass:[Appointment class]]){
-            Appointment *tempAppointment = [results objectAtIndex:i];
-            [data addObject:tempAppointment.aDate];
-            // [data addObject:[tempAppointment.aDate dateByAddingTimeInterval:timeZoneOffset]];
-        } 
-        else if ([[results objectAtIndex:i] isKindOfClass:[ToDo class]]){
-            ToDo *tempToDo = [results objectAtIndex:i];
-            [data addObject:[tempToDo.aDate dateByAddingTimeInterval:timeZoneOffset]];
-        }
+    else if ([[results objectAtIndex:i] isKindOfClass:[ToDo class]]){
+        ToDo *tempToDo = [results objectAtIndex:i];
+        [data addObject:[tempToDo.aDate dateByAddingTimeInterval:timeZoneOffset]];
     }
-    
-    NSLog(@"Number of objects in data = %d", [data count]);
-    
-    NSLog(@"Contents of data array = %@", data);
-    
-    return data;
-    
+}
+
+NSLog(@"Number of objects in data = %d", [data count]);
+
+NSLog(@"Contents of data array = %@", data);
+
+return data;
+
 }
 
 
 - (NSArray*)calendarMonthView:(TKCalendarMonthView *)monthView marksFromDate:(NSDate *)startDate toDate:(NSDate *)lastDate {	
-	NSLog(@"calendarMonthView marksFromDate toDate");	
-    
-	NSArray *data = [NSArray arrayWithArray:[self fetchDatesForTimedEvents]];
-    
-	
-	// Initialise empty marks array, this will be populated with TRUE/FALSE in order for each day a marker should be placed on.
-	NSMutableArray *marks = [NSMutableArray array];
-	
-	// Initialise calendar to current type and set the timezone to never have daylight saving
-	NSCalendar *cal = [NSCalendar currentCalendar];
-	//[cal setTimeZone:[NSTimeZone systemTimeZone]];
-    
-	// Construct DateComponents based on startDate so the iterating date can be created.
-	// Its massively important to do this assigning via the NSCalendar and NSDateComponents because of daylight saving has been removed 
-	// with the timezone that was set above. If you just used "startDate" directly (ie, NSDate *date = startDate;) as the first 
-	// iterating date then times would go up and down based on daylight savings.
-	NSDateComponents *comp = [cal components:(NSMonthCalendarUnit | NSMinuteCalendarUnit | NSYearCalendarUnit | NSDayCalendarUnit | NSWeekdayCalendarUnit | NSHourCalendarUnit | NSSecondCalendarUnit) fromDate:startDate];
-	NSDate *d = [cal dateFromComponents:comp];
-	
-	// Init offset components to increment days in the loop by one each time
-	NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
-	[offsetComponents setDay:1];	
-	
-	// for each date between start date and end date check if they exist in the data array
-	while (YES) {
-		// Is the date beyond the last date? If so, exit the loop.
-		// NSOrderedDescending = the left value is greater than the right
-		if ([d compare:lastDate] == NSOrderedDescending) {
-			break;
-		}
-		
-		// If the date is in the data array, add it to the marks array, else don't
-		//if ([data containsObject:[d description]]) {
-		if ([data containsObject:d]) {
-            
-			[marks addObject:[NSNumber numberWithBool:YES]];
-		} else {
-			[marks addObject:[NSNumber numberWithBool:NO]];
-		}
-		
-		// Increment day using offset components (ie, 1 day in this instance)
-		d = [cal dateByAddingComponents:offsetComponents toDate:d options:0];
-	}
-	
-	NSLog(@"Number of marks is %d",[marks count]);
-    NSLog(@"Array contains %@", marks);
-	return [NSArray arrayWithArray:marks];
-}
-- (void) addDateToCurrentEvent{
-    /* the navigation bar needs to be changed for the schedule view 
-     Left button = Cancel. Returns the user to the editing page.
-     
-     Right Button = ADD item - when the calendar is pulled up.
-     If the textview has text then, check if there is an appointment or task event linked. 
-     If not, selecting a date and hitting the ADD button, creates an event  if it doesn't already exist 
-     and adds the date.
-     If there is no text in TV, then create note and event. 
-     
-     Alternately, have two different looking buttons which show depending on whether there is text or not. 
-     
-     */
-    
-    [self toggleCalendar:nil];
-    return;
-}
+NSLog(@"calendarMonthView marksFromDate toDate");	
+
+NSArray *data = [NSArray arrayWithArray:[self fetchDatesForTimedEvents]];
 
 
-@end
+// Initialise empty marks array, this will be populated with TRUE/FALSE in order for each day a marker should be placed on.
+NSMutableArray *marks = [NSMutableArray array];
+
+// Initialise calendar to current type and set the timezone to never have daylight saving
+NSCalendar *cal = [NSCalendar currentCalendar];
+//[cal setTimeZone:[NSTimeZone systemTimeZone]];
+
+// Construct DateComponents based on startDate so the iterating date can be created.
+// Its massively important to do this assigning via the NSCalendar and NSDateComponents because of daylight saving has been removed 
+// with the timezone that was set above. If you just used "startDate" directly (ie, NSDate *date = startDate;) as the first 
+// iterating date then times would go up and down based on daylight savings.
+NSDateComponents *comp = [cal components:(NSMonthCalendarUnit | NSMinuteCalendarUnit | NSYearCalendarUnit | NSDayCalendarUnit | NSWeekdayCalendarUnit | NSHourCalendarUnit | NSSecondCalendarUnit) fromDate:startDate];
+NSDate *d = [cal dateFromComponents:comp];
+
+// Init offset components to increment days in the loop by one each time
+NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
+[offsetComponents setDay:1];	
+
+// for each date between start date and end date check if they exist in the data array
+while (YES) {
+    // Is the date beyond the last date? If so, exit the loop.
+    // NSOrderedDescending = the left value is greater than the right
+    if ([d compare:lastDate] == NSOrderedDescending) {
+        break;
+    }
+    
+    // If the date is in the data array, add it to the marks array, else don't
+    //if ([data containsObject:[d description]]) {
+    if ([data containsObject:d]) {
+        
+        [marks addObject:[NSNumber numberWithBool:YES]];
+    } else {
+        [marks addObject:[NSNumber numberWithBool:NO]];
+    }
+    
+    // Increment day using offset components (ie, 1 day in this instance)
+    d = [cal dateByAddingComponents:offsetComponents toDate:d options:0];
+}
+
+NSLog(@"Number of marks is %d",[marks count]);
+NSLog(@"Array contains %@", marks);
+return [NSArray arrayWithArray:marks];
+}
+*/
+
+
+
+/*
+ - (void) toggleCalendar:(id)sender {    
+ if([actionsPopover isPopoverVisible]) {
+ [actionsPopover dismissPopoverAnimated:YES];
+ }
+ 
+ if ([textView isFirstResponder]) {
+ //Check if textView is first responder. If it is, resign first responder and disable user interaction
+ [textView resignFirstResponder];
+ self.textView.userInteractionEnabled = NO;
+ }
+ 
+ if (calendarView == nil) {
+ //Check if the calendar obect exists. If it is not in view, it should not exist. Initialize and slide into view from bottom.
+ calendarView = 	[[TKCalendarMonthView alloc] init];        
+ calendarView.delegate = self;
+ calendarView.dataSource = self;
+ [self.topView addSubview:calendarView];
+ [calendarView reload];
+ calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
+ //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
+ 
+ //Add Nav buttons to dismiss the calendar (left) and to add date selected from the calendar to a new event or an event that is in the process of being created. If the user taps the calendar button before inputting any text, create a new Event object and add the selected date. If there is already some text input, create a new Event object and add both the selected date and the text to the event object. 
+ self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
+ self.navigationItem.leftBarButtonItem.target = self;
+ self.navigationItem.leftBarButtonItem.action = @selector(toggleCalendar:);
+ 
+ self.navigationItem.rightBarButtonItem = [self.navigationController addAddButton];
+ self.navigationItem.rightBarButtonItem.target = self;
+ self.navigationItem.rightBarButtonItem.action = @selector(addDateToCurrentEvent);
+ 
+ [UIView beginAnimations:nil context:nil];
+ [UIView setAnimationDuration:0.5];
+ [UIView setAnimationDelegate:self];
+ 
+ CGRect frame = topView.frame;
+ frame.size.height = calendarView.frame.size.height;
+ self.topView.frame = frame;
+ frame = bottomView.frame;
+ frame.origin.y = topView.frame.origin.y + topView.frame.size.height;    
+ self.bottomView.frame = frame;
+ calendarView.frame = CGRectMake(0, 0, calendarView.frame.size.width, calendarView.frame.size.height);
+ self.textView.frame = CGRectMake(0, -kTopViewRect.size.height, self.textView.frame.size.width, self.textView.frame.size.height);
+ [UIView commitAnimations];
+ NSDate *d = [NSDate date];
+ [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
+ }
+ else {
+ NSLog(@"Dismissing Calendar");
+ 
+ [UIView beginAnimations:nil context:nil];
+ [UIView setAnimationDuration:0.5];
+ [UIView setAnimationDelegate:self];
+ [UIView setAnimationDidStopSelector:@selector(finishedCalendarTransition)];
+ if (textView.superview != nil) {
+ //check to see if the textView is below the calendar view.
+ CGRect frame = topView.frame;
+ frame.size.height = kTopViewRect.size.height+35.0;
+ self.topView.frame = frame;
+ frame = textView.frame;
+ frame.size.height = kTextViewRect.size.height+35.0;
+ frame.origin.y  = 0;
+ textView.frame = frame;
+ frame = bottomView.frame;
+ frame.origin.y = kBottomViewRect.origin.y+85;    
+ self.bottomView.frame = frame;
+ }
+ */
+/*
+ else if (scheduleView.superview != nil){
+ //check to see if the ScheduleView is below the calendar view
+ CGRect frame = topView.frame;
+ frame.size.height = kTopViewRect.size.height+35;
+ self.topView.frame = frame;
+ frame = bottomView.frame;
+ frame.origin.y = kBottomViewRect.origin.y+85;
+ self.bottomView.frame = frame;
+ }
+ */
+/*
+ calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
+ 
+ //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
+ 
+ [UIView commitAnimations];
+ }
+ }
+ */
+/*
+- (void) finishedCalendarTransition{
+[[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:nil userInfo:nil]; 
+
+[calendarView removeFromSuperview];
+calendarView = nil;
+if (textView.superview !=nil) {
+    self.navigationItem.leftBarButtonItem = nil;
+    self.navigationItem.rightBarButtonItem = nil;
+    [textView becomeFirstResponder];
+    [textView setUserInteractionEnabled:YES];
+}
+ */
+ /*
+  else if (scheduleView.superview != nil){
+  //Add Cancel Button to the Nav Bar. Set it to call method to toggle text/shedule view
+  self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
+  self.navigationItem.leftBarButtonItem.target = self;
+  self.navigationItem.leftBarButtonItem.action = @selector(toggleTextAndScheduleView:);
+  
+  //Add Done Button to the Nav Bar. Set it to call method to save input and to return to editing
+  self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
+  self.navigationItem.rightBarButtonItem.target = self;
+  self.navigationItem.rightBarButtonItem.action = @selector(toggleTextAndScheduleView:);
+  
+  
+  //Call method to return control to the textfield that was editing when the calendar was called
+  [scheduleView textFieldBecomeFirstResponder];
+  }*/
+//}
+
+

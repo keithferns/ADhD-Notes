@@ -43,11 +43,8 @@
 {
     [super viewDidLoad];
     
-    memos = [NSMutableArray arrayWithArray:[folder.notes allObjects]];
+    //memos = [NSMutableArray arrayWithArray:[folder.notes allObjects]];
              
-    
-
-    
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -109,7 +106,7 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
     

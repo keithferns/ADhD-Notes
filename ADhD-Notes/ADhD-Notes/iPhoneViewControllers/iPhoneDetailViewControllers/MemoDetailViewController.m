@@ -53,12 +53,8 @@
         //FIXME: add the key theItem.theMemo.aPlace
         [tableHeaderView addSubview: dateplaceLabel];
     
-    [dateplaceLabel release];
-    [dateFormatter release];
-    
         
     self.tableView.tableHeaderView = tableHeaderView;
-    [tableHeaderView release];        
     
     self.tableView.allowsSelectionDuringEditing = YES;
     
@@ -75,7 +71,6 @@
     headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
     
     self.navigationItem.titleView = headerText;
-    [headerText release];
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
@@ -86,6 +81,7 @@
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
 }
+
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -172,7 +168,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
 
     
@@ -181,12 +177,11 @@
         CustomTextView *theTextView = [[CustomTextView alloc] initWithFrame:CGRectMake(0,0,300,105)];
         theTextView.editable = NO;
         
-        [theTextView setText:[[theItem.theMemo.rNote anyObject] text]];
+        [theTextView setText:theItem.theMemo.text];
         theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(14.0)];
         
         [cell.contentView addSubview: theTextView];
         
-        [theTextView release];
         
     }
     else if (indexPath.section == 1){
@@ -200,10 +195,7 @@
         [cell.contentView addSubview:folderLabel];
 
         folderLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(14.0)];
-
-        
-        [labelfolder release];
-        [folderLabel release];        
+  
         
     }
     else if (indexPath.section == 2){
@@ -216,8 +208,6 @@
         //NSString *temp = [NSString stringWithFormat:@"%@, %@, %@, %@", theItem.theMemo.rTag etc
         [cell.contentView addSubview:tagLabel];
         
-        [labeltag release];
-        [tagLabel release];
     }
     
     return cell;

@@ -1,5 +1,5 @@
 //
-//  HorizontalCells.h
+//  HorizontalCellsWithSections.h
 //  WriteNow
 //
 //  Created by Keith Fernandes on 11/1/11.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface HorizontalCells : UITableViewCell <UITableViewDataSource, UITableViewDelegate> {
+@interface HorizontalCellsWithSections : UITableViewCell <UITableViewDataSource, UITableViewDelegate> {
     
     UITableView *_hTableView;
     NSArray *myObjects;

@@ -1,15 +1,15 @@
 //
 //  MemoTableViewController.m
-//  iDoit
 //
 //  Created by Keith Fernandes on 4/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import "MemoTableViewController.h"
-#import "iDoitAppDelegate.h"
-#import "Contants.h"
+#import "ADhD_NotesAppDelegate.h"
+#import "Constants.h"
 #import "EventsCell.h"
+#import "MemoDetailViewController.h"
 
 @implementation MemoTableViewController
 
@@ -17,29 +17,28 @@
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize selectedDate;
+@synthesize navCon;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
-        [self viewDidLoad];
+       [self viewDidLoad];
     }
     return self;
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    [_fetchedResultsController release];
     
     // Release any cached data, images, etc that aren't in use.
 }
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad {
+- (void) viewDidLoad {
     [super viewDidLoad];
     
     NSLog(@"MemoTableViewController:ViewDidLoad > loading");
@@ -52,7 +51,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getSelectedCalendarDate:) name:@"GetDateNotification" object:nil];
     
     /*configure tableView, set its properties and add it to the main view.*/
-    
+    /*
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
     UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 320, 26)];
     [headerLabel setBackgroundColor:[UIColor lightGrayColor]];
@@ -60,12 +59,10 @@
     [headerLabel setTextAlignment:UITextAlignmentCenter];
     [headerView setBackgroundColor:[UIColor blackColor]];
     [headerView addSubview:headerLabel];
+     */
     //[tableView setTableHeaderView:headerView];
     //[tableView setSectionFooterHeight:0.0];
     //[tableView setSectionHeaderHeight:15.0];
-    
-    [headerLabel release];
-    [headerView release];
     
     
     //[self.tableView setSeparatorColor:[UIColor blackColor]];
@@ -76,7 +73,7 @@
     self.tableView.backgroundColor = [UIColor clearColor];
     
     if (managedObjectContext == nil) { 
-		managedObjectContext = [(iDoitAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
+		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"MemoTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
 	}
     
@@ -84,14 +81,8 @@
 	if (![[self fetchedResultsController] performFetch:&error]) {
         NSLog(@"FETCHING ERROR");
 	}
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
- 
 }
+
 
 - (void)handleDidSaveNotification:(NSNotification *)notification {
     NSLog(@"NSManagedObjectContextDidSaveNotification Received By WriteNowTableViewController");
@@ -124,7 +115,6 @@
 }
 
 
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -135,30 +125,42 @@
 #pragma mark -
 #pragma mark Fetched results controller
 
-
-
 - (NSFetchedResultsController *) fetchedResultsController{
-    NSLog(@"MemoTableViewController:fetchedResultsController -> Fetching");
+        
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     
-    //check if an instance of fetchedResultsController exists.  If it does, return fetchedResultsController
     if (_fetchedResultsController!=nil) {
 		return _fetchedResultsController;
 	}
-    //Else create a new fetchedResultsController
-    //Create a new fetchRequest
     
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    //set the entity to retrieved by this fetchrequest
-    
     [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
     
-    NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];    
-    [gregorian setLocale:[NSLocale currentLocale]];
-    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    //[gregorian setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-    //FIXME: Better way of setting the current timezone as the default and not as xx hours from GMT
+	//NSSortDescriptor *typeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"type" ascending:YES];
+	NSSortDescriptor *textDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];// just here to test the sections and row calls
     
+	[request setSortDescriptors:[NSArray arrayWithObjects:textDescriptor, nil]];
+    
+	[request setFetchBatchSize:10];
+    
+	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
+    
+	newController.delegate = self;
+	self.fetchedResultsController = newController;
+    
+	return _fetchedResultsController;
+    /*
+     [NSFetchedResultsController deleteCacheWithName:@"Root"];
+
+    if (_fetchedResultsController!=nil) {
+		return _fetchedResultsController;
+	}
+
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    
+    [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
+
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];        
     NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];    
     [timeComponents setYear:[timeComponents year]];
     [timeComponents setMonth:[timeComponents month]];
@@ -177,10 +179,6 @@
     else {
         NSLog(@"SelectedDate is %@", selectedDate);
         
-        //NSTimeZone *myTimeZone = [NSTimeZone localTimeZone];
-        //NSInteger timeZoneOffset = [myTimeZone secondsFromGMT];
-        //NSDate *temp = [selectedDate dateByAddingTimeInterval:-timeZoneOffset];
-        
         
         NSDate *temp = [selectedDate dateByAddingTimeInterval:-kTimeZoneOffset];
         
@@ -188,33 +186,23 @@
         [request setPredicate:checkDate];
         checkDate = nil;
     }
-        
+    
 	NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
  
     
 	[request setSortDescriptors:[NSArray arrayWithObjects: dateDescriptor, nil]];
-    //release the sort descriptors now that they are held by the request
-    
-    [dateDescriptor release];
-    
+        
 	[request setFetchBatchSize:10];
-    
-    //Init a temp fetchedResultsController and set its fetchRequest to the current fetchRequest
-    
+        
 	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"aDate" cacheName:@"Root"];
     // NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
     
-    
 	newController.delegate = self;
 	self.fetchedResultsController = newController;
-    
-    //release the temp fetchedResultsController and fetchrequest
-    
-	[newController release];
-	[request release];
-	
+
 	return _fetchedResultsController;
-    
+     
+     */
 }
 
 #pragma mark - Table view data source
@@ -230,51 +218,39 @@
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    //id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
-    //return [sectionInfo numberOfObjects];
-    NSLog(@"Number of Objects = %d", [[_fetchedResultsController fetchedObjects] count]);
-
-    return [[_fetchedResultsController fetchedObjects] count];
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
+    return [sectionInfo numberOfObjects];
+    //NSLog(@"Number of Objects = %d", [[_fetchedResultsController fetchedObjects] count]);
+    //return [[_fetchedResultsController fetchedObjects] count];
  
 }
-
-
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
     return @"Memos";
 }
 
-
-
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"MemoTableViewController: cellForRow - celling");
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateStyle:NSDateFormatterShortStyle];
     EventsCell *cell = (EventsCell *) [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[EventsCell alloc] init]autorelease];
+        cell = [[EventsCell alloc] init];
     }
-    
    
      if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[Memo class]]){
-         NSLog(@"MemoTableViewController: cellForRow - Object is a Memo");
         Memo *currentMemo = [_fetchedResultsController objectAtIndexPath:indexPath];
         CGSize itemSize=CGSizeMake(kCellWidth-4, kCellHeight-25);
         UIGraphicsBeginImageContext(itemSize);
-        [[[currentMemo.rNote anyObject] text] drawInRect:CGRectMake(0, 0, itemSize.width, itemSize.height) withFont:[UIFont boldSystemFontOfSize:10]];
+        [currentMemo.text drawInRect:CGRectMake(0, 0, itemSize.width, itemSize.height) withFont:[UIFont boldSystemFontOfSize:10]];
         UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
         //cell.myTextLabel.text = currentMemo.text;
         cell.dateLabel.text = [dateFormatter stringFromDate:currentMemo.creationDate];
     }
-    [dateFormatter release];
     return cell;
 }
-
-
-
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell
 forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -287,7 +263,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         cell.backgroundColor = altCellColor;
     }
 }  
-
 
 /*
  // Override to support conditional editing of the table view.
@@ -340,11 +315,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
     
-    
+
+    NSLog(@"MEMO SELECTED");
+   
 }
-
-
-
 
 #pragma mark -
 #pragma mark Fetched Results Notifications

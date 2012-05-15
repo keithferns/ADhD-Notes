@@ -38,7 +38,6 @@ return endDay-startDay;
     }
 }
 
-
 @end
 
 

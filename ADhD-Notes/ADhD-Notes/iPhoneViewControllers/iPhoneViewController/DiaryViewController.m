@@ -7,12 +7,18 @@
 //
 
 #import "DiaryViewController.h"
+#import "Constants.h"
+#import "HorizontalCells.h"
+
 
 @interface DiaryViewController ()
+
+
 
 @end
 
 @implementation DiaryViewController
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,7 +33,10 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
 }
+
+
 
 - (void)viewDidUnload
 {

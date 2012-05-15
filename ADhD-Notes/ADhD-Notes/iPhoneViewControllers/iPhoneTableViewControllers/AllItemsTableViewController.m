@@ -10,9 +10,6 @@
 #import "ADhD_NotesAppDelegate.h"
 
 @interface AllItemsTableViewController ()
-
-
-
 @end
 
 @implementation AllItemsTableViewController
@@ -27,9 +24,7 @@
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
-    
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];    
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"CURRENT TABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
@@ -40,8 +35,6 @@
     
 }
 
-
-
 - (void)handleDidSaveNotification:(NSNotification *)notification {
     NSLog(@"NSManagedObjectContextDidSaveNotification Received By NotesTableViewController");
     self.fetchedResultsController = nil;
@@ -51,18 +44,16 @@
 	}
     [self.tableView reloadData];
 }
-- (void)viewDidUnload
-{
+
+- (void)viewDidUnload{
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
 
 #pragma mark -
 #pragma mark Fetched results controller
@@ -80,7 +71,6 @@
     
 	[request setSortDescriptors:[NSArray arrayWithObjects:typeDescriptor,textDescriptor, nil]];
 
-    
 	[request setFetchBatchSize:10];
     
 	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"type" cacheName:@"Root"];
@@ -99,9 +89,7 @@
 	return [[_fetchedResultsController sections] count];
 }
 
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     return 20;
 }
 
@@ -124,19 +112,17 @@
     else if (mySection == 3) {
          temp = @"Tasks";
     }
-   
     return temp;
 }
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
     return [sectionInfo numberOfObjects];
-    //return 1;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-	
     static NSString *CellIdentifier = @"MyCell";
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -144,7 +130,6 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
        
-    
     [self configureCell:cell atIndexPath:indexPath];
 
     return cell;
@@ -197,7 +182,6 @@
 
         creationDateLabel2.text = [currentItem.endTime description];
     }
-    
 }
 
         

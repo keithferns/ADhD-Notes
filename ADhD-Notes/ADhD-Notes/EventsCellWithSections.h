@@ -1,5 +1,5 @@
 //
-//  EventsCell.h
+//  EventsCellWithSections.h
 //  WriteNow
 //
 //  Created by Keith Fernandes on 11/1/11.
@@ -10,7 +10,7 @@
 
 @class CustomTextLabel;
 
-@interface EventsCell : UITableViewCell {
+@interface EventsCellWithSections : UITableViewCell {
     UILabel *dateLabel;  
     UIImageView *_myTextView;
 }

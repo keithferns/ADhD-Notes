@@ -14,7 +14,6 @@
 #import "SettingViewController.h"
 #import "Constants.h"
 
-
 @implementation ADhD_NotesAppDelegate
 
 @synthesize window = _window;

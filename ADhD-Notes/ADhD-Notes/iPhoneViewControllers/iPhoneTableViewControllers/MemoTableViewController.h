@@ -15,6 +15,7 @@
     
 }
 
+@property (nonatomic, retain) UINavigationController *navCon;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSDate *selectedDate;

@@ -11,12 +11,15 @@
 #import "EventTableViewController.h"
 
 @interface HorizontalCells : UITableViewCell  {
+ 
     
-    NSNumber *eventType;
+
 }
+
+
 @property (nonatomic, retain) MemoTableViewController *memoTV;
+//@property (nonatomic, retain) UITableView *hTableView;
 @property (nonatomic, retain) EventTableViewController *eventTV;
-@property (nonatomic, retain) NSNumber *eventType;
 
 
 

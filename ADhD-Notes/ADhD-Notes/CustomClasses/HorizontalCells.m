@@ -7,34 +7,26 @@
 //
 
 #import "HorizontalCells.h"
-#import "Contants.h"
+#import "Constants.h"
 #import "EventsCell.h"
 
 @implementation HorizontalCells
 
-@synthesize eventType;
 @synthesize memoTV, eventTV;
 
-- (void) dealloc{
-    self.memoTV.tableView = nil;
-    eventType = nil;
-    [self.memoTV.tableView release];
-    [eventType release];
-    [super dealloc];
-}
-
-- (id)initWithFrame:(CGRect)frame {
-   eventType = [NSNumber numberWithInt:1];
-   if ((self = [super initWithFrame:frame])){
-       NSLog(@"Horizontal Cells:initWithFrame. EventType is %d", [eventType intValue]);
-       
-       if ([eventType intValue] == 0){
-       if(self.memoTV == nil) {
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
+    
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    
+     //  NSLog(@"Horizontal Cells:initWithTyle. EventType is %d", [myType intValue]);
+    [self setFrame:CGRectMake(0, 0, kScreenWidth, kCellHeight)];
+    
+    if (reuseIdentifier == @"firstCell"){
+    if(self.memoTV == nil) {
            NSLog(@"Horizontal Cells:initWithFrame: init memoTV");
-
-           memoTV = [[MemoTableViewController alloc] init];
-       }
-        self.memoTV.tableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, kScreenWidth)] autorelease];
+          memoTV = [[MemoTableViewController alloc] init];
+       }    
+        self.memoTV.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, kScreenWidth)];
         self.memoTV.tableView.showsVerticalScrollIndicator = NO;
         self.memoTV.tableView.showsHorizontalScrollIndicator = NO;
         self.memoTV.tableView.transform = CGAffineTransformMakeRotation(-M_PI * 0.5);
@@ -42,17 +34,16 @@
         self.memoTV.tableView.rowHeight = kCellWidth;
         self.memoTV.tableView.backgroundColor = [UIColor blackColor];        
         self.memoTV.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-        self.memoTV.tableView.separatorColor = [UIColor clearColor];
+        self.memoTV.tableView.separatorColor = [UIColor blackColor];
 
         [self addSubview:self.memoTV.tableView];
        }
-       else if ([eventType intValue] == 1) {
-           if(self.eventTV == nil) {
-               NSLog(@"Horizontal Cells:initWithFrame: init eventTV");
-               
-               eventTV = [[EventTableViewController alloc] init];
-           }
-           self.eventTV.tableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, kScreenWidth)] autorelease];
+       else if (reuseIdentifier == @"secondCell") {
+        
+            if (self.eventTV == nil){
+            eventTV =[[EventTableViewController alloc] init];
+            }
+           self.eventTV.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight,kScreenWidth)];
            self.eventTV.tableView.showsVerticalScrollIndicator = NO;
            self.eventTV.tableView.showsHorizontalScrollIndicator = NO;
            self.eventTV.tableView.transform = CGAffineTransformMakeRotation(-M_PI * 0.5);
@@ -63,16 +54,10 @@
            self.eventTV.tableView.separatorColor = [UIColor clearColor];
            
            [self addSubview:self.eventTV.tableView];
-   
-       }
-       
-       
-     }
-
+       }       
     return self;
-
 }
+
+
            
-
-
 @end

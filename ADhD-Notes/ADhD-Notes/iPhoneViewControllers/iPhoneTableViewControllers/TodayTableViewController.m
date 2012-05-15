@@ -7,6 +7,8 @@
 //
 
 #import "TodayTableViewController.h"
+#import "Constants.h"
+#import "HorizontalCells.h"
 
 @interface TodayTableViewController ()
 
@@ -14,19 +16,15 @@
 
 @implementation TodayTableViewController
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    self.tableView.frame = CGRectMake (0, 0, 320, kCellHeight*2);
+    self.tableView.rowHeight = kCellHeight;
+    self.tableView.bounces = NO;
+    self.tableView.allowsSelection = NO;
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
@@ -41,6 +39,10 @@
     // e.g. self.myOutlet = nil;
 }
 
+- (void) viewWillAppear:(BOOL) animated {
+    [super viewWillAppear:NO];
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -50,26 +52,47 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 0;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
-    // Return the number of rows in the section.
-    return 0;
+
+    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    NSLog (@"TODAY TABLE VIEW CONTROLLER LOADING HORIZONTAL CELLS");
     
-    // Configure the cell...
+    NSString *cellIdentifier = @"";
     
-    return cell;
+    if (indexPath.section == 0){
+        cellIdentifier = @"firstCell";
+        
+    } else if (indexPath.section == 1){
+        
+        cellIdentifier = @"secondCell";
+        
+    }     
+    HorizontalCells *cell;
+    
+    if (cellIdentifier == @"firstCell"){
+        cell = (HorizontalCells *)[self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        
+        if (cell == nil){
+            cell = [[HorizontalCells alloc] initWithStyle:UITableViewCellStyleDefault  reuseIdentifier:@"firstCell"];
+        }
+    } else if (cellIdentifier == @"secondCell"){
+        cell = (HorizontalCells *)[self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        
+        if (cell == nil){
+            
+            cell = [[HorizontalCells alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"secondCell"];            
+            
+        }
+    }
+    return cell;    
 }
 
 /*

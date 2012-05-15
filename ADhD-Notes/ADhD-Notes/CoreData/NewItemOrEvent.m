@@ -18,7 +18,7 @@
 @synthesize addingContext;//note this MOC is an adding MOC passed from the parent.
 @synthesize eventType;
 
-@synthesize collection, priority, text, name, tags, sorter, type;
+@synthesize collection, priority, text, name, tags, sorter, type, listArray;
 
 @synthesize aDate, startTime, endTime, editDate;
 
@@ -51,7 +51,6 @@
     
     self.startTime = [self.aDate dateByAddingTimeInterval: theTI];
 
-    NSLog(@"the startTime is %@", self.startTime);
 
     
     //Convert End Time
@@ -76,6 +75,10 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
 
         theSimpleNote.text = self.text;
         self.type = [NSNumber numberWithInt:0];
+    
+    NSLog(@"Simple Note aDate is %@", self.aDate);
+    
+    NSLog(@"Simple Note startTime is %@", theSimpleNote.startTime);
 }
 
 - (void) createNewList{
@@ -88,6 +91,15 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
     theList.text = self.text;
     self.type = [NSNumber numberWithInt:1];
     theList.type = [NSNumber numberWithInt:1];
+    NSString *tempString = [NSString stringWithFormat:@"-"];
+    
+    for (int i = 0; i<[listArray count]; i++) {
+        tempString = [tempString stringByAppendingString:[listArray objectAtIndex:i]];
+        tempString = [tempString stringByAppendingString:@"\n-"];
+    }
+    theList.text = tempString;
+    
+    NSLog (@"THE LIST TEXT IS %@", tempString);
 
     NSLog (@"Creating New List");
 }
@@ -172,14 +184,13 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
 
 - (void) saveNewItem {
     NSLog(@"NewItemOrEvent: Saving New Item");
+    
 
     /*--Save the MOC--*/
     NSError *error;
     if(![addingContext save:&error]){ 
         NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
-        
     } 
-  
     //
 }
 

@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53006E591560943000602430 /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 53006E581560943000602430 /* Event.m */; };
+		53006E5F1560BAC200602430 /* Memo.m in Sources */ = {isa = PBXBuildFile; fileRef = 53006E5E1560BAC200602430 /* Memo.m */; };
+		53006E621560BAC200602430 /* Note.m in Sources */ = {isa = PBXBuildFile; fileRef = 53006E611560BAC200602430 /* Note.m */; };
 		530BAD9B1541E58E0001A30A /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BAD9A1541E58E0001A30A /* Tag.m */; };
 		530BAD9F1541E58E0001A30A /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BAD9E1541E58E0001A30A /* Location.m */; };
 		530BADA21541E58E0001A30A /* Alarm.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADA11541E58E0001A30A /* Alarm.m */; };
 		530BADA81541E58F0001A30A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADA71541E58F0001A30A /* Person.m */; };
-		530BADAC1541E5DB0001A30A /* Note.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADAB1541E5DB0001A30A /* Note.m */; };
-		530BADB51541E6010001A30A /* Memo.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADB41541E6010001A30A /* Memo.m */; };
 		530BADB81541E61C0001A30A /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADB71541E61C0001A30A /* Folder.m */; };
 		530BADBB1541E61C0001A30A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBA1541E61C0001A30A /* Project.m */; };
 		530BADBE1541E61C0001A30A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBD1541E61C0001A30A /* Document.m */; };
@@ -21,6 +22,12 @@
 		530BADCA1541E6420001A30A /* SimpleNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC91541E6420001A30A /* SimpleNote.m */; };
 		530BADD01541F2B50001A30A /* Collection.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADCF1541F2B30001A30A /* Collection.m */; };
 		530BADD71541F45F0001A30A /* TapDetectingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADD61541F45F0001A30A /* TapDetectingView.m */; };
+		531E10C8156195CE0074321A /* TodayTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10C7156195CE0074321A /* TodayTableViewController.m */; };
+		531E10DA1561F4BE0074321A /* AppointmentDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10D11561F4AB0074321A /* AppointmentDetailViewController.m */; };
+		531E10DB1561F4BE0074321A /* DocumentDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10D31561F4AF0074321A /* DocumentDetailViewController.m */; };
+		531E10DC1561F4BE0074321A /* FoldersDetailTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10D51561F4B20074321A /* FoldersDetailTableViewController.m */; };
+		531E10DD1561F4BE0074321A /* MemoDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10D71561F4B60074321A /* MemoDetailViewController.m */; };
+		531E10DE1561F4BE0074321A /* ToDoDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531E10D91561F4BB0074321A /* ToDoDetailViewController.m */; };
 		532658A61540A8E600238AA1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 532658A51540A8E600238AA1 /* UIKit.framework */; };
 		532658A81540A8E600238AA1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 532658A71540A8E600238AA1 /* Foundation.framework */; };
 		532658AA1540A8E600238AA1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 532658A91540A8E600238AA1 /* CoreGraphics.framework */; };
@@ -39,6 +46,11 @@
 		5326596A1540B44600238AA1 /* main_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 532659661540B44600238AA1 /* main_background.png */; };
 		5326596B1540B44600238AA1 /* textview_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 532659671540B44600238AA1 /* textview_background.png */; };
 		5326596C1540B44600238AA1 /* white_line_page_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 532659681540B44600238AA1 /* white_line_page_background.png */; };
+		5367F29515520C9E00E1994A /* HorizontalCells.m in Sources */ = {isa = PBXBuildFile; fileRef = 5367F29415520C9E00E1994A /* HorizontalCells.m */; };
+		5367F29C1552256400E1994A /* EventsCellWithSections.m in Sources */ = {isa = PBXBuildFile; fileRef = 5367F2991552256400E1994A /* EventsCellWithSections.m */; };
+		5367F29D1552256400E1994A /* HorizontalCellsWithSections.m in Sources */ = {isa = PBXBuildFile; fileRef = 5367F29B1552256400E1994A /* HorizontalCellsWithSections.m */; };
+		5367F2A11552342F00E1994A /* MemosTableViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 5367F2A01552342F00E1994A /* MemosTableViewController2.m */; };
+		5367F2A4155234C300E1994A /* EventsTableViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 5367F2A3155234C200E1994A /* EventsTableViewController2.m */; };
 		5373202B1540E0BD00FA376E /* ArchiveViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5373202A1540E0BD00FA376E /* ArchiveViewController.m */; };
 		537320321540E0E800FA376E /* CalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5373202D1540E0E800FA376E /* CalendarViewController.m */; };
 		537320341540E0E800FA376E /* WriteNowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320311540E0E800FA376E /* WriteNowViewController.m */; };
@@ -130,9 +142,10 @@
 		5383AD951541429D0083A240 /* NewItemOrEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AD941541429D0083A240 /* NewItemOrEvent.m */; };
 		538DED3E15478E68000F460D /* SchedulerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED3D15478E68000F460D /* SchedulerViewController.m */; };
 		538DED491549F065000F460D /* CalendarTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED481549F065000F460D /* CalendarTableViewController.m */; };
+		53A0BA49155055A9002F149B /* EventTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A0BA46155055A9002F149B /* EventTableViewController.m */; };
+		53A0BA50155057EC002F149B /* MemoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A0BA4F155057EC002F149B /* MemoTableViewController.m */; };
 		53C93328154EED5D00145938 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C93327154EED5D00145938 /* Appointment.m */; };
 		53C9332B154EEE2700145938 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332A154EEE2700145938 /* Item.m */; };
-		53C9332E154EEEAF00145938 /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332D154EEEAF00145938 /* Event.m */; };
 		53EA8FC1154A4DE20036AE2D /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */; };
 		53EA8FC2154A4DE20036AE2D /* FoldersTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FC0154A4DE20036AE2D /* FoldersTableViewController.m */; };
 		53EA8FCC154A4E780036AE2D /* FolderDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FCB154A4E780036AE2D /* FolderDetailViewController.m */; };
@@ -150,6 +163,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		53006E571560943000602430 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = CoreData/ManagedObjects/Event.h; sourceTree = "<group>"; };
+		53006E581560943000602430 /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Event.m; path = CoreData/ManagedObjects/Event.m; sourceTree = "<group>"; };
+		53006E5D1560BAC200602430 /* Memo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Memo.h; path = CoreData/ManagedObjects/Memo.h; sourceTree = "<group>"; };
+		53006E5E1560BAC200602430 /* Memo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Memo.m; path = CoreData/ManagedObjects/Memo.m; sourceTree = "<group>"; };
+		53006E601560BAC200602430 /* Note.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Note.h; path = CoreData/ManagedObjects/Note.h; sourceTree = "<group>"; };
+		53006E611560BAC200602430 /* Note.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Note.m; path = CoreData/ManagedObjects/Note.m; sourceTree = "<group>"; };
 		530BAD991541E58E0001A30A /* Tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tag.h; path = CoreData/ManagedObjects/Tag.h; sourceTree = "<group>"; };
 		530BAD9A1541E58E0001A30A /* Tag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tag.m; path = CoreData/ManagedObjects/Tag.m; sourceTree = "<group>"; };
 		530BAD9D1541E58E0001A30A /* Location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Location.h; path = CoreData/ManagedObjects/Location.h; sourceTree = "<group>"; };
@@ -158,10 +177,6 @@
 		530BADA11541E58E0001A30A /* Alarm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Alarm.m; path = CoreData/ManagedObjects/Alarm.m; sourceTree = "<group>"; };
 		530BADA61541E58F0001A30A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Person.h; path = CoreData/ManagedObjects/Person.h; sourceTree = "<group>"; };
 		530BADA71541E58F0001A30A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = CoreData/ManagedObjects/Person.m; sourceTree = "<group>"; };
-		530BADAA1541E5DB0001A30A /* Note.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Note.h; path = CoreData/ManagedObjects/Note.h; sourceTree = "<group>"; };
-		530BADAB1541E5DB0001A30A /* Note.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Note.m; path = CoreData/ManagedObjects/Note.m; sourceTree = "<group>"; };
-		530BADB31541E6010001A30A /* Memo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Memo.h; path = CoreData/ManagedObjects/Memo.h; sourceTree = "<group>"; };
-		530BADB41541E6010001A30A /* Memo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Memo.m; path = CoreData/ManagedObjects/Memo.m; sourceTree = "<group>"; };
 		530BADB61541E61C0001A30A /* Folder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Folder.h; path = CoreData/ManagedObjects/Folder.h; sourceTree = "<group>"; };
 		530BADB71541E61C0001A30A /* Folder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Folder.m; path = CoreData/ManagedObjects/Folder.m; sourceTree = "<group>"; };
 		530BADB91541E61C0001A30A /* Project.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Project.h; path = CoreData/ManagedObjects/Project.h; sourceTree = "<group>"; };
@@ -178,6 +193,18 @@
 		530BADCF1541F2B30001A30A /* Collection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Collection.m; path = CoreData/ManagedObjects/Collection.m; sourceTree = "<group>"; };
 		530BADD51541F45F0001A30A /* TapDetectingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TapDetectingView.h; path = "ADhD-Notes/TapkuLibrary/TapDetectingView.h"; sourceTree = "<group>"; };
 		530BADD61541F45F0001A30A /* TapDetectingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TapDetectingView.m; path = "ADhD-Notes/TapkuLibrary/TapDetectingView.m"; sourceTree = "<group>"; };
+		531E10C6156195CE0074321A /* TodayTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TodayTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/TodayTableViewController.h; sourceTree = "<group>"; };
+		531E10C7156195CE0074321A /* TodayTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TodayTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/TodayTableViewController.m; sourceTree = "<group>"; };
+		531E10D01561F4A90074321A /* AppointmentDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppointmentDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/AppointmentDetailViewController.h; sourceTree = "<group>"; };
+		531E10D11561F4AB0074321A /* AppointmentDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppointmentDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/AppointmentDetailViewController.m; sourceTree = "<group>"; };
+		531E10D21561F4AD0074321A /* DocumentDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/DocumentDetailViewController.h; sourceTree = "<group>"; };
+		531E10D31561F4AF0074321A /* DocumentDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/DocumentDetailViewController.m; sourceTree = "<group>"; };
+		531E10D41561F4B00074321A /* FoldersDetailTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FoldersDetailTableViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/FoldersDetailTableViewController.h; sourceTree = "<group>"; };
+		531E10D51561F4B20074321A /* FoldersDetailTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FoldersDetailTableViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/FoldersDetailTableViewController.m; sourceTree = "<group>"; };
+		531E10D61561F4B50074321A /* MemoDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/MemoDetailViewController.h; sourceTree = "<group>"; };
+		531E10D71561F4B60074321A /* MemoDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MemoDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/MemoDetailViewController.m; sourceTree = "<group>"; };
+		531E10D81561F4B80074321A /* ToDoDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToDoDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/ToDoDetailViewController.h; sourceTree = "<group>"; };
+		531E10D91561F4BB0074321A /* ToDoDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ToDoDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/ToDoDetailViewController.m; sourceTree = "<group>"; };
 		532658A11540A8E600238AA1 /* ADhD-Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ADhD-Notes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		532658A51540A8E600238AA1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		532658A71540A8E600238AA1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -201,6 +228,16 @@
 		532659661540B44600238AA1 /* main_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = main_background.png; path = "Images/BackGround Images/main_background.png"; sourceTree = "<group>"; };
 		532659671540B44600238AA1 /* textview_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textview_background.png; path = "Images/BackGround Images/textview_background.png"; sourceTree = "<group>"; };
 		532659681540B44600238AA1 /* white_line_page_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = white_line_page_background.png; path = "Images/BackGround Images/white_line_page_background.png"; sourceTree = "<group>"; };
+		5367F29315520C9E00E1994A /* HorizontalCells.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalCells.h; path = CustomClasses/HorizontalCells.h; sourceTree = "<group>"; };
+		5367F29415520C9E00E1994A /* HorizontalCells.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HorizontalCells.m; path = CustomClasses/HorizontalCells.m; sourceTree = "<group>"; };
+		5367F2981552256400E1994A /* EventsCellWithSections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsCellWithSections.h; sourceTree = "<group>"; };
+		5367F2991552256400E1994A /* EventsCellWithSections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsCellWithSections.m; sourceTree = "<group>"; };
+		5367F29A1552256400E1994A /* HorizontalCellsWithSections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HorizontalCellsWithSections.h; sourceTree = "<group>"; };
+		5367F29B1552256400E1994A /* HorizontalCellsWithSections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HorizontalCellsWithSections.m; sourceTree = "<group>"; };
+		5367F29F1552342E00E1994A /* MemosTableViewController2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemosTableViewController2.h; path = iPhoneViewControllers/iPhoneTableViewControllers/MemosTableViewController2.h; sourceTree = "<group>"; };
+		5367F2A01552342F00E1994A /* MemosTableViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MemosTableViewController2.m; path = iPhoneViewControllers/iPhoneTableViewControllers/MemosTableViewController2.m; sourceTree = "<group>"; };
+		5367F2A2155234C200E1994A /* EventsTableViewController2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventsTableViewController2.h; path = iPhoneViewControllers/iPhoneTableViewControllers/EventsTableViewController2.h; sourceTree = "<group>"; };
+		5367F2A3155234C200E1994A /* EventsTableViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EventsTableViewController2.m; path = iPhoneViewControllers/iPhoneTableViewControllers/EventsTableViewController2.m; sourceTree = "<group>"; };
 		537320291540E0BD00FA376E /* ArchiveViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArchiveViewController.h; path = iPhoneViewControllers/iPhoneViewController/ArchiveViewController.h; sourceTree = "<group>"; };
 		5373202A1540E0BD00FA376E /* ArchiveViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ArchiveViewController.m; path = iPhoneViewControllers/iPhoneViewController/ArchiveViewController.m; sourceTree = "<group>"; };
 		5373202C1540E0E800FA376E /* CalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarViewController.h; path = iPhoneViewControllers/iPhoneViewController/CalendarViewController.h; sourceTree = "<group>"; };
@@ -341,12 +378,14 @@
 		538DED3D15478E68000F460D /* SchedulerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SchedulerViewController.m; path = iPhoneViewControllers/iPhoneViewController/SchedulerViewController.m; sourceTree = "<group>"; };
 		538DED471549F065000F460D /* CalendarTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.h; sourceTree = "<group>"; };
 		538DED481549F065000F460D /* CalendarTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalendarTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.m; sourceTree = "<group>"; };
+		53A0BA45155055A9002F149B /* EventTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/EventTableViewController.h; sourceTree = "<group>"; };
+		53A0BA46155055A9002F149B /* EventTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EventTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/EventTableViewController.m; sourceTree = "<group>"; };
+		53A0BA4E155057EC002F149B /* MemoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/MemoTableViewController.h; sourceTree = "<group>"; };
+		53A0BA4F155057EC002F149B /* MemoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MemoTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/MemoTableViewController.m; sourceTree = "<group>"; };
 		53C93326154EED5C00145938 /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Appointment.h; path = CoreData/ManagedObjects/Appointment.h; sourceTree = "<group>"; };
 		53C93327154EED5D00145938 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Appointment.m; path = CoreData/ManagedObjects/Appointment.m; sourceTree = "<group>"; };
 		53C93329154EEE2700145938 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = CoreData/ManagedObjects/Item.h; sourceTree = "<group>"; };
 		53C9332A154EEE2700145938 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = CoreData/ManagedObjects/Item.m; sourceTree = "<group>"; };
-		53C9332C154EEEAF00145938 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = CoreData/ManagedObjects/Event.h; sourceTree = "<group>"; };
-		53C9332D154EEEAF00145938 /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Event.m; path = CoreData/ManagedObjects/Event.m; sourceTree = "<group>"; };
 		53EA8FBD154A4DE20036AE2D /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilesTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.h; sourceTree = "<group>"; };
 		53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilesTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.m; sourceTree = "<group>"; };
 		53EA8FBF154A4DE20036AE2D /* FoldersTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FoldersTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FoldersTableViewController.h; sourceTree = "<group>"; };
@@ -394,10 +433,14 @@
 		530BADA91541E5A50001A30A /* ManagedObjects */ = {
 			isa = PBXGroup;
 			children = (
+				53006E601560BAC200602430 /* Note.h */,
+				53006E611560BAC200602430 /* Note.m */,
+				53006E5D1560BAC200602430 /* Memo.h */,
+				53006E5E1560BAC200602430 /* Memo.m */,
+				53006E571560943000602430 /* Event.h */,
+				53006E581560943000602430 /* Event.m */,
 				53C93329154EEE2700145938 /* Item.h */,
 				53C9332A154EEE2700145938 /* Item.m */,
-				53C9332C154EEEAF00145938 /* Event.h */,
-				53C9332D154EEEAF00145938 /* Event.m */,
 				53C93326154EED5C00145938 /* Appointment.h */,
 				53C93327154EED5D00145938 /* Appointment.m */,
 				530BADCE1541F2AF0001A30A /* Collection.h */,
@@ -414,10 +457,6 @@
 				530BADBA1541E61C0001A30A /* Project.m */,
 				530BADB61541E61C0001A30A /* Folder.h */,
 				530BADB71541E61C0001A30A /* Folder.m */,
-				530BADB31541E6010001A30A /* Memo.h */,
-				530BADB41541E6010001A30A /* Memo.m */,
-				530BADAA1541E5DB0001A30A /* Note.h */,
-				530BADAB1541E5DB0001A30A /* Note.m */,
 				530BADA61541E58F0001A30A /* Person.h */,
 				530BADA71541E58F0001A30A /* Person.m */,
 				530BADA01541E58E0001A30A /* Alarm.h */,
@@ -428,6 +467,35 @@
 				530BAD9A1541E58E0001A30A /* Tag.m */,
 			);
 			name = ManagedObjects;
+			sourceTree = "<group>";
+		};
+		531E10CF1561D0880074321A /* TodayTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10C6156195CE0074321A /* TodayTableViewController.h */,
+				531E10C7156195CE0074321A /* TodayTableViewController.m */,
+				53A0BA431550550B002F149B /* EventsTableViewController */,
+				53A0BA4D155057A3002F149B /* MemosTableViewController */,
+				5367F297155224C100E1994A /* HorizontalCells */,
+			);
+			name = TodayTableViewController;
+			sourceTree = "<group>";
+		};
+		531E10DF1561F4CC0074321A /* DetailViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D01561F4A90074321A /* AppointmentDetailViewController.h */,
+				531E10D11561F4AB0074321A /* AppointmentDetailViewController.m */,
+				531E10D21561F4AD0074321A /* DocumentDetailViewController.h */,
+				531E10D31561F4AF0074321A /* DocumentDetailViewController.m */,
+				531E10D41561F4B00074321A /* FoldersDetailTableViewController.h */,
+				531E10D51561F4B20074321A /* FoldersDetailTableViewController.m */,
+				531E10D61561F4B50074321A /* MemoDetailViewController.h */,
+				531E10D71561F4B60074321A /* MemoDetailViewController.m */,
+				531E10D81561F4B80074321A /* ToDoDetailViewController.h */,
+				531E10D91561F4BB0074321A /* ToDoDetailViewController.m */,
+			);
+			name = DetailViewControllers;
 			sourceTree = "<group>";
 		};
 		532658961540A8E600238AA1 = {
@@ -517,6 +585,7 @@
 		532659361540A9EA00238AA1 /* iPhoneViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				531E10DF1561F4CC0074321A /* DetailViewControllers */,
 				537320281540DFDE00FA376E /* CustomClasses */,
 				5373207C1540EE1600FA376E /* SettingsViewController */,
 				532659471540ACD100238AA1 /* ArchiveViewController */,
@@ -532,6 +601,7 @@
 			children = (
 				537320301540E0E800FA376E /* WriteNowViewController.h */,
 				537320311540E0E800FA376E /* WriteNowViewController.m */,
+				531E10CF1561D0880074321A /* TodayTableViewController */,
 			);
 			name = WriteNowViewController;
 			sourceTree = "<group>";
@@ -548,10 +618,9 @@
 		532659471540ACD100238AA1 /* ArchiveViewController */ = {
 			isa = PBXGroup;
 			children = (
+				53A0BA5215510E4C002F149B /* CollectionsTableViewContollers */,
 				537320291540E0BD00FA376E /* ArchiveViewController.h */,
 				5373202A1540E0BD00FA376E /* ArchiveViewController.m */,
-				53EA8FC5154A4E170036AE2D /* FilesTableViewController */,
-				53EA8FC4154A4DF10036AE2D /* FoldersTableViewController */,
 			);
 			name = ArchiveViewController;
 			sourceTree = "<group>";
@@ -601,26 +670,95 @@
 			name = BackGroundImages;
 			sourceTree = "<group>";
 		};
-		537320281540DFDE00FA376E /* CustomClasses */ = {
+		5367F28D15520C2600E1994A /* EventCells */ = {
 			isa = PBXGroup;
 			children = (
-				5383AC8C154113CB0083A240 /* Custom PopOver */,
-				537320471540E2BB00FA376E /* CustomTextView.h */,
-				537320481540E2BB00FA376E /* CustomTextView.m */,
-				537320491540E2BB00FA376E /* CustomToolBar.h */,
-				5373204A1540E2BB00FA376E /* CustomToolBar.m */,
 				5373204B1540E2BB00FA376E /* EventsCell.h */,
 				5373204C1540E2BB00FA376E /* EventsCell.m */,
+			);
+			name = EventCells;
+			sourceTree = "<group>";
+		};
+		5367F28F15520C3600E1994A /* CustomTextView */ = {
+			isa = PBXGroup;
+			children = (
+				537320471540E2BB00FA376E /* CustomTextView.h */,
+				537320481540E2BB00FA376E /* CustomTextView.m */,
+			);
+			name = CustomTextView;
+			sourceTree = "<group>";
+		};
+		5367F29015520C4200E1994A /* CustomToolBar */ = {
+			isa = PBXGroup;
+			children = (
+				537320491540E2BB00FA376E /* CustomToolBar.h */,
+				5373204A1540E2BB00FA376E /* CustomToolBar.m */,
+			);
+			name = CustomToolBar;
+			sourceTree = "<group>";
+		};
+		5367F29115520C5600E1994A /* FileCustomCell */ = {
+			isa = PBXGroup;
+			children = (
 				5373204D1540E2BB00FA376E /* FileCustomCell.h */,
 				5373204E1540E2BB00FA376E /* FileCustomCell.m */,
 				5373204F1540E2BB00FA376E /* FileCustomCell.xib */,
+			);
+			name = FileCustomCell;
+			sourceTree = "<group>";
+		};
+		5367F29215520C6600E1994A /* FolderCell */ = {
+			isa = PBXGroup;
+			children = (
 				537320501540E2BB00FA376E /* FolderCell.h */,
 				537320511540E2BB00FA376E /* FolderCell.m */,
 				537320521540E2BB00FA376E /* FolderCell.xib */,
+			);
+			name = FolderCell;
+			sourceTree = "<group>";
+		};
+		5367F29615520CAF00E1994A /* HorizontalCellsWithSections */ = {
+			isa = PBXGroup;
+			children = (
+				5367F29E1552263F00E1994A /* EventCellWithSections */,
+				5367F29A1552256400E1994A /* HorizontalCellsWithSections.h */,
+				5367F29B1552256400E1994A /* HorizontalCellsWithSections.m */,
+			);
+			name = HorizontalCellsWithSections;
+			sourceTree = "<group>";
+		};
+		5367F297155224C100E1994A /* HorizontalCells */ = {
+			isa = PBXGroup;
+			children = (
+				5367F28D15520C2600E1994A /* EventCells */,
+				5367F29315520C9E00E1994A /* HorizontalCells.h */,
+				5367F29415520C9E00E1994A /* HorizontalCells.m */,
+			);
+			name = HorizontalCells;
+			sourceTree = "<group>";
+		};
+		5367F29E1552263F00E1994A /* EventCellWithSections */ = {
+			isa = PBXGroup;
+			children = (
+				5367F2981552256400E1994A /* EventsCellWithSections.h */,
+				5367F2991552256400E1994A /* EventsCellWithSections.m */,
+			);
+			name = EventCellWithSections;
+			sourceTree = "<group>";
+		};
+		537320281540DFDE00FA376E /* CustomClasses */ = {
+			isa = PBXGroup;
+			children = (
+				5367F29615520CAF00E1994A /* HorizontalCellsWithSections */,
 				537320551540E2BB00FA376E /* NSCalendar+CalendarCalculations.h */,
 				537320561540E2BB00FA376E /* NSCalendar+CalendarCalculations.m */,
 				537320571540E2BB00FA376E /* UINavigationController+NavControllerCategory.h */,
 				537320581540E2BB00FA376E /* UINavigationController+NavControllerCategory.m */,
+				5383AC8C154113CB0083A240 /* Custom PopOver */,
+				5367F28F15520C3600E1994A /* CustomTextView */,
+				5367F29015520C4200E1994A /* CustomToolBar */,
+				5367F29115520C5600E1994A /* FileCustomCell */,
+				5367F29215520C6600E1994A /* FolderCell */,
 			);
 			name = CustomClasses;
 			sourceTree = "<group>";
@@ -649,8 +787,6 @@
 			children = (
 				537320871540F1C400FA376E /* SettingViewController.h */,
 				537320881540F1C400FA376E /* SettingViewController.m */,
-				53EA8FCE154B00BB0036AE2D /* AllItemsTableViewController.h */,
-				53EA8FCF154B00BB0036AE2D /* AllItemsTableViewController.m */,
 			);
 			name = SettingsViewController;
 			sourceTree = "<group>";
@@ -781,9 +917,9 @@
 		538DED3A15478E1F000F460D /* CalendarViewController */ = {
 			isa = PBXGroup;
 			children = (
-				538DED3B15478E2F000F460D /* SchedulerViewController */,
 				5373202C1540E0E800FA376E /* CalendarViewController.h */,
 				5373202D1540E0E800FA376E /* CalendarViewController.m */,
+				538DED3B15478E2F000F460D /* SchedulerViewController */,
 				538DED461549F036000F460D /* CalendarTableViewController */,
 			);
 			name = CalendarViewController;
@@ -801,10 +937,51 @@
 		538DED461549F036000F460D /* CalendarTableViewController */ = {
 			isa = PBXGroup;
 			children = (
+				5367F2A2155234C200E1994A /* EventsTableViewController2.h */,
+				5367F2A3155234C200E1994A /* EventsTableViewController2.m */,
 				538DED471549F065000F460D /* CalendarTableViewController.h */,
 				538DED481549F065000F460D /* CalendarTableViewController.m */,
 			);
 			name = CalendarTableViewController;
+			sourceTree = "<group>";
+		};
+		53A0BA431550550B002F149B /* EventsTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				53A0BA45155055A9002F149B /* EventTableViewController.h */,
+				53A0BA46155055A9002F149B /* EventTableViewController.m */,
+			);
+			name = EventsTableViewController;
+			sourceTree = "<group>";
+		};
+		53A0BA4D155057A3002F149B /* MemosTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				53A0BA4E155057EC002F149B /* MemoTableViewController.h */,
+				53A0BA4F155057EC002F149B /* MemoTableViewController.m */,
+			);
+			name = MemosTableViewController;
+			sourceTree = "<group>";
+		};
+		53A0BA5115510D99002F149B /* NotesTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5367F29F1552342E00E1994A /* MemosTableViewController2.h */,
+				5367F2A01552342F00E1994A /* MemosTableViewController2.m */,
+				53EA8FCE154B00BB0036AE2D /* AllItemsTableViewController.h */,
+				53EA8FCF154B00BB0036AE2D /* AllItemsTableViewController.m */,
+			);
+			name = NotesTableViewController;
+			sourceTree = "<group>";
+		};
+		53A0BA5215510E4C002F149B /* CollectionsTableViewContollers */ = {
+			isa = PBXGroup;
+			children = (
+				53A0BA5115510D99002F149B /* NotesTableViewController */,
+				53EA8FC4154A4DF10036AE2D /* FoldersTableViewController */,
+				53EA8FC5154A4E170036AE2D /* FilesTableViewController */,
+			);
+			name = CollectionsTableViewContollers;
 			sourceTree = "<group>";
 		};
 		53EA8FC4154A4DF10036AE2D /* FoldersTableViewController */ = {
@@ -1033,8 +1210,6 @@
 				530BAD9F1541E58E0001A30A /* Location.m in Sources */,
 				530BADA21541E58E0001A30A /* Alarm.m in Sources */,
 				530BADA81541E58F0001A30A /* Person.m in Sources */,
-				530BADAC1541E5DB0001A30A /* Note.m in Sources */,
-				530BADB51541E6010001A30A /* Memo.m in Sources */,
 				530BADB81541E61C0001A30A /* Folder.m in Sources */,
 				530BADBB1541E61C0001A30A /* Project.m in Sources */,
 				530BADBE1541E61C0001A30A /* Document.m in Sources */,
@@ -1051,7 +1226,22 @@
 				53EA8FD0154B00BB0036AE2D /* AllItemsTableViewController.m in Sources */,
 				53C93328154EED5D00145938 /* Appointment.m in Sources */,
 				53C9332B154EEE2700145938 /* Item.m in Sources */,
-				53C9332E154EEEAF00145938 /* Event.m in Sources */,
+				53A0BA49155055A9002F149B /* EventTableViewController.m in Sources */,
+				53A0BA50155057EC002F149B /* MemoTableViewController.m in Sources */,
+				5367F29515520C9E00E1994A /* HorizontalCells.m in Sources */,
+				5367F29C1552256400E1994A /* EventsCellWithSections.m in Sources */,
+				5367F29D1552256400E1994A /* HorizontalCellsWithSections.m in Sources */,
+				5367F2A11552342F00E1994A /* MemosTableViewController2.m in Sources */,
+				5367F2A4155234C300E1994A /* EventsTableViewController2.m in Sources */,
+				53006E591560943000602430 /* Event.m in Sources */,
+				53006E5F1560BAC200602430 /* Memo.m in Sources */,
+				53006E621560BAC200602430 /* Note.m in Sources */,
+				531E10C8156195CE0074321A /* TodayTableViewController.m in Sources */,
+				531E10DA1561F4BE0074321A /* AppointmentDetailViewController.m in Sources */,
+				531E10DB1561F4BE0074321A /* DocumentDetailViewController.m in Sources */,
+				531E10DC1561F4BE0074321A /* FoldersDetailTableViewController.m in Sources */,
+				531E10DD1561F4BE0074321A /* MemoDetailViewController.m in Sources */,
+				531E10DE1561F4BE0074321A /* ToDoDetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

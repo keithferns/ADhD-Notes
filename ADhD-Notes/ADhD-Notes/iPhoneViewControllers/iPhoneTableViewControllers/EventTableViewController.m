@@ -7,14 +7,11 @@
 //
 
 #import "EventTableViewController.h"
-#import "iDoitAppDelegate.h"
-#import "Contants.h"
-
+#import "ADhD_NotesAppDelegate.h"
+#import "Constants.h"
 #import "EventsCell.h"
 
 @implementation EventTableViewController
-
-
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
@@ -34,7 +31,6 @@
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    [_fetchedResultsController release];
     
     // Release any cached data, images, etc that aren't in use.
 }
@@ -54,7 +50,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getSelectedCalendarDate:) name:@"GetDateNotification" object:nil];
     
     /*configure tableView, set its properties and add it to the main view.*/
-    
+    /*
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
     UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 320, 26)];
     [headerLabel setBackgroundColor:[UIColor lightGrayColor]];
@@ -62,14 +58,10 @@
     [headerLabel setTextAlignment:UITextAlignmentCenter];
     [headerView setBackgroundColor:[UIColor blackColor]];
     [headerView addSubview:headerLabel];
+     */
     //[tableView setTableHeaderView:headerView];
     //[tableView setSectionFooterHeight:0.0];
-    //[tableView setSectionHeaderHeight:15.0];
-    
-    [headerLabel release];
-    [headerView release];
-    
-    
+    //[tableView setSectionHeaderHeight:15.0];    
     //[self.tableView setSeparatorColor:[UIColor blackColor]];
     //[self.tableView setSectionHeaderHeight:18];
     //self.tableView.rowHeight = kCellHeight;
@@ -77,23 +69,30 @@
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, kBottomViewRect.size.height-kTabBarHeight);
     self.tableView.backgroundColor = [UIColor clearColor];
     
+    self.tableView.bounces = NO;
+
+    
     if (managedObjectContext == nil) { 
-		managedObjectContext = [(iDoitAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-        NSLog(@"EventTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
+		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
+        NSLog(@"MemoTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
 	}
     
 	NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
         NSLog(@"FETCHING ERROR");
 	}
-
-    
 }
+
+
+
+- (void) viewWillAppear:(BOOL) animated {
+    [super viewWillAppear:NO];
+}
+
 
 - (void)handleDidSaveNotification:(NSNotification *)notification {
     NSLog(@"NSManagedObjectContextDidSaveNotification Received By WriteNowTableViewController");
     //FIXME: setting the fetchedResults controller to nil below is a temporary work-around for the problem created by having 1 row per section in the primary table view. 
-    
     //self.fetchedResultsController = nil;
     
     [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
@@ -120,6 +119,7 @@
 	self.fetchedResultsController = nil;
 }
 
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -145,11 +145,7 @@
     
     [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
     
-    NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];    
-    [gregorian setLocale:[NSLocale currentLocale]];
-    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    //[gregorian setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-    //FIXME: Better way of setting the current timezone as the default and not as xx hours from GMT
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
     
     NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];    
     [timeComponents setYear:[timeComponents year]];
@@ -158,54 +154,34 @@
     NSDate *currentDate= [gregorian dateFromComponents:timeComponents];
     
     NSLog(@"Current Date is %@", currentDate);
-    
+    /*
     if (selectedDate == nil) {
-        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aType > 0 AND aDate >= %@", currentDate];
+        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type > 0 AND aDate >= %@", currentDate];
         [request setPredicate:checkDate];
         checkDate = nil;
-        
     }
     else {
         NSLog(@"SelectedDate is %@", selectedDate);
-        
-        //NSTimeZone *myTimeZone = [NSTimeZone localTimeZone];
-        //NSInteger timeZoneOffset = [myTimeZone secondsFromGMT];
-        //NSDate *temp = [selectedDate dateByAddingTimeInterval:-timeZoneOffset];
-        
-        
         NSDate *temp = [selectedDate dateByAddingTimeInterval:-kTimeZoneOffset];
-        
-        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aType  > 0 AND aDate == %@", temp];
+        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type  > 0 AND aDate == %@", temp];
         [request setPredicate:checkDate];
         checkDate = nil;
     }
-    
+    */
 	NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
     
-    
 	[request setSortDescriptors:[NSArray arrayWithObjects: dateDescriptor, nil]];
-    //release the sort descriptors now that they are held by the request
-    
-    [dateDescriptor release];
-    
 	[request setFetchBatchSize:10];
     
     //Init a temp fetchedResultsController and set its fetchRequest to the current fetchRequest
     
-	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"aDate" cacheName:@"Root"];
+	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
     // NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
-    
     
 	newController.delegate = self;
 	self.fetchedResultsController = newController;
-    
-    //release the temp fetchedResultsController and fetchrequest
-    
-	[newController release];
-	[request release];
-	
+        
 	return _fetchedResultsController;
-    
 }
 
 #pragma mark - Table view data source
@@ -221,44 +197,44 @@
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    //id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
-    //return [sectionInfo numberOfObjects];
-    NSLog(@"Number of Objects = %d", [[_fetchedResultsController fetchedObjects] count]);
-
-    return [[_fetchedResultsController fetchedObjects] count];
-    
+    NSInteger temp;
+    temp = 0;
+    if ([[_fetchedResultsController fetchedObjects] count] > 0) {
+  
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
+    temp = [sectionInfo numberOfObjects];
+    }
+    NSLog (@"EVENTTABLEVIEWCONTROLLER Number of ROWS = %d", temp);
+        return temp;
+    //return [[_fetchedResultsController fetchedObjects] count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
-    return @"Event";
+    return @"Events";
 }
 
 
-
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"EventTableViewController: cellForRow - celling");
+    
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateStyle:NSDateFormatterShortStyle];
     EventsCell *cell = (EventsCell *) [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[[EventsCell alloc] init]autorelease];
+        cell = [[EventsCell alloc] init];
     }
-    
-    
-    if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[Event class]]){
-        NSLog(@"EventTableViewController: cellForRow - Object is a Event");
+    if ([[_fetchedResultsController fetchedObjects] count] > 0) {
+   
         Event *currentEvent = [_fetchedResultsController objectAtIndexPath:indexPath];
         CGSize itemSize=CGSizeMake(kCellWidth-4, kCellHeight-25);
         UIGraphicsBeginImageContext(itemSize);
-        [[[currentEvent.rNote anyObject] text] drawInRect:CGRectMake(0, 0, itemSize.width, itemSize.height) withFont:[UIFont boldSystemFontOfSize:10]];
+        [currentEvent.text drawInRect:CGRectMake(0, 0, itemSize.width, itemSize.height) withFont:[UIFont boldSystemFontOfSize:10]];
         UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
         //cell.myTextLabel.text = currentEvent.text;
         cell.dateLabel.text = [dateFormatter stringFromDate:currentEvent.creationDate];
     }
-    [dateFormatter release];
     return cell;
 }
 
@@ -310,8 +286,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     }   
 }
 
-
-
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
 }
@@ -329,11 +303,8 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
     
-    
+    NSLog(@"EVENT SELECTED");
 }
-
-
-
 
 #pragma mark -
 #pragma mark Fetched Results Notifications
