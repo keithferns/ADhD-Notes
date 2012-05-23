@@ -7,7 +7,6 @@
 //
 #import "ADhD_NotesAppDelegate.h"
 #import "FoldersTableViewController.h"
-#import "Constants.h"
 #import "FolderCell.h"
 
 @implementation FoldersTableViewController
@@ -21,11 +20,10 @@
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
+        
     }
     return self;
 }
-
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
@@ -37,7 +35,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    NSLog(@"FoldersTableViewController:viewDidLoad -> After managedObjectContext: %@",  managedObjectContext);
+
+   // self.managedObjectContext = theItem.addingContext;
+   // NSLog(@"FoldersTableViewController: After managedObjectContext: %@",  managedObjectContext);
+
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchFiles:) name:@"HasToggledToFilesViewNotification" object:nil];
     
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchFolders:) name:@"HasToggledToFoldersViewNotification" object:nil];
@@ -63,9 +65,8 @@
     
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-	}
-    NSLog(@"FoldersTableViewController: After managedObjectContext: %@",  managedObjectContext);
-
+        NSLog(@"FoldersTableViewController:viewDidLoad -> After managedObjectContext: %@",  managedObjectContext);
+        }
     
 	NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
@@ -108,13 +109,15 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    NSLog(@"FoldersTableViewController:viewWillAppear -> After managedObjectContext: %@",  managedObjectContext);
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    NSIndexPath *tableSelection = [self.tableView indexPathForSelectedRow];
-	[self.tableView deselectRowAtIndexPath:tableSelection animated:NO];
+    //NSIndexPath *tableSelection = [self.tableView indexPathForSelectedRow];
+	//[self.tableView deselectRowAtIndexPath:tableSelection animated:NO];
     
 }
 
@@ -232,6 +235,7 @@
     if ([[_fetchedResultsController sections] count] > 0) {
         id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
         numberOfRows = [sectionInfo numberOfObjects];
+        NSLog(@"FoldersTableViewController # of Rows = %d", numberOfRows);
     }
     return numberOfRows;
 }
@@ -244,13 +248,10 @@
 	}
     Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
     
-    [mycell.folderName setText:aFolder.name];
-   
-    
+    [mycell.folderName setText:aFolder.name];    
 }
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+ 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
     static NSString *CellIdentifier = @"FolderCell";
     
 	FolderCell *cell = (FolderCell *)[self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -266,7 +267,11 @@
 			}
 		}
 	}
-	[self configureCell:cell atIndexPath:indexPath];
+    //[self configureCell:cell atIndexPath:indexPath];
+
+    Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
+    [cell.folderName setText:aFolder.name];    
+    
     return cell;
 }
 
@@ -297,7 +302,6 @@
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
-        
     }   
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
@@ -306,6 +310,7 @@
 
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    //
 }
 
 
@@ -317,6 +322,18 @@
  return YES;
  }
  */
+
+
+#pragma mark - Table view delegate
+
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"FOLDER SELECTED");
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderSelectedNotification" object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
+    //[[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
+
+}
 
 
 #pragma mark -
@@ -368,18 +385,6 @@
     [self.tableView endUpdates];
 }
 
-#pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
 
- 
-    if (saving) {            
-        //ArchieViewController Will receive this notification and add the selected folder to theItem
-        [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[_fetchedResultsController objectAtIndexPath:indexPath ]];      
-    }
-    
- 
- 
-}
 @end

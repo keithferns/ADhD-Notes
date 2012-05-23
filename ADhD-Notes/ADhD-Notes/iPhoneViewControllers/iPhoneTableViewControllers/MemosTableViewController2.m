@@ -9,7 +9,6 @@
 
 #import "MemosTableViewController2.h"
 #import "ADhD_NotesAppDelegate.h"
-#import "Constants.h"
 
 #import "HorizontalCellsWithSections.h"
 

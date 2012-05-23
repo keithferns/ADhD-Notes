@@ -19,9 +19,7 @@
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSDate *selectedDate;
 
-- (void) getSelectedCalendarDate: (NSNotification *) notification;
 
-//- (NSFetchedResultsController *) fetchedResultsControllerWithPredicate:(NSPredicate *)aPredicate; 
 
 
 @end

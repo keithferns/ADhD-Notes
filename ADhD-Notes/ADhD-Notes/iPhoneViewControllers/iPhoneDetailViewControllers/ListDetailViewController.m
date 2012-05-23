@@ -1,24 +1,24 @@
-//  MemoDetailViewController.m
-//  iDoit
 //
-//  Created by Keith Fernandes on 4/15/12.
+//  ListDetailViewController.m
+//  ADhD-Notes
+//
+//  Created by Keith Fernandes on 5/18/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "MemoDetailViewController.h"
-#import "CustomTextView.h"
+#import "ListDetailViewController.h"
 #import "ArchiveViewController.h"
 
-@interface MemoDetailViewController ()
+@interface ListDetailViewController ()
 
 @end
 
-@implementation MemoDetailViewController
-
+@implementation ListDetailViewController
 @synthesize theItem;
 @synthesize saving;
 
-- (id)initWithStyle:(UITableViewStyle)style {
+- (id)initWithStyle:(UITableViewStyle)style
+{
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
@@ -26,13 +26,22 @@
     return self;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
 
-    NSLog (@"MemoDetailViewController:viewDidLoad -> loading");
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    NSLog (@"ListDetailViewController:viewDidLoad -> loading");
     
     self.tableView.backgroundColor = [UIColor blackColor];
-    
+    //self.tableView.allowsSelection = NO;
+    self.tableView.userInteractionEnabled = YES;
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
     
     [tableHeaderView setBackgroundColor:[UIColor blackColor]];
@@ -44,12 +53,12 @@
     dateLabel.backgroundColor = [UIColor blackColor];
     dateLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-ItalicMT" size:(12.0)];
     dateLabel.textColor = [UIColor whiteColor];
-    NSString *date = [dateFormatter stringFromDate:theItem.theSimpleNote.creationDate];
+    NSString *date = [dateFormatter stringFromDate:theItem.theList.creationDate];
     dateLabel.textAlignment = UITextAlignmentRight;
     NSString *temp = [NSString stringWithFormat:@"%@", date];
     dateLabel.text = temp;
     [tableHeaderView addSubview: dateLabel];
-
+    
     //FIXME: add the key theItem.theMemo.aPlace
     
     UILabel *placeLabel = [[UILabel alloc] initWithFrame:CGRectMake(130,22,180,18)];
@@ -57,24 +66,24 @@
     placeLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-ItalicMT" size:(12.0)];
     placeLabel.textColor = [UIColor whiteColor];
     placeLabel.textAlignment = UITextAlignmentRight;
-     temp = [NSString stringWithFormat:@"Some Place"];
+    temp = [NSString stringWithFormat:@"Some Place"];
     placeLabel.text = temp;
     //FIXME: add the key theItem.theMemo.aPlace
     [tableHeaderView addSubview: placeLabel];
-        
- 
+    
+    
     UIButton *folderButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 5, 80, 45)];
-    NSString *folderName = [[theItem.theSimpleNote.collection anyObject] name];
+    NSString *folderName = [[theItem.theList.collection anyObject] name];
     [folderButton setTitle:folderName forState:UIControlStateNormal];
     [folderButton setBackgroundImage:[UIImage imageNamed:@"folder.png"] forState:UIControlStateNormal];
     [folderButton addTarget:self action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
     [tableHeaderView addSubview:folderButton];
     self.tableView.tableHeaderView = tableHeaderView;
     
-    self.tableView.allowsSelectionDuringEditing = YES;
-    self.tableView.backgroundColor = [UIColor blackColor];
-
     
+    self.tableView.tableHeaderView = tableHeaderView;
+    
+    self.tableView.allowsSelectionDuringEditing = YES;
     
     UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 24)];
     // headerText.delegate = self;
@@ -88,14 +97,21 @@
     headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
     
     self.navigationItem.titleView = headerText;
+    
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     if (saving) {
-    self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
-    self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
-    self.navigationItem.leftBarButtonItem.target = self;   
+        self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
+        self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
+        self.navigationItem.leftBarButtonItem.target = self;   
     }
 }
+
+- (void) viewWillAppear:(BOOL) animated {
+    NSLog(@"ListDetailViewController - viewWillAppear");
+    [self.tableView reloadData];
+}
+
 
 - (void) startNewItem:(id) sender{
     [self.navigationController popViewControllerAnimated:YES];
@@ -103,7 +119,7 @@
 }
 
 - (void) presentArchiver: (id) sender {    
-
+    
     NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
     [addingContext setPersistentStoreCoordinator:[theItem.addingContext persistentStoreCoordinator]];
     
@@ -116,11 +132,6 @@
     NSLog(@"MemoDetailViewController -> Pushed ArchiveViewController");
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -129,7 +140,6 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    //MEMO SECTION: Text and Time/Place
     return 2;
 }
 
@@ -138,15 +148,11 @@
     //Memo has 3 sections
     switch (section) {
         case 0:// Text
+            rows = [theItem.theList.aStrings count];
+            break;
+        case 1://tags
             rows = 1;
             break;
-        case 1://Folder/File
-            rows = 1;
-            break;
-        case 2: //tags
-            rows = 1;
-            break;
-
         default:
             break;
     }
@@ -155,9 +161,10 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat result;
-    switch (indexPath.section) {
+    switch (indexPath.section)
+    {
         case 0:
-            result = 100;
+            result = 33;
             break;
         case 1:
             result = 22;
@@ -188,23 +195,70 @@
     
     return fHeight;
     
+    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"CellIdentifier";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
+        
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-
-     if (indexPath.section == 0){
-        CustomTextView *theTextView = [[CustomTextView alloc] initWithFrame:CGRectMake(0,0,300,105)];
-        theTextView.editable = NO;
-        [theTextView setText:theItem.theSimpleNote.text];
-        theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(14.0)];
-        [cell.contentView addSubview: theTextView];        
-    }
     
+    if (indexPath.section == 0){
+        NSUInteger listCount = [theItem.theList.aStrings count];
+        NSInteger row = indexPath.row;    
+        //FIXME: GET ORDERING
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+        NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+        
+        NSMutableArray *sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
+        [sortedStrings sortUsingDescriptors:sortDescriptors];
+        Liststring *listItem = [sortedStrings objectAtIndex:row];
+
+        if (indexPath.row < listCount) {
+			static NSString *ListCellIdentifier = @"ListCell";
+			
+			cell = [tableView dequeueReusableCellWithIdentifier:ListCellIdentifier];
+			
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ListCellIdentifier];
+                
+                
+                UIButton *uncheckButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 5, 20, 20)];
+                [uncheckButton setBackgroundImage:[UIImage imageNamed:@"uncheck.png"] forState:UIControlStateNormal];
+                [uncheckButton addTarget:self action:@selector(handleChecking:) forControlEvents:UIControlEventTouchUpInside];
+                [cell.contentView addSubview:uncheckButton];
+
+                /*
+                UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleChecking:)];
+                [tap setNumberOfTapsRequired:1];
+                [tap setNumberOfTouchesRequired:1];
+                [tap setDelegate:self];
+                [tap setEnabled:YES];
+                
+                [cell.imageView addGestureRecognizer:tap];
+                 
+                 */
+                
+                cell.contentView.backgroundColor = [UIColor blackColor];
+                cell.textLabel.backgroundColor = [UIColor blackColor];
+                cell.textLabel.textColor = [UIColor whiteColor];
+                 /*
+                if (listItem.checked) {
+                    cell.imageView.image = [UIImage imageNamed:@"uncheck.png"];
+                    }
+                     else {
+                        cell.imageView.image = [UIImage imageNamed:@"check.png"];
+                        }
+              */
+                
+			}
+            cell.textLabel.text = listItem.aString;
+      
+        }
+    }
     else if (indexPath.section == 1){
         UILabel *labeltag = [[UILabel alloc] initWithFrame:CGRectMake (0,0,55,24)];
         labeltag.text = @"Tags";
@@ -217,14 +271,35 @@
         tagLabel.backgroundColor = [UIColor blackColor];
         tagLabel.textColor = [UIColor whiteColor];
         [cell.contentView addSubview:tagLabel];      
-        tagLabel.text = @"Tag1, Tag2";
-
-    
-
+        tagLabel.text = @"Tag1, Tag2"; 
     }
     return cell;
 }
+                                                     
+ - (void) handleChecking:(id)sender {
+     NSLog (@"LISTDETAILVIEWCONTROLLER - HANDLING CHECKING");
+    // NSUInteger listCount = [theItem.theList.aStrings count];
+     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+     
+     NSMutableArray *sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
+     [sortedStrings sortUsingDescriptors:sortDescriptors];
+     
+          //  CGPoint tapLocation = [tapRecognizer locationInView:self.tableView];
+          //  NSIndexPath *tappedIndexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
+     
+           // Liststring *listItem = [sortedStrings objectAtIndex:tappedIndexPath.row];
 
+                                                         
+           //if (listItem.checked) {
+           //    listItem.checked = [NSNumber numberWithInt:1];
+           //     }
+           //else {
+           //    listItem.checked = [NSNumber numberWithInt:0];
+           //     }
+         //[self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:tappedIndexPath] withRowAnimation: UITableViewRowAnimationFade];
+      
+    }
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -233,21 +308,25 @@
     return YES;
 }
 */
+
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
 	UITableViewCellEditingStyle style = UITableViewCellEditingStyleNone;
     /*
-     if (indexPath.section == ????) {
-     // If this is the last item, it's the insertion row.
-     if (indexPath.row == [???? count]) {
-     style = UITableViewCellEditingStyleInsert;
-     }
-     else {
-     style = UITableViewCellEditingStyleDelete;
-     }
-     }
-     */
+    if (indexPath.section == ????) {
+        // If this is the last item, it's the insertion row.
+        if (indexPath.row == [???? count]) {
+            style = UITableViewCellEditingStyleInsert;
+        }
+        else {
+            style = UITableViewCellEditingStyleDelete;
+        }
+    }
+    */
     return style;
-}/*
+}
+
+/*
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -287,7 +366,6 @@
      // ...
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
      */
 }
 

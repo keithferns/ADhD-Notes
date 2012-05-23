@@ -36,6 +36,9 @@
     return self;
 }
 
+- (void) viewWillAppear:(BOOL)animated{
+    [self.hTableView reloadData];
+}
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSInteger numberOfRows;

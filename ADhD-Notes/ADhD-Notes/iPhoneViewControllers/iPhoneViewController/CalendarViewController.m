@@ -8,23 +8,21 @@
 
 #import "CalendarViewController.h"
 #import "ADhD_NotesAppDelegate.h"
-//#import "CalendarTableViewController.h"
 #import "EventsTableViewController2.h"
-#import "Constants.h"
 
+#import "AppointmentDetailViewController.h"
+#import "ToDoDetailViewController.h"
+#import "MemoDetailViewController.h"
 
 @interface CalendarViewController ()
 
 @property BOOL saving;
-//@property (nonatomic, retain) CalendarTableViewController *tableViewController;
-@property (nonatomic, retain) EventsTableViewController2 *tableViewController;
-
-
+@property (nonatomic, retain) EventsTableViewController2 *tableViewController1, *tableViewController2;
 @end
 
 @implementation CalendarViewController
 
-@synthesize tableViewController, segmentedControl;
+@synthesize tableViewController1, tableViewController2, segmentedControl;
 @synthesize actionsPopover;
 @synthesize saving, pushed, frontViewIsVisible;
 @synthesize managedObjectContext;
@@ -36,8 +34,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    frontViewIsVisible = YES;    
     
+    frontViewIsVisible = YES;
     if (managedObjectContext == nil) { 
         managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"CURRENT VIEWCONTROLLER: After managedObjectContext: %@",  managedObjectContext);
@@ -48,23 +46,21 @@
     [flipperView setBackgroundColor:[UIColor blackColor]];
     [self.view   addSubview:flipperView];
     
-    if (tableViewController == nil){
-        NSLog (@"CalendarViewController:viewDidLoad: Creating New Intance of CalendarTableViewController");
+    if (tableViewController2 == nil){
         
-        //tableViewController = [[CalendarTableViewController alloc]init ];
-        tableViewController = [[EventsTableViewController2 alloc] init];
-        tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
+        tableViewController2 = [[EventsTableViewController2 alloc] init];
+        tableViewController2.calendarIsVisible = NO;
+        tableViewController2.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         
-        [tableViewController.tableView setSeparatorColor:[UIColor blackColor]];
-        [tableViewController.tableView setSectionHeaderHeight:13];
-        tableViewController.tableView.rowHeight = kCellHeight;
+        [tableViewController2.tableView setSeparatorColor:[UIColor blackColor]];
+        [tableViewController2.tableView setSectionHeaderHeight:13];
+        tableViewController2.tableView.rowHeight = kCellHeight;
         
         UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 40)];
         searchBar.tintColor = [UIColor blackColor];
         
-        tableViewController.tableView.tableHeaderView = searchBar;
+        tableViewController2.tableView.tableHeaderView = searchBar;
     }
-    
     if (calendarView.superview==nil) {
         calendarView = 	[[TKCalendarMonthView alloc] init];        
         calendarView.delegate = self;
@@ -72,6 +68,16 @@
         
        // calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
         calendarView.frame = CGRectMake(0, 0, calendarView.frame.size.width, calendarView.frame.size.height);
+        tableViewController1 = [[EventsTableViewController2 alloc]init];
+        tableViewController1.calendarIsVisible = YES;
+
+        tableViewController1.tableView.frame = CGRectMake(0, calendarView.frame.size.height,kScreenWidth, kScreenHeight-calendarView.frame.size.height);
+        
+        [tableViewController1.tableView setSeparatorColor:[UIColor blackColor]];
+        [tableViewController1.tableView setSectionHeaderHeight:13];
+        tableViewController1.tableView.rowHeight = kCellHeight;
+        
+        [self.flipperView addSubview:tableViewController1.tableView];
 
         [self.flipperView addSubview:calendarView];
         [calendarView reload];
@@ -83,6 +89,7 @@
      */
     
     if (!pushed) {
+        NSLog (@"Calendar ViewC - NOT pushed");
         UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentActionsPopover:)];
         leftNavButton.tag = 1;
         self.navigationItem.leftBarButtonItem = leftNavButton;
@@ -104,6 +111,7 @@
     //[UIView commitAnimations];
     
     if (pushed) {
+        NSLog (@"Calendar ViewC - pushed");
         UIBarButtonItem *rightNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addDateToCurrentEvent)];
         rightNavButton.tag = 1;
         self.navigationItem.rightBarButtonItem = rightNavButton;
@@ -118,7 +126,6 @@
     [segmentedControl setWidth:60 forSegmentAtIndex:2];
     [segmentedControl setSelectedSegmentIndex:0];
     self.navigationItem.titleView = segmentedControl;
-    
 }
 
 - (void)viewDidUnload {
@@ -127,18 +134,26 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated{
-
+    /*
     if (!tableViewController){
         NSLog(@"CalendarViewController: viewWillAppear: CreatingNewTableViewController");
-        //tableViewController = [[CalendarTableViewController alloc]init ];
         tableViewController = [[EventsTableViewController2 alloc] init];
         tableViewController.tableView.frame = CGRectMake(0,kNavBarHeight,kScreenWidth, kScreenHeight-kNavBarHeight);
     }
+     
     if (self.calendarView.superview == nil && self.tableViewController.tableView.superview == nil){
         self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         [self.flipperView addSubview:tableViewController.tableView];
     }
+    */
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:UITableViewSelectionDidChangeNotification object:nil];
 }
+
+- (void) viewWillDisappear:(BOOL)animated {
+    NSLog(@"CalendarViewController - viewWillDisappear");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
+}
+
 
 - (UIImage *)flipperImageForDateNavigationItem {
 	// returns a 30 x 30 image to display the flipper button in the navigation bar
@@ -181,6 +196,32 @@
 	return theImage;
 }
 
+
+
+- (void) toggleAppointmentsTasksView: (id) sender{
+ 
+    switch (segmentedControl.selectedSegmentIndex) {
+        case 0:
+            {
+                NSLog (@"seg control index = %d", segmentedControl.selectedSegmentIndex);
+            NSNumber *num = [NSNumber numberWithInt:2];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"GetEventTypeNotification" object:num userInfo:nil]; 
+            }
+            break;
+        case 1:
+            {
+                NSLog (@"seg control index = %d", segmentedControl.selectedSegmentIndex);
+
+            NSNumber *num = [NSNumber numberWithInt:3];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"GetEventTypeNotification" object:num userInfo:nil]; 
+            }
+            break;
+        default:
+            break;
+    }
+    
+}
+
 - (void)toggleCalendar:(id) sender {
     // disable user interaction during the flip
     flipperView.userInteractionEnabled = NO;
@@ -196,9 +237,12 @@
     if (frontViewIsVisible==YES) {
         [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:flipperView cache:YES];
         [calendarView removeFromSuperview];
-        self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
-        [self.flipperView addSubview:tableViewController.tableView];
+        [self.tableViewController1.tableView removeFromSuperview];
+        //self. tableViewController.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
         
+        //self.tableViewController.calendarIsVisible = NO;
+        
+        [self.flipperView addSubview:tableViewController2.tableView];
         self.navigationItem.titleView = nil;
         NSArray *items = [NSArray arrayWithObjects:@"Appointments", @"Tasks", nil];
         segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
@@ -207,16 +251,18 @@
         [segmentedControl setWidth:90 forSegmentAtIndex:1];
         [segmentedControl setSelectedSegmentIndex:0];
         [segmentedControl addTarget:self
-                             action:@selector(toggleAppointmentTaskLists:)
+                             action:@selector(toggleAppointmentsTasksView:)
                    forControlEvents:UIControlEventValueChanged];
         
         self.navigationItem.titleView = segmentedControl;
         
     } else {
         [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:flipperView cache:YES];
-        [tableViewController.tableView removeFromSuperview];
-        [self.flipperView addSubview:calendarView];        
+        [tableViewController2.tableView removeFromSuperview];
         
+        [self.flipperView addSubview:calendarView];        
+        [self.flipperView addSubview:tableViewController1.tableView];
+
         self.navigationItem.titleView = nil;
         NSArray *items = [NSArray arrayWithObjects:@"Month", @"Week",@"Day", nil];
         segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
@@ -225,7 +271,7 @@
         [segmentedControl setWidth:60 forSegmentAtIndex:1];
         [segmentedControl setWidth:60 forSegmentAtIndex:2];
         [segmentedControl setSelectedSegmentIndex:0];
-        
+       
         self.navigationItem.titleView = segmentedControl;
         
     }
@@ -262,8 +308,6 @@
     return YES;
 }
 
-
-
 #pragma mark - TKCalendarMonthViewDelegate methods
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView didSelectDate:(NSDate *)d {
 	NSLog(@"calendarMonthView didSelectDate: %@", d);
@@ -273,21 +317,25 @@
 
 }
 
-- (void)calendarMonthView:(TKCalendarMonthView *)monthView monthDidChange:(NSDate *)d {
+- (void) calendarMonthView:(TKCalendarMonthView*)monthView monthDidChange:(NSDate*)month animated:(BOOL)animated {
 	NSLog(@"calendarMonthView monthDidChange");	
-    /*
-    CGRect frame = topView.frame;
-    frame.size.height = calendarView.frame.size.height;
-    topView.frame = frame;
-    frame = bottomView.frame;
-    frame.origin.y = topView.frame.origin.y + topView.frame.size.height;
-    bottomView.frame = frame;
-     */
+    [tableViewController1.tableView removeFromSuperview];
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.75];
+    [UIView setAnimationDelegate:self];
+    
+    CGRect frame = tableViewController1.tableView.frame;
+    frame.origin.y = calendarView.frame.origin.y + calendarView.frame.size.height;
+    tableViewController1.tableView.frame = frame;
+    [self.flipperView addSubview:tableViewController1.tableView];
+    
+    [UIView commitAnimations];
+    
 }
 #pragma mark - TKCalendarMonthViewDataSource methods
 //get dates with events
 - (NSArray *)fetchDatesForTimedEvents { 
-    NSLog(@"Will get array of timed event objects from store");
     
     NSFetchRequest *request = [[NSFetchRequest alloc] init]; 
     [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]]; 
@@ -307,42 +355,29 @@
     { NSLog(@"Error = %@", anyError);
         ///deal with error
     } 
-    
-    NSLog(@"Did get array of timed event objects from store");
-    
+        
     //kjf the array data contains Event objects. need to convert this to an array which has date objects 
-    NSLog(@"Number of objects in results = %d", [results count]);
     NSMutableArray *data = [[NSMutableArray alloc]init];
-    NSTimeZone *myTimeZone = [NSTimeZone localTimeZone];    
-    NSInteger timeZoneOffset = [myTimeZone secondsFromGMT];
-    NSLog (@"Time Zone offset is %d", timeZoneOffset);
     
-    //NSMutableArray *data = [NSMutableArray arrayWithCapacity:[results count]];
     for (int i=0; i<[results count]; i++) {
         
         if ([[results objectAtIndex:i] isKindOfClass:[Appointment class]]){
             Appointment *tempAppointment = [results objectAtIndex:i];
             [data addObject:tempAppointment.aDate];
             
-            //[data addObject:[tempAppointment.aDate dateByAddingTimeInterval:timeZoneOffset]];
         } 
         else if ([[results objectAtIndex:i] isKindOfClass:[ToDo class]]){
             ToDo *tempToDo = [results objectAtIndex:i];
             [data addObject:tempToDo.aDate];
             
-            //[data addObject:[tempToDo.aDate dateByAddingTimeInterval:timeZoneOffset]];
         }
         
     }
-    NSLog(@"Number of objects in data = %d", [data count]);
-    
-    NSLog(@"Contents of data array = %@", data);
     
     return data;    
 }
 
 - (NSArray*)calendarMonthView:(TKCalendarMonthView *)monthView marksFromDate:(NSDate *)startDate toDate:(NSDate *)lastDate {	
-	NSLog(@"calendarMonthView marksFromDate toDate");	
     
 	NSArray *data = [NSArray arrayWithArray:[self fetchDatesForTimedEvents]];
     
@@ -387,8 +422,6 @@
 		d = [cal dateByAddingComponents:offsetComponents toDate:d options:0];
 	}
 	
-	NSLog(@"Number of marks is %d",[marks count]);
-    NSLog(@"Array contains %@", marks);
 	return [NSArray arrayWithArray:marks];
 }
 - (void) addDateToCurrentEvent {
@@ -630,6 +663,54 @@
 }
 
 
+
+#pragma mark - Details
+
+- (void) handleTableRowSelection:(NSNotification *) notification {
+    //NOTE: Multiple messages are being posted. Apparently this is normal behavior so ignore.    
+    NSLog(@"WriteNowViewController:handleTableRowSelection - notification received");
+    
+    if ([[notification object] isKindOfClass:[Appointment class]]) {
+        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS AN APPOINTMENT");
+       // Appointment *selectedAppointment = [notification object];
+        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        //selectedItem.theAppointment = selectedAppointment;
+        //selectedItem.eventType = [NSNumber numberWithInt:2];
+        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theAppointment.text);
+        //detailViewController.theItem = selectedItem;
+        
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    } 
+    
+    else if ([[notification object] isKindOfClass:[ToDo class]]){
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A TASK");
+        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        //ToDo *selectedToDo = [notification object];
+        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        //selectedItem.theToDo = selectedToDo;
+        //selectedItem.eventType = [NSNumber numberWithInt:3];
+        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theToDo.text);
+        //detailViewController.theItem = selectedItem;
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }
+    else if ([[notification object] isKindOfClass:[Memo class]]){
+        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        
+        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A MEMO");
+        //Memo *selectedMemo = [notification object];
+        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        //selectedItem.theMemo = selectedMemo;
+        //selectedItem.eventType = [NSNumber numberWithInt:1];
+        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theMemo.text);
+        //detailViewController.theItem = selectedItem;
+        
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }
+}
 
 
 @end

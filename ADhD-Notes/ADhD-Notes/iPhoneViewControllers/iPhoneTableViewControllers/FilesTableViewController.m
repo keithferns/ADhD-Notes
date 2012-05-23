@@ -9,7 +9,6 @@
 #import "FilesTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
 #import "FileCustomCell.h"
-#import "Constants.h"
 
 @implementation FilesTableViewController
 
@@ -330,8 +329,7 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     //KJF NOTE: POST A NOTIFICATION WITH THE SELECTED ROW AS THE OBJECT PASSED WITH THE NOTIFICATION TO THE VIEW CONTROLLER
     

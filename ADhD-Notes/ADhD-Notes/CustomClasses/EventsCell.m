@@ -7,8 +7,6 @@
 //
 
 #import "EventsCell.h"
-#import "Constants.h"
-
 
 @implementation EventsCell
 
@@ -24,17 +22,19 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         [self setFrame:CGRectMake(0, 0, kCellWidth, kCellHeight)];
-        UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"white_line_page_background.png"]];
+        //UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"white_line_page_background.png"]];
+        UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"lined-page.png"]];
+
         backgroundImage.frame = CGRectMake(1, 1, kCellWidth-2, kCellHeight-2);
         self.backgroundView = backgroundImage;
         self.backgroundView.backgroundColor = [UIColor blackColor];
-        dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kCellWidth-2, 20)];
+        dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(3, 0, kCellWidth-2, 20)];
         dateLabel.backgroundColor = [UIColor clearColor];
         //dateLabel.adjustsFontSizeToFitWidth = YES;
         dateLabel.textColor = [UIColor blueColor];
         dateLabel.font = [UIFont boldSystemFontOfSize:9];
         dateLabel.numberOfLines = 1;
-        dateLabel.textAlignment = UITextAlignmentRight;
+        dateLabel.textAlignment = UITextAlignmentLeft;
         [self.contentView addSubview:dateLabel];
         /*
         self.myTextLabel= [[CustomTextLabel alloc]initWithFrame:CGRectMake(0, 15, kCellWidth, 60)];

@@ -10,22 +10,19 @@
 
 #import "WEPopoverController.h"
 #import "NewItemOrEvent.h"
-#import "FoldersTableViewController.h"
-#import "FilesTableViewController.h"
 
-@interface ArchiveViewController : UIViewController <PopoverControllerDelegate, UIAlertViewDelegate>{
+
+@interface ArchiveViewController : UIViewController <PopoverControllerDelegate, UIAlertViewDelegate, UITableViewDelegate>{
     NewItemOrEvent *theItem;
     BOOL saving;
     NSManagedObjectContext *managedObjectContext;
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-
 @property (nonatomic, retain) WEPopoverController *actionsPopover;
 @property (nonatomic, retain) NewItemOrEvent *theItem;
 @property (nonatomic, readwrite) BOOL saving;
-@property (nonatomic, retain) FoldersTableViewController *foldersTableViewController;
-@property (nonatomic, retain) FilesTableViewController *filesTableViewController;
+
 
 - (UIView *) addItemsView: (CGRect) frame;
 

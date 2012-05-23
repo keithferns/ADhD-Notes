@@ -12,15 +12,15 @@
     
     NSFetchedResultsController *_fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
+    NSDate *selectedDate;
     
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSDate *selectedDate;
-
-
-//- (NSFetchedResultsController *) fetchedResultsControllerWithPredicate:(NSPredicate *)aPredicate; 
+@property (nonatomic, readwrite) BOOL calendarIsVisible;
+@property (nonatomic, retain) NSNumber *eventType;
 
 
 - (void) getSelectedCalendarDate: (NSNotification *) notification;

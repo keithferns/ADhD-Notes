@@ -14,18 +14,16 @@
     [super awakeFromInsert];
    
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
-    [gregorian setLocale:[NSLocale currentLocale]];
-    [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-    
     NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];  
-    int thehours = [timeComponents hour];
-    int theminutes = [timeComponents minute];
     [timeComponents setYear:[timeComponents year]];
     [timeComponents setMonth:[timeComponents month]];
     [timeComponents setDay:[timeComponents day]];
     [timeComponents setHour:0];
     [timeComponents setMinute:0];
     [timeComponents setSecond:0];
+    
+    int thehours = [timeComponents hour];
+    int theminutes = [timeComponents minute];
     
     NSDate *temp = [gregorian dateFromComponents:timeComponents];
     [self setValue:temp forKey:@"aDate"];

@@ -15,6 +15,7 @@
 }
 
 @property (nonatomic,retain) NewItemOrEvent *theItem;
+@property (nonatomic, readwrite) BOOL saving;
 
 
 @end

@@ -10,6 +10,7 @@
 #import "CustomTextView.h"
 
 
+
 @interface AppointmentDetailViewController ()
 
 @end
@@ -17,6 +18,7 @@
 @implementation AppointmentDetailViewController
 
 @synthesize theItem;
+@synthesize saving;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -47,8 +49,16 @@
     headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
     
     self.navigationItem.titleView = headerText;
-    
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    if (saving) {
+    self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
+    self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
+    self.navigationItem.leftBarButtonItem.target = self;   
+    }
+}
+
+- (void) startNewItem:(id) sender{
+    [self.navigationController popViewControllerAnimated:YES];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil];
 }
 
 - (void)viewDidUnload
@@ -133,7 +143,6 @@ return result;
         fHeight = 0.0;
 
     return fHeight;
-    
     
 }
  
@@ -223,14 +232,18 @@ return result;
        
         }
     else if (indexPath.section == 3){
-        UILabel *labeltag = [[UILabel alloc] initWithFrame:CGRectMake (5,0,50,18)];
+        UILabel *labeltag = [[UILabel alloc] initWithFrame:CGRectMake (0,0,55,24)];
         labeltag.text = @"Tags";
         labeltag.enabled = NO;
+        labeltag.backgroundColor = [UIColor blackColor];
         [cell.contentView addSubview:labeltag];
         
-        UILabel *tagLabel = [[UILabel alloc] initWithFrame: CGRectMake (60,0,220,18)];
-        //NSString *temp = [NSString stringWithFormat:@"%@, %@, %@, %@", theItem.theMemo.rTag etc
-        [cell.contentView addSubview:tagLabel];
+        UILabel *tagLabel = [[UILabel alloc] initWithFrame: CGRectMake (55,0,245,24)];
+        //NSString *temp = [NSString stringWithFormat:@"%@, %@, %@, %@", theItem.theSimpleNote.rTag etc
+        tagLabel.backgroundColor = [UIColor blackColor];
+        tagLabel.textColor = [UIColor whiteColor];
+        [cell.contentView addSubview:tagLabel];      
+        tagLabel.text = @"Tag1, Tag2"; 
         
         }
 

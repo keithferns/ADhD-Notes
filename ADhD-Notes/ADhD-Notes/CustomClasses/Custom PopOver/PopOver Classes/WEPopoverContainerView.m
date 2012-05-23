@@ -59,7 +59,7 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 
 
 - (void)drawRect:(CGRect)rect {
-	[bgImage drawInRect:bgRect blendMode:kCGBlendModeNormal alpha:0.8];//KJF CHANGED ALPHA FROM 1.0
+	[bgImage drawInRect:bgRect blendMode:kCGBlendModeNormal alpha:1.0];//KJF CHANGED ALPHA FROM 1.0
 	[arrowImage drawInRect:arrowRect blendMode:kCGBlendModeNormal alpha:0.8]; 
 }
 

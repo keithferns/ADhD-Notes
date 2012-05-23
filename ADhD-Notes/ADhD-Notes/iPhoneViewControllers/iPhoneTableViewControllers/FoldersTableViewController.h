@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "NewItemOrEvent.h"
-@interface FoldersTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchBarDelegate> {
+@interface FoldersTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchBarDelegate, UINavigationControllerDelegate> {
     
     NSFetchedResultsController *_fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;

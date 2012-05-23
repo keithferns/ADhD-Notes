@@ -214,8 +214,9 @@
 	CGFloat bgCapSize = 0.0;
 	CGFloat contentMargin = 4.0;
     
-    bgImageName = @"popoverBg.png";
-    
+    //bgImageName = @"popoverBg.png";
+    bgImageName = @"popoverBg_blue.png";
+
     // These constants are determined by the popoverBg.png image file and are image dependent
     bgMargin = 13; // margin width of 13 pixels on all sides popoverBg.png (62 pixels wide - 36 pixel background) / 2 == 26 / 2 == 13 
     bgCapSize = 31; // ImageSize/2  == 62 / 2 == 31 pixels

@@ -20,6 +20,7 @@
 
     #import "Constants.h"
     #import "UINavigationController+NavControllerCategory.h"
+    #import "NSDate+TKCategory.h"
     #import "WEPopoverController.h"
     #import "TKCalendarMonthViewController.h"
 #import "Note.h"
@@ -38,5 +39,6 @@
 #import "SimpleNote.h"
 #import "List.h"
 #import "Location.h"
+#import "Liststring.h"
 
 #endif

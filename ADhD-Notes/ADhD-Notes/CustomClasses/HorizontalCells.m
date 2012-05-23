@@ -7,7 +7,6 @@
 //
 
 #import "HorizontalCells.h"
-#import "Constants.h"
 #import "EventsCell.h"
 
 @implementation HorizontalCells
@@ -18,7 +17,6 @@
     
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     
-     //  NSLog(@"Horizontal Cells:initWithTyle. EventType is %d", [myType intValue]);
     [self setFrame:CGRectMake(0, 0, kScreenWidth, kCellHeight)];
     
     if (reuseIdentifier == @"firstCell"){
@@ -41,6 +39,8 @@
        else if (reuseIdentifier == @"secondCell") {
         
             if (self.eventTV == nil){
+            NSLog(@"Horizontal Cells:initWithFrame: init eventTV");
+
             eventTV =[[EventTableViewController alloc] init];
             }
            self.eventTV.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight,kScreenWidth)];

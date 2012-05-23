@@ -7,19 +7,20 @@
 //
 
 #import "SchedulerViewController.h"
+#import "EventsTableViewController2.h"
 
 @interface SchedulerViewController ()
+@property (nonatomic, retain) EventsTableViewController2 *tableViewController;
 
 @end
 
 #define textFieldFont 14
 
-
 @implementation SchedulerViewController
 
 @synthesize toolbar;
 @synthesize theItem;
-
+@synthesize tableViewController;
 @synthesize alarmView, tagView, topView;
 @synthesize dateField, startTimeField, endTimeField, recurringField, locationField;
 @synthesize alarm1Field, alarm2Field, alarm3Field, alarm4Field;
@@ -28,8 +29,7 @@
 @synthesize datePicker, timePicker;
 @synthesize recurringPicker, alarmPicker, tagPicker, locationPicker;
 @synthesize recurringArray, alarmArray, tagArray, locationArray;
-@synthesize tableView;
-@synthesize isBeingEdited;
+@synthesize editing;
 
 
 #pragma mark - ViewManagement
@@ -141,11 +141,18 @@
     [topView addSubview:startTimeField];
     [topView addSubview:endTimeField];    
     [topView addSubview:locationField];
-    [topView addSubview:tableView];
-        
-    tableView = [[UITableView alloc] initWithFrame:CGRectMake(160, 5, 155, 140)];
-    tableView.rowHeight = 25.0;
-    [topView addSubview:tableView];
+    
+    if (tableViewController == nil) {
+        tableViewController = [[EventsTableViewController2 alloc] initWithStyle:UITableViewStylePlain];
+        tableViewController.calendarIsVisible = YES;
+
+        tableViewController.tableView.frame = CGRectMake(160, 5, 155, 140);
+        tableViewController.tableView.rowHeight = kCellHeight;
+       
+        tableViewController.selectedDate = [[NSDate date] timelessDate];
+    }
+    
+    [topView addSubview:tableViewController.tableView];
         
     dateField.delegate = self;
     startTimeField.delegate = self;
@@ -174,7 +181,6 @@
 - (void) cancelScheduling{
     
     [self.navigationController popToRootViewControllerAnimated:YES];
-
     
 }
 
@@ -249,10 +255,10 @@
     CGRect frame = alarmView.frame;
     frame.origin.y = 0;
     alarmView.frame = frame;
-    if (tableView.superview != nil){
-        frame = tableView.frame;
-        frame.origin.y = - tableView.frame.size.height;
-        tableView.frame = frame;
+    if (tableViewController.tableView.superview != nil){
+        frame = tableViewController.tableView.frame;
+        frame.origin.y = - tableViewController.tableView.frame.size.height;
+        tableViewController.tableView.frame = frame;
     }
     if (tagView.superview !=nil){
         frame = tagView.frame;
@@ -321,10 +327,10 @@
     CGRect frame = tagView.frame;
     frame.origin.y = 0;
     tagView.frame = frame;
-    if (tableView.superview != nil){
-        frame = tableView.frame;
-        frame.origin.y = - tableView.frame.size.height;
-        tableView.frame = frame;
+    if (tableViewController.tableView.superview != nil){
+        frame = tableViewController.tableView.frame;
+        frame.origin.y = - tableViewController.tableView.frame.size.height;
+        tableViewController.tableView.frame = frame;
     }
     if (alarmView.superview !=nil) {
         frame = alarmView.frame;
@@ -336,12 +342,12 @@
 
 
 - (void) finishedAlarmTransition{
-    [tableView removeFromSuperview];
+    [tableViewController.tableView removeFromSuperview];
     [tagView removeFromSuperview];
 }
 
 - (void) finishedTagTransition{
-    [tableView removeFromSuperview];
+    [tableViewController.tableView removeFromSuperview];
     [alarmView removeFromSuperview];
 }
 
@@ -370,7 +376,7 @@
 
 
 - (void) textFieldResignFirstResponder{
-    switch ([isBeingEdited intValue]) {
+    switch ([editing intValue]) {
         case 1:
             [self.dateField resignFirstResponder];
             break;
@@ -414,7 +420,7 @@
 
 - (void) textFieldBecomeFirstResponder{
     
-    switch ([isBeingEdited intValue]) {
+    switch ([editing intValue]) {
         case 1:
             [self.dateField becomeFirstResponder];
             break;
@@ -457,38 +463,34 @@
 }
 
 
-
 - (void) textFieldDidEndEditing:(UITextField *)textField{
-    NSLog(@"Method: textfieldDidEndEditing -> currently commands");
     //
 }
 
-
 - (void) textFieldDidBeginEditing:(UITextField *)textField{
-    NSLog(@"Method: textFieldDidBeginEditing -> applies in scheduleView, enables and/or disables the toolbar next and prev buttons");
     switch ([textField tag]) {
         case 1:
-            self.isBeingEdited = [NSNumber numberWithInt:1];
+            self.editing = [NSNumber numberWithInt:1];
             toolbar.firstButton.enabled = NO;
             toolbar.secondButton.enabled = YES;
             break;
         case 2:
-            self.isBeingEdited = [NSNumber numberWithInt:2];
+            self.editing = [NSNumber numberWithInt:2];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 3:
-            self.isBeingEdited = [NSNumber numberWithInt:3];
+            self.editing = [NSNumber numberWithInt:3];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 4:
-            self.isBeingEdited = [NSNumber numberWithInt:4];
+            self.editing = [NSNumber numberWithInt:4];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 5:
-            self.isBeingEdited = [NSNumber numberWithInt:5];
+            self.editing = [NSNumber numberWithInt:5];
             toolbar.firstButton.enabled = YES;
             if (self.alarm1Field.superview == nil) {
                 toolbar.secondButton.enabled = NO;
@@ -498,37 +500,37 @@
             }
             break;
         case 6:
-            self.isBeingEdited = [NSNumber numberWithInt:6];
+            self.editing = [NSNumber numberWithInt:6];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 7:
-            self.isBeingEdited = [NSNumber numberWithInt:7];
+            self.editing = [NSNumber numberWithInt:7];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 8:
-            self.isBeingEdited = [NSNumber numberWithInt:8];
+            self.editing = [NSNumber numberWithInt:8];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 9:
-            self.isBeingEdited = [NSNumber numberWithInt:9];
+            self.editing = [NSNumber numberWithInt:9];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = NO;
             break;
         case 10:
-            self.isBeingEdited = [NSNumber numberWithInt:10];
+            self.editing = [NSNumber numberWithInt:10];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;        
         case 11:
-            self.isBeingEdited = [NSNumber numberWithInt:11];
+            self.editing = [NSNumber numberWithInt:11];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = YES;
             break;
         case 12:
-            self.isBeingEdited = [NSNumber numberWithInt:12];
+            self.editing = [NSNumber numberWithInt:12];
             toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = NO;
             break;
@@ -546,18 +548,24 @@
     
     self.dateField.text = [dateFormatter stringFromDate:[datePicker date]];
     theItem.aDate = [datePicker date];
+    
+
+    NSDate *selectedDate = [[datePicker date] timelessDate];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:selectedDate userInfo:nil]; 
+    
 }
 
 - (void) timePickerChanged:(id) sender{
     NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
     [timeFormatter setDateFormat:@"h:mm a"];
-    if ([isBeingEdited intValue] == 2) {
+    if ([editing intValue] == 2) {
         
         self.startTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
         theItem.startTime = [timePicker date];
         
     }
-    else if ([isBeingEdited intValue] == 3){
+    else if ([editing intValue] == 3){
         self.endTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
         theItem.endTime  = [timePicker date];
     }
@@ -568,7 +576,6 @@
 #pragma mark - PickerView DataSource and Delgate Methods
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component{  
-    NSLog(@"PickerView Changed");
     
     switch ([pickerView tag]) {
         case 1:
@@ -579,7 +586,7 @@
             self.locationField.text = [locationArray objectAtIndex:row];
             break;
         case 3:
-            switch ([isBeingEdited intValue]) {
+            switch ([editing intValue]) {
                 case 6:
                     self.alarm1Field.text = [alarmArray objectAtIndex:row];
                     break;
@@ -597,7 +604,7 @@
             }
             break;
         case 4:
-            switch ([isBeingEdited intValue]) {
+            switch ([editing intValue]) {
                 case 10:
                     self.tag1Field.text = [tagArray objectAtIndex:row];
                     break;
@@ -676,39 +683,39 @@
     
     [self textFieldResignFirstResponder];
     
-    switch ([self.isBeingEdited intValue]) {
+    switch ([self.editing intValue]) {
         case 2:
-            self.isBeingEdited = [NSNumber numberWithInt:1];
+            self.editing = [NSNumber numberWithInt:1];
             break;
         case 3:
-            self.isBeingEdited = [NSNumber numberWithInt:2];
+            self.editing = [NSNumber numberWithInt:2];
             break;
         case 4:
-            self.isBeingEdited = [NSNumber numberWithInt:3];
+            self.editing = [NSNumber numberWithInt:3];
             break;
         case 5:
-            self.isBeingEdited = [NSNumber numberWithInt:4];
+            self.editing = [NSNumber numberWithInt:4];
             break;
         case 6:
-            self.isBeingEdited = [NSNumber numberWithInt:5];
+            self.editing = [NSNumber numberWithInt:5];
             break;
         case 7:
-            self.isBeingEdited = [NSNumber numberWithInt:6];
+            self.editing = [NSNumber numberWithInt:6];
             break;
         case 8:
-            self.isBeingEdited = [NSNumber numberWithInt:7];
+            self.editing = [NSNumber numberWithInt:7];
             break;
         case 9:
-            self.isBeingEdited = [NSNumber numberWithInt:8];
+            self.editing = [NSNumber numberWithInt:8];
             break;
         case 10:
-            self.isBeingEdited = [NSNumber numberWithInt:5];
+            self.editing = [NSNumber numberWithInt:5];
             break;
         case 11:
-            self.isBeingEdited = [NSNumber numberWithInt:10];
+            self.editing = [NSNumber numberWithInt:10];
             break;
         case 12:
-            self.isBeingEdited = [NSNumber numberWithInt:11];
+            self.editing = [NSNumber numberWithInt:11];
         default:
             break;
     }
@@ -719,44 +726,44 @@
     //Check which textField is first responder. Move to next textField. 
     [self textFieldResignFirstResponder];
     
-    switch ([self.isBeingEdited intValue]) {
+    switch ([self.editing intValue]) {
         case 1:
-            self.isBeingEdited = [NSNumber numberWithInt:2];
+            self.editing = [NSNumber numberWithInt:2];
             break;
         case 2:
-            self.isBeingEdited = [NSNumber numberWithInt:3];
+            self.editing = [NSNumber numberWithInt:3];
             break;
         case 3:
-            self.isBeingEdited = [NSNumber numberWithInt:4];
+            self.editing = [NSNumber numberWithInt:4];
             break;
         case 4:
-            self.isBeingEdited = [NSNumber numberWithInt:5];
+            self.editing = [NSNumber numberWithInt:5];
             break;
         case 5:
             if (self.alarmView.superview == nil) {
-                self.isBeingEdited = [NSNumber numberWithInt:10];
+                self.editing = [NSNumber numberWithInt:10];
             }
             else if (self.tagView.superview == nil){
-                self.isBeingEdited = [NSNumber numberWithInt:6];
+                self.editing = [NSNumber numberWithInt:6];
             }
             break;
         case 6:
-            self.isBeingEdited = [NSNumber numberWithInt:7];
+            self.editing = [NSNumber numberWithInt:7];
             break;
         case 7:
-            self.isBeingEdited = [NSNumber numberWithInt:8];
+            self.editing = [NSNumber numberWithInt:8];
             break;
         case 8:
-            self.isBeingEdited = [NSNumber numberWithInt:9];
+            self.editing = [NSNumber numberWithInt:9];
             break;
         case 9:
-            self.isBeingEdited = [NSNumber numberWithInt:10];
+            self.editing = [NSNumber numberWithInt:10];
             break;        
         case 10:
-            self.isBeingEdited = [NSNumber numberWithInt:11];
+            self.editing = [NSNumber numberWithInt:11];
             break;        
         case 11:
-            self.isBeingEdited = [NSNumber numberWithInt:12];
+            self.editing = [NSNumber numberWithInt:12];
             break;
         default:
             break;

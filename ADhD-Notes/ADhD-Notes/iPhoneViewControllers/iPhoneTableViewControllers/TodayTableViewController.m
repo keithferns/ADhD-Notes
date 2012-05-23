@@ -7,7 +7,6 @@
 //
 
 #import "TodayTableViewController.h"
-#import "Constants.h"
 #import "HorizontalCells.h"
 
 @interface TodayTableViewController ()
@@ -20,10 +19,24 @@
 {
     [super viewDidLoad];
 
-    self.tableView.frame = CGRectMake (0, 0, 320, kCellHeight*2);
+    self.tableView.frame = CGRectMake (0, 0, 320, kCellHeight*2+40);
     self.tableView.rowHeight = kCellHeight;
     self.tableView.bounces = NO;
     self.tableView.allowsSelection = NO;
+    
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)];
+    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 40)];
+    [headerLabel setBackgroundColor:[UIColor blackColor]];
+    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
+    [dateformatter setDateFormat:@"EEEE, MMM d"];
+    
+    [headerLabel setText:[dateformatter stringFromDate:[NSDate date]]];
+    [headerLabel setTextColor:[UIColor whiteColor]];
+    [headerLabel setTextAlignment:UITextAlignmentCenter];
+    [headerView setBackgroundColor:[UIColor blackColor]];
+    [headerView addSubview:headerLabel];
+
+    [self.tableView setTableHeaderView:headerView];
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;

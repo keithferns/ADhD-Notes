@@ -7,14 +7,12 @@
 //
 
 #import "NewItemOrEvent.h"
-#import "NSCalendar+CalendarCalculations.h"
-#import "Constants.h"
 
 @implementation NewItemOrEvent
 
 @synthesize recurring;
 @synthesize delegate;
-@synthesize theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote, theList;
+@synthesize theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote, theList, theString;
 @synthesize addingContext;//note this MOC is an adding MOC passed from the parent.
 @synthesize eventType;
 
@@ -51,8 +49,6 @@
     
     self.startTime = [self.aDate dateByAddingTimeInterval: theTI];
 
-
-    
     //Convert End Time
     timeComponents = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:self.endTime];
     thehours = [timeComponents hour];
@@ -60,12 +56,9 @@
     theTI = thehours*60*60 + theminutes*60;
     self.endTime = [self.aDate dateByAddingTimeInterval: theTI];
     NSLog(@"the endTime is %@", self.endTime);
-
-
 }
 
 #pragma mark - CREATE NEW ITEMS
-
 
 - (void) createNewSimpleNote{
 NSLog(@"NewItemOrEvent: Creating New Simple Note");
@@ -81,6 +74,22 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
     NSLog(@"Simple Note startTime is %@", theSimpleNote.startTime);
 }
 
+- (void) createNewStringFromText:(NSString *)mytext {
+    NSLog(@"Creating New string");
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:addingContext];
+    
+     theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
+    theString.aString = mytext;
+    NSLog(@"NEWITEMOREVENT:CREATNEWSTRING theString.aString =  %@", theString.aString);
+    
+    if (listArray == nil) {
+        listArray = [[NSArray alloc] init];
+        NSLog(@"NEWITEMOREVENT:CREATENEWSTRING - initing listArray");
+    }
+    listArray = [listArray arrayByAddingObject:theString];
+    theString.order = [NSNumber numberWithInt:[listArray count]];
+}
+
 - (void) createNewList{
         
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"List" inManagedObjectContext:addingContext];
@@ -88,14 +97,16 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
     theList = [[List alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
     
     //FIXME: THIS SHOULD TAKE AN ARRAY OF STRING OBJECTS PASSED FROM A TEXT FEILD. 
-    theList.text = self.text;
     self.type = [NSNumber numberWithInt:1];
     theList.type = [NSNumber numberWithInt:1];
+    theList.aStrings = [NSSet setWithArray:listArray];
     NSString *tempString = [NSString stringWithFormat:@"-"];
-    
+    NSLog(@"NEWITEMOREVENT:CREATENEWLIST-> # of Items in listArray = %d", [listArray count]);
     for (int i = 0; i<[listArray count]; i++) {
-        tempString = [tempString stringByAppendingString:[listArray objectAtIndex:i]];
+        Liststring *myString = [listArray objectAtIndex:i];
+        tempString = [tempString stringByAppendingString:myString.aString];
         tempString = [tempString stringByAppendingString:@"\n-"];
+        NSLog(@"THE LIST ITEM IS %@", myString.aString);
     }
     theList.text = tempString;
     
@@ -107,7 +118,6 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
 - (void) createNewAppointment{
         
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:addingContext];
-                
     theAppointment = [[Appointment alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
     theAppointment.text = self.text;
     theAppointment.type = [NSNumber numberWithInt:2];
@@ -115,16 +125,13 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
     theAppointment.startTime = self.startTime;
     theAppointment.endTime = self.endTime;
     theAppointment.recurrence = self.recurring;
-    
     NSLog(@"Creating New Appointment");
                 
 }
     
 - (void) createNewToDo{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"ToDo" inManagedObjectContext:addingContext];
-                
-    theToDo = [[ToDo alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
-                
+    theToDo = [[ToDo alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];                    
     theToDo.text = self.text;
     theToDo.type = [NSNumber numberWithInt:3];
     theToDo.aDate = self.aDate;
@@ -137,16 +144,12 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
 - (void) createNewFolder{
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Folder" inManagedObjectContext:addingContext];
-                
-    theFolder = [[Folder alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
-    
-                
+    theFolder = [[Folder alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
     }
 
 - (void) createNewDocument{
 
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Folder" inManagedObjectContext:addingContext];
-                
     theDocument = [[Document alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
             
     }
@@ -204,18 +207,12 @@ NSLog(@"NewItemOrEvent: Creating New Simple Note");
 #pragma mark - Get Values From Event Objects
 
 - (NSArray *) dateTimeArrayfromObject: (id)theObject{
-    
-    
     NSArray *theArray = [theObject allObjects];
-    
     return theArray;
 }
 
--(NSArray *) alarmArrayFromEventObject:(id)theObject{
-        
-    
+-(NSArray *) alarmArrayFromEventObject:(id)theObject{        
     NSArray *theArray = [theObject allObjects];
-    
     return theArray;
 }
 

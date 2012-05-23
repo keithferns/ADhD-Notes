@@ -11,4 +11,7 @@
 @interface NSCalendar (CalendarCalculations)
 
 -(NSInteger)daysWithinEraFromDate:(NSDate *) startDate toDate:(NSDate *) endDate;
+-(BOOL)isDateThisWeek:(NSDate *)date;
+
+
 @end

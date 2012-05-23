@@ -18,7 +18,6 @@
 		530BADBB1541E61C0001A30A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBA1541E61C0001A30A /* Project.m */; };
 		530BADBE1541E61C0001A30A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADBD1541E61C0001A30A /* Document.m */; };
 		530BADC41541E6360001A30A /* ToDo.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC31541E6360001A30A /* ToDo.m */; };
-		530BADC71541E6420001A30A /* List.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC61541E6420001A30A /* List.m */; };
 		530BADCA1541E6420001A30A /* SimpleNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADC91541E6420001A30A /* SimpleNote.m */; };
 		530BADD01541F2B50001A30A /* Collection.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADCF1541F2B30001A30A /* Collection.m */; };
 		530BADD71541F45F0001A30A /* TapDetectingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BADD61541F45F0001A30A /* TapDetectingView.m */; };
@@ -70,7 +69,6 @@
 		5373205D1540E2BB00FA376E /* FileCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5373204F1540E2BB00FA376E /* FileCustomCell.xib */; };
 		5373205E1540E2BB00FA376E /* FolderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320511540E2BB00FA376E /* FolderCell.m */; };
 		5373205F1540E2BB00FA376E /* FolderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 537320521540E2BB00FA376E /* FolderCell.xib */; };
-		537320611540E2BB00FA376E /* NSCalendar+CalendarCalculations.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320561540E2BB00FA376E /* NSCalendar+CalendarCalculations.m */; };
 		537320621540E2BB00FA376E /* UINavigationController+NavControllerCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320581540E2BB00FA376E /* UINavigationController+NavControllerCategory.m */; };
 		537320701540EA4600FA376E /* alarm_24.png in Resources */ = {isa = PBXBuildFile; fileRef = 537320641540EA4600FA376E /* alarm_24.png */; };
 		537320711540EA4600FA376E /* arrow_left_24.png in Resources */ = {isa = PBXBuildFile; fileRef = 537320651540EA4600FA376E /* arrow_left_24.png */; };
@@ -140,12 +138,27 @@
 		5383AD90154140100083A240 /* UIView+TKCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AD71154140100083A240 /* UIView+TKCategory.m */; };
 		5383AD91154140100083A240 /* UIViewController+TKCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AD73154140100083A240 /* UIViewController+TKCategory.m */; };
 		5383AD951541429D0083A240 /* NewItemOrEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AD941541429D0083A240 /* NewItemOrEvent.m */; };
+		5389A5351565D04E0055E493 /* DiaryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5389A5341565D04E0055E493 /* DiaryTableViewController.m */; };
+		5389A5381565F7270055E493 /* NSCalendar+CalendarCalculations.m in Sources */ = {isa = PBXBuildFile; fileRef = 5389A5371565F7270055E493 /* NSCalendar+CalendarCalculations.m */; };
+		5389A540156602AA0055E493 /* button-disabled.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53A156602AA0055E493 /* button-disabled.png */; };
+		5389A541156602AA0055E493 /* button-disabled@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53B156602AA0055E493 /* button-disabled@2x.png */; };
+		5389A542156602AA0055E493 /* button-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53C156602AA0055E493 /* button-highlighted.png */; };
+		5389A543156602AA0055E493 /* button-highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53D156602AA0055E493 /* button-highlighted@2x.png */; };
+		5389A544156602AA0055E493 /* button-normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53E156602AA0055E493 /* button-normal.png */; };
+		5389A545156602AA0055E493 /* button-normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5389A53F156602AA0055E493 /* button-normal@2x.png */; };
+		5389A5591566A7AF0055E493 /* ListDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5389A5581566A7AF0055E493 /* ListDetailViewController.m */; };
 		538DED3E15478E68000F460D /* SchedulerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED3D15478E68000F460D /* SchedulerViewController.m */; };
-		538DED491549F065000F460D /* CalendarTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 538DED481549F065000F460D /* CalendarTableViewController.m */; };
 		53A0BA49155055A9002F149B /* EventTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A0BA46155055A9002F149B /* EventTableViewController.m */; };
 		53A0BA50155057EC002F149B /* MemoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A0BA4F155057EC002F149B /* MemoTableViewController.m */; };
 		53C93328154EED5D00145938 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C93327154EED5D00145938 /* Appointment.m */; };
 		53C9332B154EEE2700145938 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332A154EEE2700145938 /* Item.m */; };
+		53D59C05156AB8BB005F5004 /* List.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D59C04156AB8BB005F5004 /* List.m */; };
+		53D59C09156B2A3C005F5004 /* folder_open_go.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C08156B2A3C005F5004 /* folder_open_go.png */; };
+		53D59C0B156B3C7D005F5004 /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C0A156B3C7C005F5004 /* folder.png */; };
+		53D59C0F156B43BB005F5004 /* lined-page.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C0E156B43BB005F5004 /* lined-page.png */; };
+		53D59C17156C3ACA005F5004 /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C15156C3ACA005F5004 /* check.png */; };
+		53D59C18156C3ACA005F5004 /* uncheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C16156C3ACA005F5004 /* uncheck.png */; };
+		53D59C1B156C4077005F5004 /* Liststring.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D59C1A156C4075005F5004 /* Liststring.m */; };
 		53EA8FC1154A4DE20036AE2D /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */; };
 		53EA8FC2154A4DE20036AE2D /* FoldersTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FC0154A4DE20036AE2D /* FoldersTableViewController.m */; };
 		53EA8FCC154A4E780036AE2D /* FolderDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EA8FCB154A4E780036AE2D /* FolderDetailViewController.m */; };
@@ -185,8 +198,6 @@
 		530BADBD1541E61C0001A30A /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Document.m; path = CoreData/ManagedObjects/Document.m; sourceTree = "<group>"; };
 		530BADC21541E6360001A30A /* ToDo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToDo.h; path = CoreData/ManagedObjects/ToDo.h; sourceTree = "<group>"; };
 		530BADC31541E6360001A30A /* ToDo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ToDo.m; path = CoreData/ManagedObjects/ToDo.m; sourceTree = "<group>"; };
-		530BADC51541E6420001A30A /* List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = List.h; path = CoreData/ManagedObjects/List.h; sourceTree = "<group>"; };
-		530BADC61541E6420001A30A /* List.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = List.m; path = CoreData/ManagedObjects/List.m; sourceTree = "<group>"; };
 		530BADC81541E6420001A30A /* SimpleNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleNote.h; path = CoreData/ManagedObjects/SimpleNote.h; sourceTree = "<group>"; };
 		530BADC91541E6420001A30A /* SimpleNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleNote.m; path = CoreData/ManagedObjects/SimpleNote.m; sourceTree = "<group>"; };
 		530BADCE1541F2AF0001A30A /* Collection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Collection.h; path = CoreData/ManagedObjects/Collection.h; sourceTree = "<group>"; };
@@ -265,8 +276,6 @@
 		537320501540E2BB00FA376E /* FolderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FolderCell.h; path = CustomClasses/FolderCell.h; sourceTree = "<group>"; };
 		537320511540E2BB00FA376E /* FolderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FolderCell.m; path = CustomClasses/FolderCell.m; sourceTree = "<group>"; };
 		537320521540E2BB00FA376E /* FolderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = FolderCell.xib; path = CustomClasses/FolderCell.xib; sourceTree = "<group>"; };
-		537320551540E2BB00FA376E /* NSCalendar+CalendarCalculations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSCalendar+CalendarCalculations.h"; path = "CustomClasses/NSCalendar+CalendarCalculations.h"; sourceTree = "<group>"; };
-		537320561540E2BB00FA376E /* NSCalendar+CalendarCalculations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSCalendar+CalendarCalculations.m"; path = "CustomClasses/NSCalendar+CalendarCalculations.m"; sourceTree = "<group>"; };
 		537320571540E2BB00FA376E /* UINavigationController+NavControllerCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UINavigationController+NavControllerCategory.h"; path = "CustomClasses/UINavigationController+NavControllerCategory.h"; sourceTree = "<group>"; };
 		537320581540E2BB00FA376E /* UINavigationController+NavControllerCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UINavigationController+NavControllerCategory.m"; path = "CustomClasses/UINavigationController+NavControllerCategory.m"; sourceTree = "<group>"; };
 		537320641540EA4600FA376E /* alarm_24.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = alarm_24.png; path = "Images/ToolBar Images/alarm_24.png"; sourceTree = "<group>"; };
@@ -374,10 +383,20 @@
 		5383AD73154140100083A240 /* UIViewController+TKCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+TKCategory.m"; path = "ADhD-Notes/TapkuLibrary/UIViewController+TKCategory.m"; sourceTree = "<group>"; };
 		5383AD931541429D0083A240 /* NewItemOrEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewItemOrEvent.h; path = CoreData/NewItemOrEvent.h; sourceTree = "<group>"; };
 		5383AD941541429D0083A240 /* NewItemOrEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NewItemOrEvent.m; path = CoreData/NewItemOrEvent.m; sourceTree = "<group>"; };
+		5389A5331565D04E0055E493 /* DiaryTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiaryTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/DiaryTableViewController.h; sourceTree = "<group>"; };
+		5389A5341565D04E0055E493 /* DiaryTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DiaryTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/DiaryTableViewController.m; sourceTree = "<group>"; };
+		5389A5361565F7270055E493 /* NSCalendar+CalendarCalculations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCalendar+CalendarCalculations.h"; sourceTree = "<group>"; };
+		5389A5371565F7270055E493 /* NSCalendar+CalendarCalculations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCalendar+CalendarCalculations.m"; sourceTree = "<group>"; };
+		5389A53A156602AA0055E493 /* button-disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-disabled.png"; path = "Images/Buttons/button-disabled.png"; sourceTree = "<group>"; };
+		5389A53B156602AA0055E493 /* button-disabled@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-disabled@2x.png"; path = "Images/Buttons/button-disabled@2x.png"; sourceTree = "<group>"; };
+		5389A53C156602AA0055E493 /* button-highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-highlighted.png"; path = "Images/Buttons/button-highlighted.png"; sourceTree = "<group>"; };
+		5389A53D156602AA0055E493 /* button-highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-highlighted@2x.png"; path = "Images/Buttons/button-highlighted@2x.png"; sourceTree = "<group>"; };
+		5389A53E156602AA0055E493 /* button-normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-normal.png"; path = "Images/Buttons/button-normal.png"; sourceTree = "<group>"; };
+		5389A53F156602AA0055E493 /* button-normal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-normal@2x.png"; path = "Images/Buttons/button-normal@2x.png"; sourceTree = "<group>"; };
+		5389A5571566A7AF0055E493 /* ListDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/ListDetailViewController.h; sourceTree = "<group>"; };
+		5389A5581566A7AF0055E493 /* ListDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ListDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/ListDetailViewController.m; sourceTree = "<group>"; };
 		538DED3C15478E68000F460D /* SchedulerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SchedulerViewController.h; path = iPhoneViewControllers/iPhoneViewController/SchedulerViewController.h; sourceTree = "<group>"; };
 		538DED3D15478E68000F460D /* SchedulerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SchedulerViewController.m; path = iPhoneViewControllers/iPhoneViewController/SchedulerViewController.m; sourceTree = "<group>"; };
-		538DED471549F065000F460D /* CalendarTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.h; sourceTree = "<group>"; };
-		538DED481549F065000F460D /* CalendarTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalendarTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/CalendarTableViewController.m; sourceTree = "<group>"; };
 		53A0BA45155055A9002F149B /* EventTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/EventTableViewController.h; sourceTree = "<group>"; };
 		53A0BA46155055A9002F149B /* EventTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EventTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/EventTableViewController.m; sourceTree = "<group>"; };
 		53A0BA4E155057EC002F149B /* MemoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/MemoTableViewController.h; sourceTree = "<group>"; };
@@ -386,6 +405,15 @@
 		53C93327154EED5D00145938 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Appointment.m; path = CoreData/ManagedObjects/Appointment.m; sourceTree = "<group>"; };
 		53C93329154EEE2700145938 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = CoreData/ManagedObjects/Item.h; sourceTree = "<group>"; };
 		53C9332A154EEE2700145938 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = CoreData/ManagedObjects/Item.m; sourceTree = "<group>"; };
+		53D59C03156AB8BB005F5004 /* List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = List.h; path = CoreData/ManagedObjects/List.h; sourceTree = "<group>"; };
+		53D59C04156AB8BB005F5004 /* List.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = List.m; path = CoreData/ManagedObjects/List.m; sourceTree = "<group>"; };
+		53D59C08156B2A3C005F5004 /* folder_open_go.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder_open_go.png; sourceTree = "<group>"; };
+		53D59C0A156B3C7C005F5004 /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
+		53D59C0E156B43BB005F5004 /* lined-page.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "lined-page.png"; path = "Images/Background Images/lined-page.png"; sourceTree = "<group>"; };
+		53D59C15156C3ACA005F5004 /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check.png; sourceTree = "<group>"; };
+		53D59C16156C3ACA005F5004 /* uncheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = uncheck.png; sourceTree = "<group>"; };
+		53D59C19156C4074005F5004 /* Liststring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Liststring.h; path = CoreData/ManagedObjects/Liststring.h; sourceTree = "<group>"; };
+		53D59C1A156C4075005F5004 /* Liststring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Liststring.m; path = CoreData/ManagedObjects/Liststring.m; sourceTree = "<group>"; };
 		53EA8FBD154A4DE20036AE2D /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilesTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.h; sourceTree = "<group>"; };
 		53EA8FBE154A4DE20036AE2D /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilesTableViewController.m; path = iPhoneViewControllers/iPhoneTableViewControllers/FilesTableViewController.m; sourceTree = "<group>"; };
 		53EA8FBF154A4DE20036AE2D /* FoldersTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FoldersTableViewController.h; path = iPhoneViewControllers/iPhoneTableViewControllers/FoldersTableViewController.h; sourceTree = "<group>"; };
@@ -433,6 +461,10 @@
 		530BADA91541E5A50001A30A /* ManagedObjects */ = {
 			isa = PBXGroup;
 			children = (
+				53D59C19156C4074005F5004 /* Liststring.h */,
+				53D59C1A156C4075005F5004 /* Liststring.m */,
+				53D59C03156AB8BB005F5004 /* List.h */,
+				53D59C04156AB8BB005F5004 /* List.m */,
 				53006E601560BAC200602430 /* Note.h */,
 				53006E611560BAC200602430 /* Note.m */,
 				53006E5D1560BAC200602430 /* Memo.h */,
@@ -447,8 +479,6 @@
 				530BADCF1541F2B30001A30A /* Collection.m */,
 				530BADC81541E6420001A30A /* SimpleNote.h */,
 				530BADC91541E6420001A30A /* SimpleNote.m */,
-				530BADC51541E6420001A30A /* List.h */,
-				530BADC61541E6420001A30A /* List.m */,
 				530BADC21541E6360001A30A /* ToDo.h */,
 				530BADC31541E6360001A30A /* ToDo.m */,
 				530BADBC1541E61C0001A30A /* Document.h */,
@@ -484,16 +514,12 @@
 		531E10DF1561F4CC0074321A /* DetailViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				531E10D01561F4A90074321A /* AppointmentDetailViewController.h */,
-				531E10D11561F4AB0074321A /* AppointmentDetailViewController.m */,
-				531E10D21561F4AD0074321A /* DocumentDetailViewController.h */,
-				531E10D31561F4AF0074321A /* DocumentDetailViewController.m */,
-				531E10D41561F4B00074321A /* FoldersDetailTableViewController.h */,
-				531E10D51561F4B20074321A /* FoldersDetailTableViewController.m */,
-				531E10D61561F4B50074321A /* MemoDetailViewController.h */,
-				531E10D71561F4B60074321A /* MemoDetailViewController.m */,
-				531E10D81561F4B80074321A /* ToDoDetailViewController.h */,
-				531E10D91561F4BB0074321A /* ToDoDetailViewController.m */,
+				5389A5561566A76A0055E493 /* ListDetailViewController */,
+				53D59C07156AD3A4005F5004 /* AppointmentDetailViewController */,
+				53D59C13156B47EC005F5004 /* DocumentDetailViewController */,
+				53D59C12156B47C8005F5004 /* FolderDetailViewController */,
+				53D59C10156B46F4005F5004 /* MemoDetailViewController */,
+				53D59C11156B471C005F5004 /* ToDoDetailViewController */,
 			);
 			name = DetailViewControllers;
 			sourceTree = "<group>";
@@ -609,6 +635,7 @@
 		5326593F1540AC5700238AA1 /* DiaryViewController */ = {
 			isa = PBXGroup;
 			children = (
+				53D59C14156B519D005F5004 /* DiaryTableViewController */,
 				5383AC89154108E00083A240 /* DiaryViewController.h */,
 				5383AC8A154108E00083A240 /* DiaryViewController.m */,
 			);
@@ -618,6 +645,7 @@
 		532659471540ACD100238AA1 /* ArchiveViewController */ = {
 			isa = PBXGroup;
 			children = (
+				53D59C0A156B3C7C005F5004 /* folder.png */,
 				53A0BA5215510E4C002F149B /* CollectionsTableViewContollers */,
 				537320291540E0BD00FA376E /* ArchiveViewController.h */,
 				5373202A1540E0BD00FA376E /* ArchiveViewController.m */,
@@ -636,6 +664,7 @@
 		5326594D1540B17C00238AA1 /* ImageFiles */ = {
 			isa = PBXGroup;
 			children = (
+				5389A539156601FE0055E493 /* Buttons */,
 				537320631540EA2900FA376E /* ToolBarImages */,
 				532659641540B42600238AA1 /* BackGroundImages */,
 				5326594E1540B18A00238AA1 /* TabNavBarImages */,
@@ -662,6 +691,7 @@
 		532659641540B42600238AA1 /* BackGroundImages */ = {
 			isa = PBXGroup;
 			children = (
+				53D59C0E156B43BB005F5004 /* lined-page.png */,
 				532659651540B44600238AA1 /* 54700.png */,
 				532659661540B44600238AA1 /* main_background.png */,
 				532659671540B44600238AA1 /* textview_background.png */,
@@ -730,6 +760,7 @@
 		5367F297155224C100E1994A /* HorizontalCells */ = {
 			isa = PBXGroup;
 			children = (
+				53D59C08156B2A3C005F5004 /* folder_open_go.png */,
 				5367F28D15520C2600E1994A /* EventCells */,
 				5367F29315520C9E00E1994A /* HorizontalCells.h */,
 				5367F29415520C9E00E1994A /* HorizontalCells.m */,
@@ -749,9 +780,8 @@
 		537320281540DFDE00FA376E /* CustomClasses */ = {
 			isa = PBXGroup;
 			children = (
-				5367F29615520CAF00E1994A /* HorizontalCellsWithSections */,
-				537320551540E2BB00FA376E /* NSCalendar+CalendarCalculations.h */,
-				537320561540E2BB00FA376E /* NSCalendar+CalendarCalculations.m */,
+				5389A5361565F7270055E493 /* NSCalendar+CalendarCalculations.h */,
+				5389A5371565F7270055E493 /* NSCalendar+CalendarCalculations.m */,
 				537320571540E2BB00FA376E /* UINavigationController+NavControllerCategory.h */,
 				537320581540E2BB00FA376E /* UINavigationController+NavControllerCategory.m */,
 				5383AC8C154113CB0083A240 /* Custom PopOver */,
@@ -914,6 +944,28 @@
 			name = CoreData;
 			sourceTree = "<group>";
 		};
+		5389A539156601FE0055E493 /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				5389A53A156602AA0055E493 /* button-disabled.png */,
+				5389A53B156602AA0055E493 /* button-disabled@2x.png */,
+				5389A53C156602AA0055E493 /* button-highlighted.png */,
+				5389A53D156602AA0055E493 /* button-highlighted@2x.png */,
+				5389A53E156602AA0055E493 /* button-normal.png */,
+				5389A53F156602AA0055E493 /* button-normal@2x.png */,
+			);
+			name = Buttons;
+			sourceTree = "<group>";
+		};
+		5389A5561566A76A0055E493 /* ListDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5389A5571566A7AF0055E493 /* ListDetailViewController.h */,
+				5389A5581566A7AF0055E493 /* ListDetailViewController.m */,
+			);
+			name = ListDetailViewController;
+			sourceTree = "<group>";
+		};
 		538DED3A15478E1F000F460D /* CalendarViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -937,10 +989,9 @@
 		538DED461549F036000F460D /* CalendarTableViewController */ = {
 			isa = PBXGroup;
 			children = (
+				5367F29615520CAF00E1994A /* HorizontalCellsWithSections */,
 				5367F2A2155234C200E1994A /* EventsTableViewController2.h */,
 				5367F2A3155234C200E1994A /* EventsTableViewController2.m */,
-				538DED471549F065000F460D /* CalendarTableViewController.h */,
-				538DED481549F065000F460D /* CalendarTableViewController.m */,
 			);
 			name = CalendarTableViewController;
 			sourceTree = "<group>";
@@ -982,6 +1033,62 @@
 				53EA8FC5154A4E170036AE2D /* FilesTableViewController */,
 			);
 			name = CollectionsTableViewContollers;
+			sourceTree = "<group>";
+		};
+		53D59C07156AD3A4005F5004 /* AppointmentDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D01561F4A90074321A /* AppointmentDetailViewController.h */,
+				531E10D11561F4AB0074321A /* AppointmentDetailViewController.m */,
+			);
+			name = AppointmentDetailViewController;
+			sourceTree = "<group>";
+		};
+		53D59C10156B46F4005F5004 /* MemoDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D61561F4B50074321A /* MemoDetailViewController.h */,
+				53D59C15156C3ACA005F5004 /* check.png */,
+				53D59C16156C3ACA005F5004 /* uncheck.png */,
+				531E10D71561F4B60074321A /* MemoDetailViewController.m */,
+			);
+			name = MemoDetailViewController;
+			sourceTree = "<group>";
+		};
+		53D59C11156B471C005F5004 /* ToDoDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D81561F4B80074321A /* ToDoDetailViewController.h */,
+				531E10D91561F4BB0074321A /* ToDoDetailViewController.m */,
+			);
+			name = ToDoDetailViewController;
+			sourceTree = "<group>";
+		};
+		53D59C12156B47C8005F5004 /* FolderDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D41561F4B00074321A /* FoldersDetailTableViewController.h */,
+				531E10D51561F4B20074321A /* FoldersDetailTableViewController.m */,
+			);
+			name = FolderDetailViewController;
+			sourceTree = "<group>";
+		};
+		53D59C13156B47EC005F5004 /* DocumentDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				531E10D21561F4AD0074321A /* DocumentDetailViewController.h */,
+				531E10D31561F4AF0074321A /* DocumentDetailViewController.m */,
+			);
+			name = DocumentDetailViewController;
+			sourceTree = "<group>";
+		};
+		53D59C14156B519D005F5004 /* DiaryTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5389A5331565D04E0055E493 /* DiaryTableViewController.h */,
+				5389A5341565D04E0055E493 /* DiaryTableViewController.m */,
+			);
+			name = DiaryTableViewController;
 			sourceTree = "<group>";
 		};
 		53EA8FC4154A4DF10036AE2D /* FoldersTableViewController */ = {
@@ -1124,6 +1231,17 @@
 				5383ACAF154113CB0083A240 /* popoverBg_blue.png in Resources */,
 				5383ACB0154113CB0083A240 /* popoverBg_blue@2x.png in Resources */,
 				5383AD78154140100083A240 /* TapkuLibrary.bundle in Resources */,
+				5389A540156602AA0055E493 /* button-disabled.png in Resources */,
+				5389A541156602AA0055E493 /* button-disabled@2x.png in Resources */,
+				5389A542156602AA0055E493 /* button-highlighted.png in Resources */,
+				5389A543156602AA0055E493 /* button-highlighted@2x.png in Resources */,
+				5389A544156602AA0055E493 /* button-normal.png in Resources */,
+				5389A545156602AA0055E493 /* button-normal@2x.png in Resources */,
+				53D59C09156B2A3C005F5004 /* folder_open_go.png in Resources */,
+				53D59C0B156B3C7D005F5004 /* folder.png in Resources */,
+				53D59C0F156B43BB005F5004 /* lined-page.png in Resources */,
+				53D59C17156C3ACA005F5004 /* check.png in Resources */,
+				53D59C18156C3ACA005F5004 /* uncheck.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1169,7 +1287,6 @@
 				5373205B1540E2BB00FA376E /* EventsCell.m in Sources */,
 				5373205C1540E2BB00FA376E /* FileCustomCell.m in Sources */,
 				5373205E1540E2BB00FA376E /* FolderCell.m in Sources */,
-				537320611540E2BB00FA376E /* NSCalendar+CalendarCalculations.m in Sources */,
 				537320621540E2BB00FA376E /* UINavigationController+NavControllerCategory.m in Sources */,
 				537320891540F1C400FA376E /* SettingViewController.m in Sources */,
 				5383AC8B154108E00083A240 /* DiaryViewController.m in Sources */,
@@ -1214,12 +1331,10 @@
 				530BADBB1541E61C0001A30A /* Project.m in Sources */,
 				530BADBE1541E61C0001A30A /* Document.m in Sources */,
 				530BADC41541E6360001A30A /* ToDo.m in Sources */,
-				530BADC71541E6420001A30A /* List.m in Sources */,
 				530BADCA1541E6420001A30A /* SimpleNote.m in Sources */,
 				530BADD01541F2B50001A30A /* Collection.m in Sources */,
 				530BADD71541F45F0001A30A /* TapDetectingView.m in Sources */,
 				538DED3E15478E68000F460D /* SchedulerViewController.m in Sources */,
-				538DED491549F065000F460D /* CalendarTableViewController.m in Sources */,
 				53EA8FC1154A4DE20036AE2D /* FilesTableViewController.m in Sources */,
 				53EA8FC2154A4DE20036AE2D /* FoldersTableViewController.m in Sources */,
 				53EA8FCC154A4E780036AE2D /* FolderDetailViewController.m in Sources */,
@@ -1242,6 +1357,11 @@
 				531E10DC1561F4BE0074321A /* FoldersDetailTableViewController.m in Sources */,
 				531E10DD1561F4BE0074321A /* MemoDetailViewController.m in Sources */,
 				531E10DE1561F4BE0074321A /* ToDoDetailViewController.m in Sources */,
+				5389A5351565D04E0055E493 /* DiaryTableViewController.m in Sources */,
+				5389A5381565F7270055E493 /* NSCalendar+CalendarCalculations.m in Sources */,
+				5389A5591566A7AF0055E493 /* ListDetailViewController.m in Sources */,
+				53D59C05156AB8BB005F5004 /* List.m in Sources */,
+				53D59C1B156C4077005F5004 /* Liststring.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

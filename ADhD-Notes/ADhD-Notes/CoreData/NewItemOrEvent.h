@@ -23,6 +23,7 @@
     Project *theProject;
     Folder *theFolder;
     Document *theDocument;
+    Liststring *theString;
     
     NSManagedObjectContext *addingContext;
     __unsafe_unretained id<NewItemOrEventDelegate> delegate;
@@ -53,8 +54,11 @@
 @property (nonatomic, retain) Folder *theFolder;
 @property (nonatomic, retain) Document *theDocument;
 @property (nonatomic, retain) SimpleNote *theSimpleNote;
+@property (nonatomic, retain) Liststring *theString;
 
 - (void) createNewSimpleNote;
+- (void) createNewStringFromText:(NSString *)mytext;
+
 - (void) createNewList;
 - (void) createNewAppointment;
 - (void) createNewToDo;

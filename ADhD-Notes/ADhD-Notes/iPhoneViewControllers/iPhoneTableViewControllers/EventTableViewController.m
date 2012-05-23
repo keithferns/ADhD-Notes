@@ -5,10 +5,8 @@
 //  Created by Keith Fernandes on 4/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
-
 #import "EventTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
-#import "Constants.h"
 #import "EventsCell.h"
 
 @implementation EventTableViewController
@@ -27,54 +25,36 @@
     return self;
 }
 
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
 }
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
+    NSLog(@"EVENTTableViewController:ViewDidLoad > loading");
+
     [super viewDidLoad];
-    
-    NSLog(@"EventTableViewController:ViewDidLoad > loading");
+
     selectedDate = nil;
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getSelectedCalendarDate:) name:@"GetDateNotification" object:nil];
-    
-    /*configure tableView, set its properties and add it to the main view.*/
-    /*
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 320, 26)];
-    [headerLabel setBackgroundColor:[UIColor lightGrayColor]];
-    [headerLabel setText:@"MY STUFF"];
-    [headerLabel setTextAlignment:UITextAlignmentCenter];
-    [headerView setBackgroundColor:[UIColor blackColor]];
-    [headerView addSubview:headerLabel];
-     */
-    //[tableView setTableHeaderView:headerView];
-    //[tableView setSectionFooterHeight:0.0];
-    //[tableView setSectionHeaderHeight:15.0];    
-    //[self.tableView setSeparatorColor:[UIColor blackColor]];
-    //[self.tableView setSectionHeaderHeight:18];
-    //self.tableView.rowHeight = kCellHeight;
-    
+        
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, kBottomViewRect.size.height-kTabBarHeight);
     self.tableView.backgroundColor = [UIColor clearColor];
     
     self.tableView.bounces = NO;
 
-    
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-        NSLog(@"MemoTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
+        NSLog(@"EVENTTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getSelectedCalendarDate:) name:@"GetDateNotification" object:nil];
 	}
     
 	NSError *error;
@@ -83,15 +63,8 @@
 	}
 }
 
-
-
-- (void) viewWillAppear:(BOOL) animated {
-    [super viewWillAppear:NO];
-}
-
-
 - (void)handleDidSaveNotification:(NSNotification *)notification {
-    NSLog(@"NSManagedObjectContextDidSaveNotification Received By WriteNowTableViewController");
+    NSLog(@"NSManagedObjectContextDidSaveNotification Received By EVENTTableViewController");
     //FIXME: setting the fetchedResults controller to nil below is a temporary work-around for the problem created by having 1 row per section in the primary table view. 
     //self.fetchedResultsController = nil;
     
@@ -130,7 +103,6 @@
 #pragma mark Fetched results controller
 
 - (NSFetchedResultsController *) fetchedResultsController{
-    NSLog(@"EventTableViewController:fetchedResultsController -> Fetching");
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     
     //check if an instance of fetchedResultsController exists.  If it does, return fetchedResultsController
@@ -144,33 +116,16 @@
     //set the entity to retrieved by this fetchrequest
     
     [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
+       
+    selectedDate = [[NSDate date] timelessDate];
+
+    NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
+    [request setPredicate:checkDate];
     
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
+	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
     
-    NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];    
-    [timeComponents setYear:[timeComponents year]];
-    [timeComponents setMonth:[timeComponents month]];
-    [timeComponents setDay:[timeComponents day]];
-    NSDate *currentDate= [gregorian dateFromComponents:timeComponents];
+	[request setSortDescriptors:[NSArray arrayWithObjects:timeDescriptor, nil]];
     
-    NSLog(@"Current Date is %@", currentDate);
-    /*
-    if (selectedDate == nil) {
-        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type > 0 AND aDate >= %@", currentDate];
-        [request setPredicate:checkDate];
-        checkDate = nil;
-    }
-    else {
-        NSLog(@"SelectedDate is %@", selectedDate);
-        NSDate *temp = [selectedDate dateByAddingTimeInterval:-kTimeZoneOffset];
-        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type  > 0 AND aDate == %@", temp];
-        [request setPredicate:checkDate];
-        checkDate = nil;
-    }
-    */
-	NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
-    
-	[request setSortDescriptors:[NSArray arrayWithObjects: dateDescriptor, nil]];
 	[request setFetchBatchSize:10];
     
     //Init a temp fetchedResultsController and set its fetchRequest to the current fetchRequest
@@ -204,7 +159,7 @@
     id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
     temp = [sectionInfo numberOfObjects];
     }
-    NSLog (@"EVENTTABLEVIEWCONTROLLER Number of ROWS = %d", temp);
+    NSLog(@"EVENTTABLEVIEWCONTROLLER # OF ROWS = %d", temp);
         return temp;
     //return [[_fetchedResultsController fetchedObjects] count];
 }
@@ -218,7 +173,7 @@
     
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateStyle:NSDateFormatterShortStyle];
+    [dateFormatter setDateFormat:@"h:mm a"];
     EventsCell *cell = (EventsCell *) [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
         cell = [[EventsCell alloc] init];
@@ -233,7 +188,7 @@
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
         //cell.myTextLabel.text = currentEvent.text;
-        cell.dateLabel.text = [dateFormatter stringFromDate:currentEvent.creationDate];
+        cell.dateLabel.text = [dateFormatter stringFromDate:currentEvent.startTime];
     }
     return cell;
 }
@@ -322,26 +277,25 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 			
         case NSFetchedResultsChangeInsert:
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            NSLog(@"WriteNowTableViewController:FetchedResultsController ChangeInsert");
+            NSLog(@"EVENTTableViewController:FetchedResultsController ChangeInsert");
             break;
             
         case NSFetchedResultsChangeDelete:
 			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            NSLog(@"WriteNowTableViewController:FetchedResultsController: ChangeDelete");
+            NSLog(@"EVENTTableViewController:FetchedResultsController: ChangeDelete");
             
             break;
             
         case NSFetchedResultsChangeUpdate:
             [self.tableView cellForRowAtIndexPath:indexPath];
 			//[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
-            NSLog(@"WriteNowTableViewController:FetchedResultsController: ChangeUpdate");
+            NSLog(@"EVENTTableViewController:FetchedResultsController: ChangeUpdate");
             break;
         case NSFetchedResultsChangeMove:
             [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             // Reloading the section inserts a new row and ensures that titles are updated appropriately.
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
-            NSLog(@"WriteNowTableViewController:FetchedResultsController ChangeMove");
-            
+            NSLog(@"EVENTTableViewController:FetchedResultsController ChangeMove");
             break;
     }
 }

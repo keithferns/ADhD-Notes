@@ -2,24 +2,17 @@
 //  List.m
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 5/21/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import "List.h"
+#import "Liststring.h"
 
 
 @implementation List
 
 @dynamic category;
-@dynamic listArray;
+@dynamic aStrings;
 
-
-- (void) awakeFromInsert{
-    [super awakeFromInsert];
-    
-    [self setValue:[NSNumber numberWithInt:1] forKey:@"type"];
-
-     }
-     
 @end
