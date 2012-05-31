@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1171" systemVersion="11D50" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Alarm" representedClassName="Alarm" syncable="YES">
-        <attribute name="reminder" attributeType="Date" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" syncable="YES"/>
+        <attribute name="reminder" attributeType="String" syncable="YES"/>
         <relationship name="event" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="alarms" inverseEntity="Event" syncable="YES"/>
     </entity>
     <entity name="Appointment" representedClassName="Appointment" parentEntity="Event" syncable="YES"/>
@@ -75,7 +76,7 @@
     <entity name="Project" representedClassName="Project" parentEntity="Collection" syncable="YES"/>
     <entity name="SimpleNote" representedClassName="SimpleNote" parentEntity="Memo" syncable="YES"/>
     <entity name="Tag" representedClassName="Tag" syncable="YES">
-        <attribute name="name" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="tags" inverseEntity="Item" syncable="YES"/>
     </entity>
     <entity name="ToDo" representedClassName="ToDo" parentEntity="Event" syncable="YES"/>
@@ -88,6 +89,7 @@
         <element name="Folder" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Item" positionX="160" positionY="192" width="128" height="120"/>
         <element name="List" positionX="160" positionY="192" width="128" height="45"/>
+        <element name="Liststring" positionX="160" positionY="192" width="128" height="105"/>
         <element name="Location" positionX="160" positionY="192" width="128" height="165"/>
         <element name="Memo" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Note" positionX="160" positionY="192" width="128" height="210"/>
@@ -96,6 +98,5 @@
         <element name="SimpleNote" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Tag" positionX="160" positionY="192" width="128" height="75"/>
         <element name="ToDo" positionX="160" positionY="192" width="128" height="45"/>
-        <element name="Liststring" positionX="160" positionY="192" width="128" height="105"/>
     </elements>
 </model>

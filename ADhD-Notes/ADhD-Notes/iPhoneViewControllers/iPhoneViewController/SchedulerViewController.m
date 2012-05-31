@@ -1,10 +1,9 @@
-//
 //  SchedulerViewController.m
 //  ADhD-Notes
-//
 //  Created by Keith Fernandes on 4/24/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+
+//FIXME: the Calendar Button is not connected
 
 #import "SchedulerViewController.h"
 #import "EventsTableViewController2.h"
@@ -18,19 +17,9 @@
 
 @implementation SchedulerViewController
 
-@synthesize toolbar;
-@synthesize theItem;
-@synthesize tableViewController;
-@synthesize alarmView, tagView, topView;
-@synthesize dateField, startTimeField, endTimeField, recurringField, locationField;
-@synthesize alarm1Field, alarm2Field, alarm3Field, alarm4Field;
-@synthesize tag1Field, tag2Field, tag3Field;
-@synthesize tagButton;
-@synthesize datePicker, timePicker;
-@synthesize recurringPicker, alarmPicker, tagPicker, locationPicker;
-@synthesize recurringArray, alarmArray, tagArray, locationArray;
-@synthesize editing;
-
+@synthesize toolbar, theItem, tableViewController, alarmView, tagView, topView, dateField, startTimeField, endTimeField, recurringField, locationField;
+@synthesize alarm1Field, alarm2Field, alarm3Field, alarm4Field, tag1Field, tag2Field, tag3Field, tagButton, datePicker, timePicker;
+@synthesize recurringPicker, alarmPicker, tagPicker, locationPicker, recurringArray, alarmArray, tagArray, locationArray, editing;
 
 #pragma mark - ViewManagement
 
@@ -54,13 +43,16 @@
         [toolbar.fourthButton setTarget:self];
         [toolbar.fifthButton setTarget:self];
     }
-           
     [toolbar changeToSchedulingButtons];
     toolbar.fourthButton.enabled = YES;
     
     datePicker = [[UIDatePicker alloc] initWithFrame:CGRectZero];
     datePicker.datePickerMode = UIDatePickerModeDate;
-    [datePicker setDate:[NSDate date]];
+    if (theItem.aDate != nil) {
+        [datePicker setDate:theItem.aDate];
+    } else {
+        [datePicker setDate:[NSDate date]];
+    }
     [datePicker setMinimumDate:[NSDate date]];
     [datePicker setMaximumDate:[NSDate dateWithTimeIntervalSinceNow:(2*60*60*24*365)]];
     datePicker.timeZone = [NSTimeZone systemTimeZone];
@@ -68,13 +60,31 @@
     datePicker.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
     [datePicker addTarget:self action:@selector(datePickerChanged:) forControlEvents:UIControlEventValueChanged];  
     
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"EEE, MMM dd, yyyy"];
+    
+    dateField = [[UITextField alloc] initWithFrame:CGRectMake(5, 5, 150, 35)];
+    dateField.borderStyle = UITextBorderStyleRoundedRect;
+    dateField.text = [dateFormatter stringFromDate:[datePicker date] ];
+    dateField.tag = 1;
+    dateField.inputView = datePicker;
+    [dateField setFont:[UIFont systemFontOfSize:textFieldFont]];
+    dateField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    
+    [dateFormatter setDateFormat:@"h:mm a"];
+
+    
     timePicker = [[UIDatePicker alloc] initWithFrame:CGRectZero];
     timePicker.datePickerMode = UIDatePickerModeTime;
     [timePicker setMinuteInterval:10];
     timePicker.timeZone = [NSTimeZone systemTimeZone];
     [timePicker sizeToFit];
     timePicker.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-    //timePicker.date = [timeFormatter dateFromString:@"12:00 PM"]; 
+    if (theItem.startTime != nil) {
+        timePicker.date = theItem.startTime;
+    }else {
+        timePicker.date = [dateFormatter dateFromString:@"12:00 PM"]; 
+    }
     [timePicker addTarget:self action:@selector(timePickerChanged:) forControlEvents:UIControlEventValueChanged];        
     
     recurringPicker = [[UIPickerView alloc] initWithFrame:CGRectZero];
@@ -89,32 +99,30 @@
     locationPicker.showsSelectionIndicator = YES;
     [locationPicker setTag:2];
     
-    recurringArray = [[NSArray alloc] initWithObjects:@"Never",@"Daily",@"Weekly", @"Fortnightly", @"Monthy", @"Annualy",nil];
+    recurringArray = [[NSArray alloc] initWithObjects:@"Never",@"Daily",@"Weekly", @"Fortnightly", @"Monthy", @"Annualy", nil];
     locationArray = [[NSArray alloc] initWithObjects:@"Home", @"Work", @"School", @"Gym", nil];
     
     topView = [[UIView alloc] initWithFrame:kTopViewRect];
     topView.backgroundColor = [UIColor blackColor]; 
     [self.view addSubview:topView];
-    
-    dateField = [[UITextField alloc] initWithFrame:CGRectMake(5, 5, 150, 35)];
-    dateField.borderStyle = UITextBorderStyleRoundedRect;
-    dateField.placeholder = @"Date";
-    dateField.tag = 1;
-    dateField.inputView = datePicker;
-    [dateField setFont:[UIFont systemFontOfSize:textFieldFont]];
-    dateField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        
+    NSDate *temp = [timePicker date];
     
     startTimeField = [[UITextField alloc] initWithFrame:CGRectMake(5, 40, 75, 35)];
     startTimeField.borderStyle = UITextBorderStyleRoundedRect;
-    startTimeField.placeholder = @"Starts At";
+    startTimeField.text = [dateFormatter stringFromDate:temp];
     startTimeField.tag = 2;
     startTimeField.inputView = timePicker;
     [startTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
-    startTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    
+    startTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;                         
+    if (theItem.endTime != nil){
+        temp = theItem.endTime;
+    }else{
+        temp = [temp dateByAddingTimeInterval:60*60];
+    }
     endTimeField = [[UITextField alloc] initWithFrame:CGRectMake(80, 40, 75, 35)];
     endTimeField.borderStyle = UITextBorderStyleRoundedRect;
-    endTimeField.placeholder = @"Ends At";
+    endTimeField.text = [dateFormatter stringFromDate:temp];
     endTimeField.tag = 3;
     endTimeField.inputView = timePicker;
     [endTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
@@ -145,13 +153,10 @@
     if (tableViewController == nil) {
         tableViewController = [[EventsTableViewController2 alloc] initWithStyle:UITableViewStylePlain];
         tableViewController.calendarIsVisible = YES;
-
         tableViewController.tableView.frame = CGRectMake(160, 5, 155, 140);
-        tableViewController.tableView.rowHeight = kCellHeight;
-       
+        tableViewController.tableView.rowHeight = kCellHeight;       
         tableViewController.selectedDate = [[NSDate date] timelessDate];
     }
-    
     [topView addSubview:tableViewController.tableView];
         
     dateField.delegate = self;
@@ -172,24 +177,17 @@
     // Release any retained subviews of the main view.
 }
 
-
 - (void)viewWillAppear:(BOOL)animated{
     [dateField becomeFirstResponder];    
 }
 
-
 - (void) cancelScheduling{
-    
-    [self.navigationController popToRootViewControllerAnimated:YES];
-    
+    [self.navigationController popViewControllerAnimated:YES];
 }
-
-
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
 
 - (void) addReminderFields {
     if (alarmView.superview == nil) {
@@ -204,11 +202,10 @@
         alarmPicker.showsSelectionIndicator = YES;
         [alarmPicker setTag:3];
         
-        alarmArray = [[NSArray alloc] initWithObjects:@"15 minutes before", @"30 minutes before", @"1 hour before", @"1 day before", @"1 week before", nil];
+        alarmArray = [[NSArray alloc] initWithObjects:@"15 minutes before", @"30 minutes before", @"1 hour before", @"1 day before",@"2 Days Before", @"1 week before", nil];
         
         //Check if any of the alarmFields exist, if YES, then add the alarmFields
         if (alarm1Field == nil) {
-            NSLog(@"Adding Alarm Fields");
             
             alarm1Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 5, 155, 35)];
             alarm1Field.borderStyle = UITextBorderStyleRoundedRect;
@@ -244,7 +241,17 @@
             alarm4Field.tag = 9;
             alarm4Field.inputView = alarmPicker;
             [alarm4Field setFont:[UIFont systemFontOfSize:textFieldFont]];
-            alarm4Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;   
+            alarm4Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;  
+            
+            alarm1Field.delegate = self;
+            alarm2Field.delegate = self;
+            alarm3Field.delegate = self;
+            alarm4Field.delegate = self;
+
+            alarm1Field.inputAccessoryView = self.toolbar;
+            alarm2Field.inputAccessoryView = self.toolbar;
+            alarm3Field.inputAccessoryView = self.toolbar;
+            alarm4Field.inputAccessoryView = self.toolbar;
         }
     }
     [UIView beginAnimations:nil context:nil];
@@ -267,7 +274,7 @@
     }
     [UIView commitAnimations];
 }
-
+/*
 - (void) addTagFields {
     if (tagView.superview == nil) {
         if (tagView == nil){
@@ -314,6 +321,14 @@
             [tag3Field setFont:[UIFont systemFontOfSize:textFieldFont]];
             tag3Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
             
+            tag1Field.delegate = self;
+            tag2Field.delegate = self;
+            tag3Field.delegate = self;
+            
+            tag1Field.inputAccessoryView = self.toolbar;
+            tag2Field.inputAccessoryView = self.toolbar;
+            tag3Field.inputAccessoryView = self.toolbar;
+            
             tagButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 110, 155, 35)];
             [tagButton setImage:[UIImage imageNamed:@"tag_add_24"] forState:UIControlStateNormal];
             [tagView addSubview:tagButton];        
@@ -339,7 +354,7 @@
     }
     [UIView commitAnimations];
 }
-
+*/
 
 - (void) finishedAlarmTransition{
     [tableViewController.tableView removeFromSuperview];
@@ -357,23 +372,23 @@
 - (void) saveSchedule {
     
     theItem.recurring  = recurringField.text;
-        
-        //set Alarms
-        //create an alarm in NewItemOrEvent
-        //set the selected time value for this alarm here
-        //add alarm object to theAppointment
+    if (alarm2Field.text != nil) {
+    [theItem createNewStringFromText:self.alarm1Field.text withType:2];
+    } else if (alarm1Field.text != nil){
+    [theItem createNewStringFromText:self.alarm2Field.text withType:2];
+    }
+    //[theItem createNewStringFromText:self.alarm3Field.text withType:2];
+    //[theItem createNewStringFromText:self.alarm4Field.text withType:2];
     
     [theItem saveSchedule];
     
+    [theItem updateSchedule];
+    
     //Programmatically return to parentViewController//
     [self.navigationController popViewControllerAnimated:YES];
-    
 }
 
-
-
 #pragma mark - TextField Delegate and Navigation 
-
 
 - (void) textFieldResignFirstResponder{
     switch ([editing intValue]) {
@@ -471,8 +486,8 @@
     switch ([textField tag]) {
         case 1:
             self.editing = [NSNumber numberWithInt:1];
-            toolbar.firstButton.enabled = NO;
-            toolbar.secondButton.enabled = YES;
+            toolbar.firstButton.enabled = YES;
+            toolbar.secondButton.enabled = NO;
             break;
         case 2:
             self.editing = [NSNumber numberWithInt:2];
@@ -491,9 +506,9 @@
             break;
         case 5:
             self.editing = [NSNumber numberWithInt:5];
-            toolbar.firstButton.enabled = YES;
+            toolbar.secondButton.enabled = YES;
             if (self.alarm1Field.superview == nil) {
-                toolbar.secondButton.enabled = NO;
+                toolbar.firstButton.enabled = NO;
             }
             else {
                 toolbar.secondButton.enabled = YES;
@@ -549,29 +564,23 @@
     self.dateField.text = [dateFormatter stringFromDate:[datePicker date]];
     theItem.aDate = [datePicker date];
     
-
     NSDate *selectedDate = [[datePicker date] timelessDate];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:selectedDate userInfo:nil]; 
-    
 }
 
 - (void) timePickerChanged:(id) sender{
     NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
     [timeFormatter setDateFormat:@"h:mm a"];
     if ([editing intValue] == 2) {
-        
         self.startTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
         theItem.startTime = [timePicker date];
-        
     }
     else if ([editing intValue] == 3){
         self.endTimeField.text = [timeFormatter stringFromDate:[timePicker date]];
         theItem.endTime  = [timePicker date];
     }
 }
-
-
 
 #pragma mark - PickerView DataSource and Delgate Methods
 
@@ -621,7 +630,6 @@
         default:
             break;
     }
-    
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
@@ -664,6 +672,7 @@
             break;
         case 4:
             titleforrow = [tagArray objectAtIndex:row];
+            break;
         default:
             break;
     }
@@ -680,7 +689,6 @@
 
 - (void) moveToPreviousField {
     //Check which textField is first responder. Move to previous textField. 
-    
     [self textFieldResignFirstResponder];
     
     switch ([self.editing intValue]) {
@@ -770,7 +778,5 @@
     }
     [self textFieldBecomeFirstResponder];
 }
-
-
 
 @end

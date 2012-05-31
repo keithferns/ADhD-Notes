@@ -14,15 +14,14 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import <CoreData/CoreData.h>
-    #import <QuartzCore/QuartzCore.h>
-
-    
+    #import <QuartzCore/QuartzCore.h>    
 
     #import "Constants.h"
     #import "UINavigationController+NavControllerCategory.h"
     #import "NSDate+TKCategory.h"
     #import "WEPopoverController.h"
     #import "TKCalendarMonthViewController.h"
+
 #import "Note.h"
 #import "Event.h"
 #import "Person.h"

@@ -1,16 +1,14 @@
-//
 //  MemoTableViewController.m
-//
+//  ADhD-Notes
 //  Created by Keith Fernandes on 4/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+
 #import "MemoTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
 #import "EventsCell.h"
 #import "MemoDetailViewController.h"
 
 @implementation MemoTableViewController
-
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
@@ -37,14 +35,14 @@
 - (void) viewDidLoad {
     [super viewDidLoad];
     
-    NSLog(@"MemoTableViewController:ViewDidLoad > loading");
     selectedDate = nil;
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
     
        self.tableView.frame = CGRectMake(0, 0, kScreenWidth, kBottomViewRect.size.height-kTabBarHeight);
     self.tableView.backgroundColor = [UIColor clearColor];
-    
+    self.clearsSelectionOnViewWillAppear = YES;
+
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"MemoTABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
@@ -62,12 +60,12 @@
 - (void)handleDidSaveNotification:(NSNotification *)notification {
     NSLog(@"NSManagedObjectContextDidSaveNotification Received By MemoTableViewController");
     //FIXME: setting the fetchedResults controller to nil below is a temporary work-around for the problem created by having 1 row per section in the primary table view. 
-    
     //self.fetchedResultsController = nil;
     
     [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
     NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
+        NSLog(@"MEMOtableViewcont:handleDidSaveNotification -->did not save");
 	}
     [self.tableView reloadData];
 }
@@ -89,13 +87,11 @@
 	self.fetchedResultsController = nil;
 }
 
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
 
 #pragma mark -
 #pragma mark Fetched results controller
@@ -110,24 +106,15 @@
     
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
-    
     selectedDate = [[NSDate date] timelessDate];
-
-    
     NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
     [request setPredicate:checkDate];
-    
-	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-    
+	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];    
 	[request setSortDescriptors:[NSArray arrayWithObjects:timeDescriptor, nil]];
-    
 	[request setFetchBatchSize:10];
-    
 	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
-    
 	newController.delegate = self;
-	self.fetchedResultsController = newController;
-    
+	self.fetchedResultsController = newController;    
 	return _fetchedResultsController;
  }
 
@@ -142,16 +129,12 @@
     return 20;
 }
 
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
-    return [sectionInfo numberOfObjects];
-    //NSLog(@"Number of Objects = %d", [[_fetchedResultsController fetchedObjects] count]);
-    //return [[_fetchedResultsController fetchedObjects] count];
- 
+    return [sectionInfo numberOfObjects]; 
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     return @"Memos";
 }
 
@@ -163,7 +146,6 @@
     if (cell == nil) {
         cell = [[EventsCell alloc] init];
     }
-   
      if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[Memo class]]){
         Memo *currentMemo = [_fetchedResultsController objectAtIndexPath:indexPath];
         CGSize itemSize=CGSizeMake(kCellWidth-4, kCellHeight-25);
@@ -200,8 +182,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
  */
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source.
         NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
 		[context deleteObject:[_fetchedResultsController objectAtIndexPath:indexPath]];
@@ -222,8 +203,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     }   
 }
 
-
-
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
 }
@@ -240,9 +219,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
-    
-    NSLog(@"MEMO SELECTED");
-   
 }
 
 #pragma mark -
@@ -255,21 +231,15 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 }
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-	
-	
-    switch(type) {
-			
+    switch(type) {			
         case NSFetchedResultsChangeInsert:
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
             NSLog(@"MemoTableViewController:FetchedResultsController ChangeInsert");
             break;
-            
         case NSFetchedResultsChangeDelete:
 			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             NSLog(@"MemoTableViewController:FetchedResultsController: ChangeDelete");
-            
-            break;
-            
+            break;            
         case NSFetchedResultsChangeUpdate:
             [self.tableView cellForRowAtIndexPath:indexPath];
 			//[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
@@ -279,8 +249,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
             [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             // Reloading the section inserts a new row and ensures that titles are updated appropriately.
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
-            NSLog(@"MemoTableViewController:FetchedResultsController ChangeMove");
-            
+            NSLog(@"MemoTableViewController:FetchedResultsController ChangeMove");            
             break;
     }
 }
@@ -301,8 +270,5 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
     [self.tableView endUpdates];
 }
-
-
-
 
 @end

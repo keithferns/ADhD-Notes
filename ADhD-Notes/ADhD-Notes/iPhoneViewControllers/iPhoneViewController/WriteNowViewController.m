@@ -1,10 +1,7 @@
-//
 //  WriteNowViewController.m
 //  ADhD-Notes
-//
 //  Created by Keith Fernandes on 4/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
 
 #import "WriteNowViewController.h"
 
@@ -42,12 +39,9 @@
 @implementation WriteNowViewController
 
 @synthesize textView, topView, bottomView, toolbar, actionsPopover, textField;
-@synthesize listTableView, todayTableViewController;
-@synthesize theItem;
-@synthesize managedObjectContext, calendarView;
-@synthesize segmentedControl;
-@synthesize listArray;
-@synthesize saving;
+@synthesize listTableView,todayTableViewController, theItem, managedObjectContext, calendarView, segmentedControl,listArray, saving;
+
+#pragma mark - View Management
 
 - (void)viewDidUnload {
     [super viewDidUnload];
@@ -57,11 +51,6 @@
 - (void)viewDidLoad{
     [super viewDidLoad];    
     self.saving = NO;
-    NSDate *temp = [NSDate date];
-    NSLog(@"TimeLess Date = %@", [temp timelessDate]);
-    
-    NSLog(@"WriteNowViewController -  loading view");
-    
     self.navigationController.delegate = self;
     
     /*-- Point current instance of the MOC to the main managedObjectContext --*/
@@ -69,7 +58,6 @@
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"WriteNow VIEWCONTROLLER: After managedObjectContext: %@",  managedObjectContext);
 	}        
-    
     //Navigation Bar SetUp
     NSArray *items = [NSArray arrayWithObjects:@"Note", @"List", nil];
     segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
@@ -77,14 +65,12 @@
     [segmentedControl setWidth:90 forSegmentAtIndex:0];
     [segmentedControl setWidth:90 forSegmentAtIndex:1];
     [segmentedControl setSelectedSegmentIndex:0];
-    [segmentedControl addTarget:self
-                         action:@selector(toggleNoteListView)
+    [segmentedControl addTarget:self action:@selector(toggleNoteListView)
                forControlEvents:UIControlEventValueChanged];
     
     self.navigationItem.titleView = segmentedControl;
     self.navigationController.navigationBar.topItem.title = @"Write Now";    
 
-    
     //Init and add the top and bottom Views. These views will be used to animate the transitions of textView and the table and calendar Views. 
     if (bottomView.superview == nil && bottomView == nil) {
         bottomView = [[UIView alloc] initWithFrame:kBottomViewRect];
@@ -109,58 +95,56 @@
     }
     
     //Initialize and add the textView. the TV is a basic part of initial view.     
-    if (textView.superview == nil) {
-        if (textView == nil){
-            textView = [[CustomTextView alloc] initWithFrame:kTextViewRect];
+    if (self.textView.superview == nil) {
+        if (self.textView == nil){
+            self.textView = [[CustomTextView alloc] initWithFrame:kTextViewRect];
         }
         [self.topView addSubview:textView];
-        textView.delegate = self;    
-        textView.inputAccessoryView = toolbar;
+        self.textView.delegate = self;    
+        self.textView.inputAccessoryView = toolbar;
     }    
     if (textField == nil) {
         textField = [[UITextField alloc] initWithFrame: CGRectMake (5,0,310,45)];
-        
         textField.textColor = [UIColor whiteColor];
         UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
         [textField.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
         textField.layer.cornerRadius = 5.0;
+        textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         
         [textField setFont:[UIFont systemFontOfSize:18]];
         textField.layer.borderWidth = 2.0;
         textField.layer.borderColor = [UIColor darkGrayColor].CGColor;      
         textField.inputAccessoryView = toolbar;
         [textField setDelegate:self];
+        textField.placeholder = @"tap 'return' to add item";
         [textField setReturnKeyType:UIReturnKeyDefault];
-        //[textField addTarget:self action:@selector(addToList) forControlEvents:UIControlEventEditingDidEndOnExit];
         
         listTableView = [[UITableView alloc] initWithFrame:CGRectMake (5,50,310,topView.frame.size.height-50)];
-        listTableView.rowHeight = 30.0;
+        listTableView.rowHeight = 33.0;
         listTableView.tag = 1;
         listTableView.backgroundColor = [UIColor blackColor];
-        listTableView.separatorColor = [UIColor whiteColor];
+        listTableView.separatorColor = [UIColor blackColor];
         listTableView.delegate = self;
         listTableView.dataSource = self;
         
         todayTableViewController = [[TodayTableViewController alloc] init];
         [self.bottomView addSubview:todayTableViewController.tableView];
     }
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startNewItem:) name:@"StartNewItemNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleStartNewItemNotification:) name:@"StartNewItemNotification" object:nil];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-      //  [super viewWillAppear:NO];    
-    NSLog(@"WriteNowVIEWCONTROLLER - viewWillAppear");
+    //  [super viewWillAppear:NO];    
     [self.navigationController hidesBottomBarWhenPushed];
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:UITableViewSelectionDidChangeNotification object:nil];    
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    NSLog(@"WriteNowVIEWCONTROLLER - viewWillDisappear");
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name: UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name: UIKeyboardWillHideNotification object:nil];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -170,28 +154,23 @@
 
 #pragma mark - Nav Bar Actions
 
-- (void) toggleNoteListView {
-    
-    NSLog(@"WriteNowViewController:toggleNoteListView -> segmentedControl Segment %d touched", segmentedControl.selectedSegmentIndex);
-    
+- (void) toggleNoteListView {    
     switch (segmentedControl.selectedSegmentIndex) {
         case 0:
             [textField removeFromSuperview];
-            NSLog (@"Adding TextView");
 
             if (textView.superview == nil){
                 [topView addSubview:textView];
             }
-            
             break;
         case 1:
             [textView removeFromSuperview];
-            NSLog (@"Adding TextField");
             if (listArray == nil){
                 listArray = [[NSArray alloc] init];
             }
             if (textField.superview == nil) {
                 [topView addSubview:textField];
+                [textField becomeFirstResponder];
                 [topView addSubview: listTableView];
             }
             break;
@@ -205,10 +184,8 @@
     if (toolbar.firstButton.enabled == NO && toolbar.fourthButton.enabled == NO) {
         toolbar.firstButton.enabled = YES;
         toolbar.fourthButton.enabled = YES;
-    }    
-    
+    }        
     if (theItem == nil) {
-        NSLog(@"WriteNowViewController:textFieldShouldReturn - Creating theItem");
         NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
         [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
         theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
@@ -217,7 +194,7 @@
 
     if (![self.textField.text isEqualToString:@""]){
         
-        [theItem createNewStringFromText:self.textField.text];
+        [theItem createNewStringFromText:self.textField.text withType:1];
     }
     self.textField.text = nil;
 
@@ -240,20 +217,17 @@
 }
 
 #pragma mark - tableView Delegate and Data Source Methods
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     int sections;
     if (tableView.tag == 1){
         sections = 1;
     }
-        
     return sections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     int rows;
     if (tableView.tag == 1) {
-        NSLog (@"# of ITEMS IN LIST = %d", [theItem.listArray count]);
     rows =  [theItem.listArray count];
     }
     return rows;
@@ -270,6 +244,12 @@
     Liststring *myString = [theItem.listArray objectAtIndex: temp];
     cell.textLabel.text = myString.aString;
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+        cell.backgroundColor = [UIColor colorWithPatternImage:[[UIImage imageNamed:@"54700.png"]stretchableImageWithLeftCapWidth:320 topCapHeight:33]];;        
+        [[cell textLabel] setBackgroundColor:[UIColor clearColor]];
+        [[cell detailTextLabel] setBackgroundColor:[UIColor clearColor]];
 }
 
 #pragma mark - Responding to keyboard notifications
@@ -341,7 +321,6 @@
 - (void) presentScheduler: (id) sender {
     [actionsPopover dismissPopoverAnimated:YES];
     if (theItem == nil) {
-        NSLog(@"WriteNowViewController:presentScheduler - Creating theItem");
         NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
         [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
         theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
@@ -357,7 +336,6 @@
         default:
             break;
     }
-    
     SchedulerViewController *scheduleViewController = [[SchedulerViewController alloc] init];
     scheduleViewController.hidesBottomBarWhenPushed = YES;
     scheduleViewController.theItem = self.theItem;
@@ -388,7 +366,6 @@
 #pragma mark - Data Management
 
 - (void) saveItem {
-    
     [actionsPopover dismissPopoverAnimated:YES];
     if ([textView isFirstResponder]){
         if (![textView hasText]) {
@@ -433,8 +410,7 @@
             {
             [theItem createNewSimpleNote];
                 if (!saving) {
-
-            MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];            
+            MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
             detailViewController.theItem = self.theItem;
             detailViewController.saving = YES;
             detailViewController.hidesBottomBarWhenPushed = YES;
@@ -446,8 +422,7 @@
             {
             [theItem createNewList];
                 if (!saving) {
-                   
-            ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];            
+            ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
             detailViewController.theItem = self.theItem;
             detailViewController.saving = YES;
             detailViewController.hidesBottomBarWhenPushed = YES;
@@ -458,7 +433,7 @@
         case 2:
             {
             [theItem createNewAppointment];
-            AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];            
+            AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
             detailViewController.theItem = self.theItem;
             detailViewController.saving = YES;
             detailViewController.hidesBottomBarWhenPushed = YES;
@@ -468,7 +443,7 @@
         case 3:
             {   
             [theItem createNewToDo];
-            ToDoDetailViewController *detailViewController =[[ToDoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];            
+            ToDoDetailViewController *detailViewController =[[ToDoDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
             detailViewController.theItem = self.theItem;
             detailViewController.saving = YES;
             detailViewController.hidesBottomBarWhenPushed = YES;
@@ -482,11 +457,25 @@
         return;
 }
 
-- (void) startNewItem:(id) sender{//Called by Left Nav ADD_ITEM Button.
-    if (theItem == nil) {
+- (void) handleStartNewItemNotification: (NSNotification *) notification {
+    NSDictionary *theDict = [notification userInfo];
+    if ([self.textView hasText]) {
+        self.saving = YES;
+        [self startNewItem:nil];
+    }
+    [self.textView becomeFirstResponder];
+    NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
+    [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
+    theItem = [[NewItemOrEvent alloc] init];//Create new instance of delegate class.
+    theItem.addingContext = addingContext; // pass adding MOC to the delegate instance.
+    theItem.aDate = [theDict objectForKey:@"theDate"];
+    theItem.type = [theDict objectForKey:@"theType"];
+}
+
+- (void) startNewItem: (id) sender{
+       if (theItem == nil) {
         [self saveItem];
         }
-    
     //clear the current instance of theItem
     self.theItem = nil;
     
@@ -509,7 +498,6 @@
     toolbar.fourthButton.enabled = NO;
 }
 
-
 #pragma mark - calendar actions
 
 - (void) toggleCalendar:(id) sender{
@@ -520,16 +508,13 @@
     calendarViewC.hidesBottomBarWhenPushed = YES;
     calendarViewC.pushed = YES;
     [self.navigationController pushViewController: calendarViewC animated:YES];
-    
-    NSDate *d = [NSDate date];
+    NSDate *d = [NSDate date];    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
 }
-
 
 #pragma mark - TextView Management - Delegate Methods
 
 - (void) textViewDidBeginEditing:(UITextView *)textView {
-    NSLog(@"TextView Did Begin Editing");
     if ([self.textView hasText]){
         self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
         self.navigationItem.rightBarButtonItem.action = @selector(saveItem);
@@ -703,64 +688,59 @@
     return YES;
 }
 
-
-
 #pragma mark - Details
 
 - (void) handleTableRowSelection:(NSNotification *) notification {
     NSLog(@"WriteNowViewController:handleTableRowSelection - notification received");
     
+    NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
+    [addingContext setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
+    NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+    //selectedItem.addingContext = addingContext;
+
     if ([[notification object] isKindOfClass:[Appointment class]]) {
-        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS AN APPOINTMENT");
+        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];
         Appointment *selectedAppointment = [notification object];
-        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theAppointment = selectedAppointment;
         selectedItem.eventType = [NSNumber numberWithInt:2];
-        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theAppointment.text);
         detailViewController.theItem = selectedItem;
-        
+        detailViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     } 
     
     else if ([[notification object] isKindOfClass:[ToDo class]]){
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A TASK");
-        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
         ToDo *selectedToDo = [notification object];
-        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theToDo = selectedToDo;
         selectedItem.eventType = [NSNumber numberWithInt:3];
-        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theToDo.text);
         detailViewController.theItem = selectedItem;
+        detailViewController.hidesBottomBarWhenPushed = YES;
+
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }
     else if ([[notification object] isKindOfClass:[SimpleNote class]]){
-        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A MEMO");
+        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
         SimpleNote *selectedMemo = [notification object];
-        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theSimpleNote = selectedMemo;
         selectedItem.eventType = [NSNumber numberWithInt:0];
-        NSLog (@"WriteNowViewController: The text is %@", selectedItem.theMemo.text);
         detailViewController.theItem = selectedItem;
-        
+        detailViewController.hidesBottomBarWhenPushed = YES;
+
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }else if ([[notification object] isKindOfClass:[List class]]){
-              ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-              
-              NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A LIST");
-              List *selectedList = [notification object];
-              NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
-              selectedItem.theList = selectedList;
-              selectedItem.eventType = [NSNumber numberWithInt:1];
-              detailViewController.theItem = selectedItem;
-              [self.navigationController pushViewController:detailViewController animated:YES];
-              return;
-        }
+        ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStylePlain];              
+        List *selectedList = [notification object];
+        selectedItem.theList = selectedList;
+        selectedItem.eventType = [NSNumber numberWithInt:1];
+        detailViewController.theItem = selectedItem;
+        detailViewController.hidesBottomBarWhenPushed = YES;
+
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }
 }
 
 @end

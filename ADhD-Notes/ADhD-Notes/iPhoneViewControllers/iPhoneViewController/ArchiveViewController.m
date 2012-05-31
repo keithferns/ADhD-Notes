@@ -18,15 +18,9 @@
 @property (nonatomic, retain) FilesTableViewController *filesTableViewController;
 @end;
 
-
 @implementation ArchiveViewController
 
-@synthesize actionsPopover;
-@synthesize saving;
-@synthesize theItem;
-@synthesize foldersTableViewController, filesTableViewController;
-@synthesize managedObjectContext;
-
+@synthesize actionsPopover, saving, theItem, foldersTableViewController, filesTableViewController, managedObjectContext;
 
 - (void)viewDidUnload {
     [super viewDidUnload];
@@ -49,7 +43,6 @@
 - (void)viewDidLoad {
     
     [super viewDidLoad];
-
     //Navigation Bar SetUP
     NSArray *items = [NSArray arrayWithObjects:@"Folders", @"Documents", nil];
     UISegmentedControl *archivingControl = [[UISegmentedControl alloc] initWithItems:items];
@@ -64,8 +57,12 @@
     self.navigationItem.titleView = archivingControl;
 
     if (saving){
-        self.managedObjectContext = theItem.addingContext;
-        NSLog(@"Archive VIEWCONTROLLER: passed managedObjectContext: %@",  managedObjectContext);
+        if (theItem.theSimpleNote != nil){
+        self.managedObjectContext = theItem.theSimpleNote.managedObjectContext;
+        }
+        else if (theItem.theList != nil) {
+        self.managedObjectContext = theItem.theList.managedObjectContext;
+        }
         self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
         self.navigationItem.leftBarButtonItem.target = self;
         self.navigationItem.leftBarButtonItem.action = @selector(cancelSaving:);
@@ -77,8 +74,7 @@
     }else if (managedObjectContext == nil){
         /*-- Point current instance of the MOC to the main managedObjectContext --*/
         managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-        NSLog(@"Archive VIEWCONTROLLER: new managedObjectContext: %@",  managedObjectContext);
-    } 
+        } 
 
     if (!saving){
         UIBarButtonItem *rightNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:self action:@selector(presentActionsPopover:)];
@@ -90,17 +86,11 @@
     } else {
     //
     }
-
- 
 }
 
 - (void) viewWillAppear:(BOOL)animated{
-    NSLog(@"ArchiveVIEWCONTROLLER - viewWillAppear");
-
     //Table View Controllers
     if (foldersTableViewController == nil) {
-        NSLog(@"Initing and Adding the FoldersTableViewController");
-        NSLog(@"Archive VIEWCONTROLLER: passed managedObjectContext: %@",  managedObjectContext);
         foldersTableViewController = [[FoldersTableViewController alloc] init];
         foldersTableViewController.saving = YES;
         foldersTableViewController.managedObjectContext = self.managedObjectContext;
@@ -134,7 +124,6 @@
 }
 
 - (void) viewDidDisappear:(BOOL)animated{
-    NSLog(@"ArchiveVIEWCONTROLLER - viewWillDisappear");
 
     //[[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"FolderSelectedNotification" object:nil];
@@ -145,25 +134,20 @@
     }
 }
 
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (void) toggleFoldersFilesView:(id) sender{
-
     UISegmentedControl *segControl = (UISegmentedControl *)sender;
-    NSLog(@"ArchiveViewController:toggleFoldersViewController -> Segment %d touched", segControl.selectedSegmentIndex);
 
     switch (segControl.selectedSegmentIndex) {
         case 0:
-            NSLog(@"ArchiveViewController:toggleFoldersViewController -> Switching to Folder View");
             [filesTableViewController.tableView removeFromSuperview];
             [self.view addSubview:foldersTableViewController.tableView];
             break;
         case 1:
-            NSLog(@"ArchiveViewController:toggleFoldersViewController -> Switching to File View");	
             [foldersTableViewController.tableView removeFromSuperview];
             [self.view addSubview:filesTableViewController.tableView];
             break;
@@ -191,8 +175,6 @@
     switch ([sender tag]) {
         case 1://ADDING NEW FOLDERS OR FILES
         {
-            NSLog(@"Saving");        
-            
             CGSize size = CGSizeMake(140, 160);
             viewCon.contentSizeForViewInPopover = size;
             
@@ -213,7 +195,6 @@
                               permittedArrowDirections:UIPopoverArrowDirectionUp
                                               animated:YES name:@"Save"];     
             }
-            
         }
             break;
             
@@ -229,7 +210,6 @@
             [actionsPopover setDelegate:self];
             
             if (saving) {
-                
                 [actionsPopover presentPopoverFromRect:CGRectMake(190, kScreenHeight-kTabBarHeight, 50, 40)
                                                 inView:self.view
                               permittedArrowDirections: UIPopoverArrowDirectionDown
@@ -240,67 +220,56 @@
                               permittedArrowDirections: UIPopoverArrowDirectionUp
                                               animated:YES name:@"Organize"];
             }
-            
-        }
+                    }
             break;
-            
-            
         default:
             break;
-    }    
-    
+        }        
+    }
 }
 
-}
 - (void) cancelPopover:(id)sender {
-NSLog(@"CANCELLING POPOVER");
-return;
+    NSLog(@"CANCELLING POPOVER");
+    return;
 }
 
 - (void)popoverControllerDidDismissPopover:(WEPopoverController *)popoverController {
-NSLog(@"Did dismiss");
+    NSLog(@"Did dismiss");
 }
 
 - (BOOL)popoverControllerShouldDismissPopover:(WEPopoverController *)popoverController {
-NSLog(@"Should dismiss");
-return YES;
+    NSLog(@"Should dismiss");
+    return YES;
 }
-
 
 - (void) showTextBox:(id) sender {
-
-//Check for visisble instance of actionsPopover. if yes dismiss.
-if([actionsPopover isPopoverVisible]) {
-    [actionsPopover dismissPopoverAnimated:YES];
-    [actionsPopover setDelegate:nil];
-    actionsPopover = nil;
+    //Check for visisble instance of actionsPopover. if yes dismiss.
+    if([actionsPopover isPopoverVisible]) {
+        [actionsPopover dismissPopoverAnimated:YES];
+        [actionsPopover setDelegate:nil];
+        actionsPopover = nil;
 }
 
-UIAlertView *textBox = [[UIAlertView alloc] initWithTitle:nil message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Save", nil];
-[textBox setAlertViewStyle:UIAlertViewStylePlainTextInput];
+    UIAlertView *textBox = [[UIAlertView alloc] initWithTitle:nil message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Save", nil];
+    [textBox setAlertViewStyle:UIAlertViewStylePlainTextInput];
 
-if ([sender tag] == 1){
+    if ([sender tag] == 1){
     
-    textBox.title = @"New Folder:";
+        textBox.title = @"New Folder:";
     
-}else if ([sender tag] == 2){
+        }else if ([sender tag] == 2){
     
-    textBox.title = @"New Document:";
-}
-
-[textBox show];
+            textBox.title = @"New Document:";
+        }
+    [textBox show];
 }
 
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
 
     NSString *string = [alertView buttonTitleAtIndex:buttonIndex];
-
-    if ([string isEqualToString:@"Save"]){
-    
+    if ([string isEqualToString:@"Save"]){    
         UITextField *theTextField = [alertView textFieldAtIndex:0];
-        NSLog(@"New Folder/File Name is %@", theTextField.text);
         if ([alertView.title isEqualToString:@"New Folder:"]){
-                
             NSEntityDescription *entity = [NSEntityDescription entityForName:@"Folder" inManagedObjectContext:managedObjectContext];
             Folder *theFolder = [[Folder alloc] initWithEntity:entity insertIntoManagedObjectContext:managedObjectContext];
             theFolder.name = theTextField.text;
@@ -328,15 +297,14 @@ if ([sender tag] == 1){
         }
     }
         /*--Save the MOC--*/
+        NSLog(@"ArchiveViewController:AlertView -> ADDING MOC:  TRYING TO SAVE");
         NSError *error;
         if(![managedObjectContext save:&error]){ 
-            NSLog(@"ArchiveViewController ADDING MOC: DID NOT SAVE");
-        }     
+            NSLog(@"ArchiveViewController:AlertView -> ADDING MOC: DID NOT SAVE");
+        }  
+        NSLog(@"ArchiveViewController:AlertView -> ADDING MOC: SAVED");
     }
 }
-
-
-
 
 - (void) handleTableRowSelection:(NSNotification *)notification{
     NSLog(@"ArchiveViewController:handleTableRowSelection - notification received");
@@ -350,6 +318,7 @@ if ([sender tag] == 1){
         
         if (theItem.theSimpleNote != nil){
         NSLog(@"ArchiveViewController: theSimpleNote text = %@", theItem.theSimpleNote.text);
+        
         if (thefolder.items == nil) {
             
             thefolder.items = [NSSet setWithObject:theItem.theSimpleNote];
@@ -366,7 +335,6 @@ if ([sender tag] == 1){
         } else {
             thefolder.items = [thefolder.items setByAddingObject:theItem.theList];
         }
-        
         return;
     }
     }else {
@@ -382,15 +350,15 @@ if ([sender tag] == 1){
     [self.navigationController pushViewController:detailViewController animated:YES];
     return;
     }
-
 }
 
 -(void)saveFolderFile:(id) sender{
     saving = NO;
     NSError *error;
     if(![managedObjectContext save:&error]){ 
-    NSLog(@"DID NOT SAVE");
+    NSLog(@"ARCHIVE VIEW MOC:SaveFolderFile -> DID NOT SAVE");
     }
+    [theItem saveNewItem];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -398,7 +366,6 @@ if ([sender tag] == 1){
     saving = NO;
     [self.navigationController popViewControllerAnimated:YES];
 }
-
 
 - (UIView *) addItemsView: (CGRect) frame{
     UIView *oView = [[UIView alloc] initWithFrame:frame];
@@ -461,9 +428,7 @@ if ([sender tag] == 1){
     [oView addSubview:b3];
 
 return oView;
-
 }
-
 
 - (UIView *)organizerView: (CGRect)frame {
     UIView *oView = [[UIView alloc] initWithFrame:frame];

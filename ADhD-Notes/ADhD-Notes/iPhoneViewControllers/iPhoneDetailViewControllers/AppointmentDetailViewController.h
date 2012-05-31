@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "NewItemOrEvent.h"
 
-@interface AppointmentDetailViewController : UITableViewController{
+@interface AppointmentDetailViewController : UITableViewController <UITextViewDelegate>{
 
     NewItemOrEvent *theItem;
 

@@ -10,7 +10,6 @@
 #import "Collection.h"
 #import "Tag.h"
 
-
 @implementation Item
 
 @dynamic aDate, primitiveADate;
@@ -81,7 +80,6 @@
         NSDateComponents *components = [calendar components:(NSYearCalendarUnit |NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[self aDate]];
         
         tmp = [NSString stringWithFormat:@"%d", ([components year] * 1000000) + ([components month] *1000) + [components day]];
-        
         */
         
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];

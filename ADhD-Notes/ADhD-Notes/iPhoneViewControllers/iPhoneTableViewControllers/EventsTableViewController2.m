@@ -18,8 +18,7 @@
 @synthesize selectedDate, eventType;
 @synthesize calendarIsVisible;
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
+- (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
@@ -27,8 +26,7 @@
     return self;
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
@@ -38,18 +36,13 @@
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
-
-    [super viewDidLoad];
-    
-    NSLog(@"EVENT2 TABLEVIEWCONTROLLER:viewDidLoad -> loading view");
-    
+    [super viewDidLoad];    
     if (calendarIsVisible) {
-        
-       
         selectedDate = [[NSDate date] timelessDate];
+        eventType = [NSNumber numberWithInt:2];
+
     }
     else if (!calendarIsVisible) {
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEventTypeNotification:) name:@"GetEventTypeNotification" object:nil];
         
         eventType = [NSNumber numberWithInt:2];
@@ -57,25 +50,10 @@
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
     
-    /*configure tableView, set its properties and add it to the main view.*/
-    
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 320, 26)];
-    [headerLabel setBackgroundColor:[UIColor lightGrayColor]];
-    [headerLabel setText:@"MY STUFF"];
-    [headerLabel setTextAlignment:UITextAlignmentCenter];
-    [headerView setBackgroundColor:[UIColor blackColor]];
-    [headerView addSubview:headerLabel];
-    //[tableView setTableHeaderView:headerView];
-    //[tableView setSectionFooterHeight:0.0];
-    //[tableView setSectionHeaderHeight:15.0];
-    //[self.tableView setSeparatorColor:[UIColor blackColor]];
-    //[self.tableView setSectionHeaderHeight:18];
-    //self.tableView.rowHeight = kCellHeight;
-    
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, kBottomViewRect.size.height-kTabBarHeight);
-    self.tableView.backgroundColor = [UIColor clearColor];
+    self.tableView.backgroundColor = [UIColor blackColor];
     self.tableView.bounces = NO;
+    self.tableView.separatorColor = [UIColor blackColor];
     
     if (managedObjectContext == nil) { 
         managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
@@ -88,7 +66,6 @@
     NSError *error;
     if (![[self fetchedResultsController] performFetch:&error]) {
     }
-    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -97,7 +74,6 @@
         
     //KVO (Key Value Observing). Do a search on "Key-Value Observing Quick Start" in the XCode help system for more info.  You would want to make objects that need to be notified of changes call observeValueForKeyPathfObject:change:context: on the data container object. Then, they will get notified automatically when the object changes.
 }
-
 
 - (void)handleDidSaveNotification:(NSNotification *)notification {
     //FIXME: setting the fetchedResults controller to nil below is a temporary work-around for the problem created by having 1 row per section in the primary table view. 
@@ -111,10 +87,8 @@
     [self.tableView reloadData];
 }
 
-
 - (void)viewDidUnload{
     [super viewDidUnload];
-    
     self.managedObjectContext = nil;
     self.fetchedResultsController.delegate = nil;
     self.fetchedResultsController = nil;
@@ -124,11 +98,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    NSLog(@"View WIll appear Selected Date is %@", selectedDate);
+    [super viewWillAppear:animated];    
     eventType = [NSNumber numberWithInt:2];
-    
     self.fetchedResultsController = nil;
     NSError *error;
     if (![[self fetchedResultsController] performFetch:&error]) {
@@ -153,7 +124,6 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-
 #pragma mark -
 #pragma mark Fetched results controller
 
@@ -161,7 +131,6 @@
     // if (!calendarIsVisible){
     //     return;
     // }
-    NSLog(@"Event2_TableViewController - getSelected date notification");
     selectedDate = [notification object];
     self.fetchedResultsController = nil;
     
@@ -171,12 +140,8 @@
     [self.tableView reloadData];
 }
 
-
 - (void)handleEventTypeNotification:(NSNotification *)notification {    
-    
-    self.eventType= [notification object];
-    NSLog(@"Event2_TableViewController - getEventType notification received = %d", [self.eventType intValue]);
-    
+    self.eventType= [notification object];    
     self.fetchedResultsController = nil;
     
     //NSPredicate *eventTypePredicate = [NSPredicate predicateWithFormat: @"aType == %d", [number intValue]];
@@ -187,8 +152,6 @@
 	}
     [self.tableView reloadData];
 }
-
-
 
 - (NSFetchedResultsController *) fetchedResultsController {
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
@@ -210,18 +173,21 @@
         return _fetchedResultsController;
     }
     NSFetchRequest *request = [[NSFetchRequest alloc] init];    
-    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
-    
-   
+
+    if ([eventType intValue] == 2) {
+        [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
+    }
+    else if ([eventType intValue] == 3){
+                [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
+    }
     
     NSDate *currentDate;
     
     if (!calendarIsVisible) { 
-        NSLog(@"EVENT2 TVC - Calendar is NOT Visible");
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
         [gregorian setLocale:[NSLocale currentLocale]];
         [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-        
+       
         NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];  
         [timeComponents setYear:[timeComponents year]];
         [timeComponents setMonth:[timeComponents month]];
@@ -230,13 +196,14 @@
         [timeComponents setMinute:0];
         [timeComponents setSecond:0];
         currentDate = [gregorian dateFromComponents:timeComponents];
-        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type = %@ AND aDate >= %@", eventType, currentDate];
+        //NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type = %@ AND aDate >= %@", eventType, currentDate];
+        if ([eventType intValue] == 2) {
+      
+        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate >= %@", currentDate];
         [request setPredicate:checkDate];
-        
+        }
     }
     else if (calendarIsVisible){
-        NSLog(@"EVENT2 TVC - Calendar is Visible");
-
      /*
         if (selectedDate == nil) {
             NSLog(@"Selected Date is nil");
@@ -246,7 +213,6 @@
             }
         else {
       */
-            NSLog(@"fetching: Selected Date is %@", selectedDate);
         
             NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
             [request setPredicate:checkDate];
@@ -302,6 +268,18 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 20;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    CGFloat fHeight;
+    if (calendarIsVisible) {
+        fHeight = 8.0;
+    }
+    else {
+        fHeight = 0.0;
+    }
+    return fHeight;
 }
 
 
@@ -392,6 +370,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         cell.backgroundColor = altCellColor;
     }
 }  
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     /*
     if ([[_fetchedResultsController fetchedObjects] count] > 0){
@@ -420,8 +399,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
      [formatter setCalendar:[NSCalendar currentCalendar]];
      monthSymbols = [formatter monthSymbols];
      }
-     
-     NSInteger numericSection = [[theSection name] integerValue];
+    NSInteger numericSection = [[theSection name] integerValue];
      NSInteger year = numericSection / 10000;
      NSInteger tempmonth = numericSection - (year * 10000);
      NSInteger month = tempmonth/100;
@@ -429,7 +407,16 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
      NSString *titleString = [NSString stringWithFormat:@"%@ %d, %d", [monthSymbols objectAtIndex:month-1],day,year];
      
      return titleString;
-     
+}
+
+
+#pragma mark -
+#pragma mark Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    //[tableView deselectRowAtIndexPath:indexPath animated:YES];    
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[_fetchedResultsController objectAtIndexPath:indexPath ]];      
 }
 
 
@@ -440,7 +427,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
  // Return NO if you do not want the specified item to be editable.
  return YES;
  }
- */
+ 
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -451,11 +438,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         // Save the context.
         NSError *error;
         if (![managedObjectContext save:&error]) {
-            /*
-             Replace this implementation with code to handle the error appropriately.
-             
-             abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-             */
+          
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
@@ -465,44 +448,14 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     }   
 }
 
-
-
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-#pragma mark -
-#pragma mark Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    //[tableView deselectRowAtIndexPath:indexPath animated:YES];    
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[_fetchedResultsController objectAtIndexPath:indexPath ]];      
-   
-    
-    
-    
-}
-
 #pragma mark -
 #pragma mark Fetched Results Notifications
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
     // The fetch controller is about to start sending change notifications, so prepare the table view for updates.
-    
     [self.tableView beginUpdates];
 }
-
-- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-    
-    
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {    
     switch(type) {
             
         case NSFetchedResultsChangeInsert:
@@ -512,8 +465,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
             
         case NSFetchedResultsChangeDelete:
             [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            NSLog(@"Event2_TableViewController:FetchedResultsController: ChangeDelete");
-            
+            NSLog(@"Event2_TableViewController:FetchedResultsController: ChangeDelete");            
             break;
             
         case NSFetchedResultsChangeUpdate:
@@ -526,7 +478,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
             // Reloading the section inserts a new row and ensures that titles are updated appropriately.
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
             NSLog(@"Event2_TableViewController:FetchedResultsController ChangeMove");
-            
             break;
     }
 }
@@ -547,8 +498,5 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
     [self.tableView endUpdates];
 }
-
-
-
-
+*/
 @end

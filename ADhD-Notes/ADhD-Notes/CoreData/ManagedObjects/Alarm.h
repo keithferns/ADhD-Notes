@@ -2,7 +2,7 @@
 //  Alarm.h
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 4/20/12.
+//  Created by Keith Fernandes on 5/24/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -13,7 +13,8 @@
 
 @interface Alarm : NSManagedObject
 
-@property (nonatomic, retain) NSDate * reminder;
+@property (nonatomic, retain) NSString * reminder;
+@property (nonatomic, retain) NSNumber * order;
 @property (nonatomic, retain) NSSet *event;
 @end
 

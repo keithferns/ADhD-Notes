@@ -14,7 +14,6 @@
 
 @interface DiaryViewController ()
 
-
 @property (nonatomic, retain) DiaryTableViewController *currentTableViewController;
 
 @end
@@ -27,11 +26,7 @@
 @synthesize calendarView;
 //@synthesize calendarDayTimelineView;
 
-
-
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
@@ -39,12 +34,10 @@
     return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     dateCounter = 0;
 
-    
     NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
     [dateformatter setDateFormat:@"EEEE, MMMM dd"];
     UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
@@ -62,8 +55,7 @@
     [diaryControl setWidth:90 forSegmentAtIndex:0];
     [diaryControl setWidth:90 forSegmentAtIndex:1];
     [diaryControl setSelectedSegmentIndex:0];
-    [diaryControl addTarget:self
-                     action:@selector(toggleTodayCalendarView:)
+    [diaryControl addTarget:self action:@selector(toggleTodayCalendarView:)
            forControlEvents:UIControlEventValueChanged];
     
     self.navigationItem.titleView = diaryControl;
@@ -94,41 +86,31 @@
     [self.view addSubview:currentTableViewController.tableView];    
  
     //[self.view addSubview:self.calendarDayTimelineView];
-    
 }
 
 - (void) toggleTodayCalendarView:(id) sender{
-    
     UISegmentedControl *segControl = (UISegmentedControl *)sender;
     NSLog(@"DiaryViewController:toggleTodayCalendarView -> Segment %d touched", segControl.selectedSegmentIndex);
-    
-	
-	switch (segControl.selectedSegmentIndex) {
+    switch (segControl.selectedSegmentIndex) {
 		case 0:
             NSLog(@"DiaryViewController:toggleTodayCalendarView -> Switching to Today View");
             dateCounter = 0;
-            [self postSelectedDateNotification:nil];
-            
+            [self postSelectedDateNotification:nil];            
             [self moveCalendarDown];
-            
 			break;
         case 1:
             NSLog(@"DiaryViewController:toggleTodayCalendarView  -> Switching to Calendar View");	            
             if (calendarView == nil) {
-                
                 calendarView = 	[[TKCalendarMonthView alloc] init];        
                 calendarView.delegate = self;
                 [self.view addSubview:calendarView];
                 [calendarView reload];
                 calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
                 //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-                
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.5];
-                [UIView setAnimationDelegate:self];
-                
+                [UIView setAnimationDelegate:self];                
                 calendarView.frame = CGRectMake(0, kNavBarHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-                
                 [UIView commitAnimations];
             }
             break;
@@ -136,14 +118,11 @@
 }
 
 - (void) moveCalendarDown{
-    
     if (calendarView.superview != nil) {
-        
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.5];
         [UIView setAnimationDelegate:self];
         [UIView setAnimationDidStopSelector:@selector(finishedMovingCalendar)];
-        
         calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
         
         [UIView commitAnimations];
@@ -151,29 +130,24 @@
 }
 
 - (void) finishedMovingCalendar{
-    
     if (calendarView !=nil) {
-        
         calendarView = nil;
     }
 }
-
 
 #pragma mark - TKCalendarMonthViewDelegate methods
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView didSelectDate:(NSDate *)d {
 	NSLog(@"calendarMonthView didSelectDate: %@", d);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
-
     [self moveCalendarDown];
-    
 }
+
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView monthDidChange:(NSDate *)d {
 	NSLog(@"calendarMonthView monthDidChange");	
     //
 }
 
 - (void) postSelectedDateNotification:(id) sender{
-    
     NSLog(@"DiaryViewController:postDateNotification -> posting dateNotification");
     // if nil then post current date. 
     //if left arrow selected add
@@ -188,11 +162,8 @@
         NSLog(@"increment dateCounter by 1");
         ++dateCounter;
     }
-    
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDate *currentDate= [[NSDate date] timelessDate];
-    
-    
+    NSDate *currentDate= [[NSDate date] timelessDate];    
     NSDateComponents *addDay = [[NSDateComponents alloc] init];
     addDay.day = dateCounter;
     
@@ -207,10 +178,6 @@
     dateLabel.backgroundColor = [UIColor clearColor];
     dateLabel.textColor = [UIColor whiteColor];
     dateLabel.textAlignment = UITextAlignmentCenter;
-    
-    
-    NSLog(@"DiaryViewController:postDateNotification -> dateNotification Posted");
-
 }
 
 /*
@@ -235,7 +202,6 @@
 	NSLog(@"CalendarDayTimelineView: EventViewWasSelected");
 }
 
-
 - (TKCalendarDayTimelineView *) calendarDayTimelineView{
 	if (!_calendarDayTimelineView) {
 		_calendarDayTimelineView = [[TKCalendarDayTimelineView alloc]initWithFrame:self.view.bounds];
@@ -245,9 +211,7 @@
 }
 */
 
-
-- (void)viewDidUnload
-{
+- (void)viewDidUnload{
     [super viewDidUnload];
     currentTableViewController  = nil;
     datelabel = nil;

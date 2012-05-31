@@ -1,14 +1,11 @@
-//
 //  Constants.h
 //  ADhD-Notes
 //
 //  Created by Keith Fernandes on 4/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
 
 #ifndef ADhD_Notes_Constants_h
 #define ADhD_Notes_Constants_h
-
 
 //Define the timeZone and TimeZone Offset
 
@@ -31,13 +28,11 @@
 
 //Define TopView Properties
 
-
 #define kTopViewRect CGRectMake(0, kNavBarHeight, kScreenWidth, 150)
 
 //Define BottomView Properties
 
 #define kBottomViewRect CGRectMake(0, kTopViewRect.origin.y+kTopViewRect.size.height, kScreenRect.size.width, kScreenRect.size.height-kNavBarHeight-kTopViewRect.size.height-kTabBarHeight)
-
 
 //Define TextView Properties
 
@@ -45,12 +40,11 @@
 
 //Define TableView Properties
 
-
 // Height of the cells of the embedded table view (after rotation, which would be the table's width)
-#define kCellHeight  88
+#define kCellHeight  110
 
 // Width of the cells of the embedded table view (after rotation, which means it controls the rowHeight property)
-#define kCellWidth 68
+#define kCellWidth 75
 
 // Padding for the Cell containing the article image and title
 #define kArticleCellVerticalInnerPadding            3
@@ -72,6 +66,5 @@
 
 // The background color on the horizontal table view for when we select a particular cell
 #define kHorizontalTableSelectedBackgroundColor [UIColor colorWithRed:0.0 green:0.59607843 blue:0.37254902 alpha:1.0]
-
 
 #endif

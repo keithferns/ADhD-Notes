@@ -1,10 +1,8 @@
-//
 //  CalendarViewController.m
 //  ADhD-Notes
 //
 //  Created by Keith Fernandes on 4/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
 
 #import "CalendarViewController.h"
 #import "ADhD_NotesAppDelegate.h"
@@ -13,52 +11,43 @@
 #import "AppointmentDetailViewController.h"
 #import "ToDoDetailViewController.h"
 #import "MemoDetailViewController.h"
-
+#import "ListDetailViewController.h"
 @interface CalendarViewController ()
 
 @property BOOL saving;
 @property (nonatomic, retain) EventsTableViewController2 *tableViewController1, *tableViewController2;
+@property (nonatomic, retain) NSDate *selectedDate;
 @end
 
 @implementation CalendarViewController
 
-@synthesize tableViewController1, tableViewController2, segmentedControl;
-@synthesize actionsPopover;
-@synthesize saving, pushed, frontViewIsVisible;
-@synthesize managedObjectContext;
-@synthesize flipIndicatorButton;
-@synthesize calendarView, flipperImageForDateNavigationItem, flipperView, listImageForFlipperView;
+@synthesize tableViewController1, tableViewController2, segmentedControl, actionsPopover, saving, pushed, frontViewIsVisible, managedObjectContext, flipIndicatorButton, calendarView, flipperImageForDateNavigationItem, flipperView, listImageForFlipperView, selectedDate;
 
 #pragma mark - ViewManagement
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    
+    selectedDate = [NSDate date];
+    self.navigationController.navigationBar.topItem.title = @"Calendar";    
     frontViewIsVisible = YES;
     if (managedObjectContext == nil) { 
         managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"CURRENT VIEWCONTROLLER: After managedObjectContext: %@",  managedObjectContext);
     }    
-    
     /*-ADD FLIPPER VIEW -*/
     flipperView = [[UIView alloc] initWithFrame:mainFrame];
     [flipperView setBackgroundColor:[UIColor blackColor]];
     [self.view   addSubview:flipperView];
     
     if (tableViewController2 == nil){
-        
         tableViewController2 = [[EventsTableViewController2 alloc] init];
         tableViewController2.calendarIsVisible = NO;
         tableViewController2.tableView.frame = CGRectMake(0, 0, flipperView.frame.size.width, flipperView.frame.size.height-kTabBarHeight);
-        
         [tableViewController2.tableView setSeparatorColor:[UIColor blackColor]];
         [tableViewController2.tableView setSectionHeaderHeight:13];
         tableViewController2.tableView.rowHeight = kCellHeight;
-        
         UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 40)];
         searchBar.tintColor = [UIColor blackColor];
-        
         tableViewController2.tableView.tableHeaderView = searchBar;
     }
     if (calendarView.superview==nil) {
@@ -70,15 +59,11 @@
         calendarView.frame = CGRectMake(0, 0, calendarView.frame.size.width, calendarView.frame.size.height);
         tableViewController1 = [[EventsTableViewController2 alloc]init];
         tableViewController1.calendarIsVisible = YES;
-
         tableViewController1.tableView.frame = CGRectMake(0, calendarView.frame.size.height,kScreenWidth, kScreenHeight-calendarView.frame.size.height);
-        
         [tableViewController1.tableView setSeparatorColor:[UIColor blackColor]];
         [tableViewController1.tableView setSectionHeaderHeight:13];
-        tableViewController1.tableView.rowHeight = kCellHeight;
-        
+        tableViewController1.tableView.rowHeight = kCellHeight;        
         [self.flipperView addSubview:tableViewController1.tableView];
-
         [self.flipperView addSubview:calendarView];
         [calendarView reload];
     }
@@ -107,7 +92,6 @@
     [self.navigationItem setRightBarButtonItem:flipButtonBarItem animated:YES];
     [flipIndicatorButton addTarget:self action:@selector(toggleCalendar:) forControlEvents:(UIControlEventTouchDown)];
     }
-    
     //[UIView commitAnimations];
     
     if (pushed) {
@@ -116,14 +100,12 @@
         rightNavButton.tag = 1;
         self.navigationItem.rightBarButtonItem = rightNavButton;
     }
-    
     /* Init and Add the Segmented Control */
-    NSArray *items = [NSArray arrayWithObjects:@"Month", @"Week",@"Day", nil];
+    NSArray *items = [NSArray arrayWithObjects:@"Month",@"Day", nil];
     segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
     [segmentedControl setSegmentedControlStyle:UISegmentedControlStyleBar];
     [segmentedControl setWidth:60 forSegmentAtIndex:0];
     [segmentedControl setWidth:60 forSegmentAtIndex:1];
-    [segmentedControl setWidth:60 forSegmentAtIndex:2];
     [segmentedControl setSelectedSegmentIndex:0];
     self.navigationItem.titleView = segmentedControl;
 }
@@ -150,10 +132,9 @@
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    NSLog(@"CalendarViewController - viewWillDisappear");
+
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
 }
-
 
 - (UIImage *)flipperImageForDateNavigationItem {
 	// returns a 30 x 30 image to display the flipper button in the navigation bar
@@ -191,35 +172,27 @@
 	CGRect buttonRectange = CGRectMake(2,4, backgroundImage.size.width, backgroundImage.size.height);
 	[backgroundImage drawInRect:buttonRectange];
     UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
-    
 	UIGraphicsEndImageContext();
 	return theImage;
 }
 
-
-
 - (void) toggleAppointmentsTasksView: (id) sender{
- 
     switch (segmentedControl.selectedSegmentIndex) {
         case 0:
             {
-                NSLog (@"seg control index = %d", segmentedControl.selectedSegmentIndex);
             NSNumber *num = [NSNumber numberWithInt:2];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"GetEventTypeNotification" object:num userInfo:nil]; 
             }
             break;
         case 1:
             {
-                NSLog (@"seg control index = %d", segmentedControl.selectedSegmentIndex);
-
             NSNumber *num = [NSNumber numberWithInt:3];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"GetEventTypeNotification" object:num userInfo:nil]; 
             }
             break;
         default:
             break;
-    }
-    
+    }    
 }
 
 - (void)toggleCalendar:(id) sender {
@@ -244,7 +217,7 @@
         
         [self.flipperView addSubview:tableViewController2.tableView];
         self.navigationItem.titleView = nil;
-        NSArray *items = [NSArray arrayWithObjects:@"Appointments", @"Tasks", nil];
+        NSArray *items = [NSArray arrayWithObjects:@"Events", @"Memos", nil];
         segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
         [segmentedControl setSegmentedControlStyle:UISegmentedControlStyleBar];
         [segmentedControl setWidth:90 forSegmentAtIndex:0];
@@ -264,16 +237,14 @@
         [self.flipperView addSubview:tableViewController1.tableView];
 
         self.navigationItem.titleView = nil;
-        NSArray *items = [NSArray arrayWithObjects:@"Month", @"Week",@"Day", nil];
+        NSArray *items = [NSArray arrayWithObjects:@"Month", @"Day", nil];
         segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
         [segmentedControl setSegmentedControlStyle:UISegmentedControlStyleBar];
         [segmentedControl setWidth:60 forSegmentAtIndex:0];
         [segmentedControl setWidth:60 forSegmentAtIndex:1];
-        [segmentedControl setWidth:60 forSegmentAtIndex:2];
         [segmentedControl setSelectedSegmentIndex:0];
        
         self.navigationItem.titleView = segmentedControl;
-        
     }
 	[UIView commitAnimations];
     
@@ -293,7 +264,6 @@
 	}
 	[UIView commitAnimations];
     frontViewIsVisible=!frontViewIsVisible;
-    
 }
 
 - (void)myTransitionDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
@@ -310,11 +280,10 @@
 
 #pragma mark - TKCalendarMonthViewDelegate methods
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView didSelectDate:(NSDate *)d {
-	NSLog(@"calendarMonthView didSelectDate: %@", d);
+    selectedDate = d;
+    NSLog (@"CalendarViewController:selected date is %@", selectedDate);
     //ADD DATE TO CURRENT EVENT
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
-
 }
 
 - (void) calendarMonthView:(TKCalendarMonthView*)monthView monthDidChange:(NSDate*)month animated:(BOOL)animated {
@@ -328,11 +297,10 @@
     CGRect frame = tableViewController1.tableView.frame;
     frame.origin.y = calendarView.frame.origin.y + calendarView.frame.size.height;
     tableViewController1.tableView.frame = frame;
-    [self.flipperView addSubview:tableViewController1.tableView];
-    
+    [self.flipperView addSubview:tableViewController1.tableView];    
     [UIView commitAnimations];
-    
 }
+
 #pragma mark - TKCalendarMonthViewDataSource methods
 //get dates with events
 - (NSArray *)fetchDatesForTimedEvents { 
@@ -368,23 +336,16 @@
         } 
         else if ([[results objectAtIndex:i] isKindOfClass:[ToDo class]]){
             ToDo *tempToDo = [results objectAtIndex:i];
-            [data addObject:tempToDo.aDate];
-            
+            [data addObject:tempToDo.aDate];            
         }
-        
     }
-    
     return data;    
 }
 
 - (NSArray*)calendarMonthView:(TKCalendarMonthView *)monthView marksFromDate:(NSDate *)startDate toDate:(NSDate *)lastDate {	
-    
-	NSArray *data = [NSArray arrayWithArray:[self fetchDatesForTimedEvents]];
-    
-	
+	NSArray *data = [NSArray arrayWithArray:[self fetchDatesForTimedEvents]];	
 	// Initialise empty marks array, this will be populated with TRUE/FALSE in order for each day a marker should be placed on.
 	NSMutableArray *marks = [NSMutableArray array];
-	
 	// Initialise calendar to current type and set the timezone to never have daylight saving
 	NSCalendar *cal = [NSCalendar currentCalendar];
     [cal setTimeZone:[NSTimeZone systemTimeZone]];
@@ -407,8 +368,7 @@
 		// NSOrderedDescending = the left value is greater than the right
 		if ([d compare:lastDate] == NSOrderedDescending) {
 			break;
-		}
-		
+		}		
 		// If the date is in the data array, add it to the marks array, else don't
 		//if ([data containsObject:[d description]]) {
 		if ([data containsObject:d]) {
@@ -416,14 +376,13 @@
 			[marks addObject:[NSNumber numberWithBool:YES]];
 		} else {
 			[marks addObject:[NSNumber numberWithBool:NO]];
-		}
-		
+		}		
 		// Increment day using offset components (ie, 1 day in this instance)
 		d = [cal dateByAddingComponents:offsetComponents toDate:d options:0];
 	}
-	
 	return [NSArray arrayWithArray:marks];
 }
+
 - (void) addDateToCurrentEvent {
     /* the navigation bar needs to be changed for the schedule view 
      Left button = Cancel. Returns the user to the editing page.
@@ -435,13 +394,57 @@
      If there is no text in TV, then create note and event. 
      
      Alternately, have two different looking buttons which show depending on whether there is text or not. 
-     
      */
     //[[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
-    
     [self.navigationController popViewControllerAnimated:YES];
     return;
 }
+
+- (void) startNewItem:(id) sender {
+
+    if (!pushed) {
+
+        NSNumber *num;
+        switch ([sender tag]) {
+            case 1:           
+               
+                num = [NSNumber numberWithInt:2];
+                
+                break;
+            case 2:
+                num = [NSNumber numberWithInt:3];
+
+                break;
+            case 3:
+                num = [NSNumber numberWithInt:0];
+
+                //Note
+                break;
+                
+            default:
+                break;
+        }
+        NSArray *objects = [NSArray arrayWithObjects:selectedDate , num, nil];
+        NSArray *keys = [NSArray arrayWithObjects:@"theDate", @"theType",nil];
+        NSDictionary *dict = [NSDictionary dictionaryWithObjects:objects forKeys:keys];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil userInfo:dict];                
+
+        self.tabBarController.selectedViewController 
+        = [self.tabBarController.viewControllers objectAtIndex:0];
+        
+    }else{
+        
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    if([actionsPopover isPopoverVisible]) {
+        [actionsPopover dismissPopoverAnimated:YES];
+        [actionsPopover setDelegate:nil];
+        actionsPopover = nil;
+        return;
+    }
+}
+
 
 
 #pragma mark - Popover Management
@@ -454,23 +457,18 @@
         actionsPopover = nil;
         return;
     }
-    
     if(!actionsPopover ) {
-        
         UIViewController *viewCon = [[UIViewController alloc] init];
-        
         switch ([sender tag]) {
             case 1://ADDING NEW FOLDERS OR FILES
             {
-                CGSize size = CGSizeMake(140, 150);
+                CGSize size = CGSizeMake(140, 160);
                 viewCon.contentSizeForViewInPopover = size;
-                
                 viewCon.view =  [self addItemsView:CGRectMake(0, 0, size.width, size.height)];
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
                 if (saving){
-                    
                     [actionsPopover presentPopoverFromRect:CGRectMake(80, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view    
                                   permittedArrowDirections:UIPopoverArrowDirectionDown
@@ -482,23 +480,17 @@
                                   permittedArrowDirections:UIPopoverArrowDirectionUp
                                                   animated:YES name:@"Save"];     
                 }
-                
             }
                 break;
-                
             case 2:
             {
-                NSLog(@"Organizing");
-                
                 CGSize size = CGSizeMake(140, 260);
                 viewCon.contentSizeForViewInPopover = size;
                 viewCon.view = [self organizerView: CGRectMake(0, 0, size.width, size.height)];
-                
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
                 if (saving) {
-                    
                     [actionsPopover presentPopoverFromRect:CGRectMake(190, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view
                                   permittedArrowDirections: UIPopoverArrowDirectionDown
@@ -509,16 +501,14 @@
                                   permittedArrowDirections: UIPopoverArrowDirectionUp
                                                   animated:YES name:@"Organize"];
                 }
-                
             }
                 break;
             default:
                 break;
         }    
-        
-    }
-    
+    }    
 }
+
 - (void) cancelPopover:(id)sender {
     NSLog(@"CANCELLING POPOVER");
     return;
@@ -533,56 +523,67 @@
     return YES;
 }
 
-- (UIView *) addItemsView: (CGRect) frame {
+- (UIView *) addItemsView: (CGRect) frame{
     UIView *oView = [[UIView alloc] initWithFrame:frame];
     //FIXME: Potential Memory Leak for oView
-    UILabel *addLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 140, 29)];
-    [addLabel setText:@"Add New:"];
+    UILabel *addLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 140, 39)];
+    [addLabel setText:@"ADD NEW"];
+    [addLabel setTextAlignment:UITextAlignmentCenter];
     [addLabel setBackgroundColor:[UIColor clearColor]];
     addLabel.textColor = [UIColor lightTextColor];
     addLabel.font = [UIFont boldSystemFontOfSize:18];
     addLabel.layer.borderWidth = 2;
     addLabel.layer.borderColor = [UIColor clearColor].CGColor;
     
-    UIButton *b1 = [[UIButton alloc] initWithFrame:CGRectMake(5, 30, 120, 39)];
+    UIButton *b1 = [[UIButton alloc] initWithFrame:CGRectMake(10, 40, 120, 39)];
     [b1 setTitle:@"Appointment" forState:UIControlStateNormal];
     b1.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    b1.backgroundColor = [UIColor darkGrayColor];
-    b1.alpha = 0.8;
+    //b1.backgroundColor = [UIColor darkGrayColor];
+    b1.alpha = 1.0;
+    [b1 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
+    [b1 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
     [b1 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [b1 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    b1.layer.cornerRadius = 6.0;
-    b1.layer.borderWidth = 1.0;
-    [b1 addTarget:self action:@selector(pushingDetail) forControlEvents:UIControlEventTouchUpInside];
+    //b1.layer.cornerRadius = 6.0;
+    //b1.layer.borderWidth = 1.0;
+    [b1 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
+    [b1 setTag:1];
     
-    UIButton *b2 = [[UIButton alloc] initWithFrame:CGRectMake(5, 70, 120, 39)];
-    b2.backgroundColor = [UIColor darkGrayColor];
-    b2.alpha = 0.8;
+    UIButton *b2 = [[UIButton alloc] initWithFrame:CGRectMake(10, 80, 120, 39)];
+    // b2.backgroundColor = [UIColor darkGrayColor];
+    b2.alpha = 1.0;
     [b2 setTitle:@"To Do" forState:UIControlStateNormal];
     b2.titleLabel.font = [UIFont italicSystemFontOfSize:15];
+    [b2 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
+    [b2 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
     [b2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [b2 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    b2.layer.cornerRadius = 6.0;
-    b2.layer.borderWidth = 1.0;
+    [b2 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
+    //b2.layer.cornerRadius = 6.0;
+    //b2.layer.borderWidth = 1.0;
+    [b2 setTag:2];
+    //b2.layer.borderWidth = 2;
+    //b2.layer.borderColor = [UIColor darkGrayColor].CGColor;
     
-    UIButton *b3 = [[UIButton alloc] initWithFrame:CGRectMake(5, 110, 120, 39)];
+    UIButton *b3 = [[UIButton alloc] initWithFrame:CGRectMake(10, 120, 120, 39)];
     [b3 setTitle:@"Note" forState:UIControlStateNormal];
     b3.titleLabel.font = [UIFont italicSystemFontOfSize:15];
+    [b3 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
+    [b3 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
     [b3 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [b3 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    b3.backgroundColor = [UIColor darkGrayColor];
-    b3.alpha = 0.8;    
-    b3.layer.cornerRadius = 6.0;
-    b3.layer.borderWidth = 1.0;
+    //b3.backgroundColor = [UIColor darkGrayColor];
+    b3.alpha = 1.0;
+    [b3 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
+    //b3.layer.cornerRadius = 6.0;
+    //b3.layer.borderWidth = 1.0;
+    [b3 setTag:3];
     
     [oView addSubview:addLabel];
-    
     [oView addSubview:b1];
     [oView addSubview:b2];
     [oView addSubview:b3];
-    
     return oView;
-    
 }
 
 - (UIView *)organizerView: (CGRect)frame {
@@ -662,55 +663,51 @@
     return oView;
 }
 
-
-
 #pragma mark - Details
 
 - (void) handleTableRowSelection:(NSNotification *) notification {
-    //NOTE: Multiple messages are being posted. Apparently this is normal behavior so ignore.    
-    NSLog(@"WriteNowViewController:handleTableRowSelection - notification received");
-    
     if ([[notification object] isKindOfClass:[Appointment class]]) {
-        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS AN APPOINTMENT");
-       // Appointment *selectedAppointment = [notification object];
-        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
-        //selectedItem.theAppointment = selectedAppointment;
-        //selectedItem.eventType = [NSNumber numberWithInt:2];
-        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theAppointment.text);
-        //detailViewController.theItem = selectedItem;
-        
+        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        Appointment *selectedAppointment = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theAppointment = selectedAppointment;
+        selectedItem.eventType = [NSNumber numberWithInt:2];
+        detailViewController.theItem = selectedItem;
+        detailViewController.hidesBottomBarWhenPushed = YES;
+
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
-    } 
-    
-    else if ([[notification object] isKindOfClass:[ToDo class]]){
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A TASK");
-        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        //ToDo *selectedToDo = [notification object];
-        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
-        //selectedItem.theToDo = selectedToDo;
-        //selectedItem.eventType = [NSNumber numberWithInt:3];
-        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theToDo.text);
-        //detailViewController.theItem = selectedItem;
+    } else if ([[notification object] isKindOfClass:[ToDo class]]){
+        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        ToDo *selectedToDo = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theToDo = selectedToDo;
+        selectedItem.eventType = [NSNumber numberWithInt:3];
+        detailViewController.theItem = selectedItem;
+        detailViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
-    }
-    else if ([[notification object] isKindOfClass:[Memo class]]){
-        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        
-        NSLog(@"THE SELECTED NOTIFICATION OBJECT IS A MEMO");
-        //Memo *selectedMemo = [notification object];
-        //NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
-        //selectedItem.theMemo = selectedMemo;
-        //selectedItem.eventType = [NSNumber numberWithInt:1];
-        //NSLog (@"WriteNowViewController: The text is %@", selectedItem.theMemo.text);
-        //detailViewController.theItem = selectedItem;
-        
+    } else if ([[notification object] isKindOfClass:[SimpleNote class]]){
+        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        SimpleNote *selectedSimpleNote = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theSimpleNote = selectedSimpleNote;
+        selectedItem.eventType = [NSNumber numberWithInt:0];
+        detailViewController.theItem = selectedItem;
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        return;
+    }else if ([[notification object] isKindOfClass:[List class]]){
+        ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        List *selectedList = [notification object];
+        NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
+        selectedItem.theList = selectedList;
+        selectedItem.eventType = [NSNumber numberWithInt:1];
+        detailViewController.theItem = selectedItem;
+        detailViewController.hidesBottomBarWhenPushed = YES;
+
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }
 }
-
 
 @end

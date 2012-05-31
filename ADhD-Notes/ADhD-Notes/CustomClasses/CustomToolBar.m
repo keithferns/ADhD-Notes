@@ -1,6 +1,6 @@
 //
 //  CustomToolBar.m
-//  iDoit
+//  ADhD-Notes
 //
 //  Created by Keith Fernandes on 11/23/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
@@ -10,7 +10,7 @@
 #import "Constants.h"
 @implementation CustomToolBar
 
-@synthesize firstButton, secondButton, fourthButton, thirdButton, fifthButton;
+@synthesize firstButton, secondButton, fourthButton, thirdButton, fifthButton, flexSpace, myItems;
 
 - (id)init{
     self = [super init];
@@ -53,30 +53,39 @@
         [self.fifthButton setWidth:40.0];
         [self.fifthButton setTag:5];
         [fifthButton setAction:@selector(dismissKeyboard)];        
-        UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil	action:nil];
         
-        NSArray *items = [NSArray arrayWithObjects:flexSpace, firstButton, flexSpace, secondButton, flexSpace, thirdButton, flexSpace, fourthButton,flexSpace, fifthButton, flexSpace, nil];
-        [self setItems:items];
+        flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil	action:nil];
+        
+        myItems = [NSArray arrayWithObjects:flexSpace, firstButton, flexSpace, secondButton, flexSpace, thirdButton, flexSpace, fourthButton,flexSpace, fifthButton, flexSpace, nil];
+        [self setItems:myItems];
     }
     return self;
 }
 
 - (void) changeToSchedulingButtons{
-    firstButton.image = [UIImage imageNamed:@"arrow_left_24.png"];
+  
+    firstButton.image = [UIImage imageNamed:@"arrow_right_24.png"];
     firstButton.title = @"";
-    firstButton.action = @selector(moveToPreviousField);
+    firstButton.action = @selector(moveToNextField);
     
-    secondButton.image = [UIImage imageNamed:@"arrow_right_24.png"];
+    secondButton.image = [UIImage imageNamed:@"arrow_left_24.png"];
     secondButton.title = @"";
-    secondButton.action = @selector(moveToNextField);
+    secondButton.action = @selector(moveToPreviousField);
     
     fourthButton.image = [UIImage imageNamed:@"alarm_24.png"];
     fourthButton.title = @"Remind";
-    fourthButton.action = @selector(addReminders);
+    fourthButton.action = @selector(addReminderFields);
     
-    fifthButton.image = [UIImage imageNamed:@"tag_24.png"];
-    fifthButton.title = @"Tag";
-    fifthButton.action = @selector(addTags);
+    fifthButton = nil;
+    fifthButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
+    
+    
+    myItems = [NSArray arrayWithObjects:flexSpace, firstButton, flexSpace, secondButton, flexSpace, thirdButton, flexSpace, fourthButton,flexSpace, fifthButton, flexSpace, nil];
+    [self setItems:myItems];
+    
+    //fifthButton.image = [UIImage imageNamed:@"tag_24.png"];
+    //fifthButton.title = @"Tag";
+    //fifthButton.action = @selector(addTagFields);
 }
 
 - (void) changeToEditingButtons{
@@ -101,6 +110,31 @@
     [self.fifthButton setTag:5];
     [fifthButton setAction:@selector(dismissKeyboard)];
 }
+
+- (void) changeToDetailButtons{
+    firstButton.image = [UIImage imageNamed:@"save.png"];
+    [self.firstButton setTitle:@"Save"];
+    [firstButton setAction:@selector(presentActionsPopover:)];
+    
+    secondButton.image = [UIImage imageNamed:@"clock_running.png"];
+    [self.secondButton setTitle:@"Plan"];
+    [secondButton setAction:@selector(presentActionsPopover:)];
+    [secondButton setEnabled:YES];
+    
+    fourthButton.image = [UIImage imageNamed:@"email_white.png"];
+    [self.fourthButton setTitle:@"Send"];
+    [fourthButton setAction:@selector(presentActionsPopover:)];
+    
+    fifthButton = nil;
+    fifthButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
+    
+    
+    myItems = [NSArray arrayWithObjects:flexSpace, firstButton, flexSpace, secondButton, flexSpace, thirdButton, flexSpace, fourthButton,flexSpace, fifthButton, flexSpace, nil];
+    [self setItems:myItems];
+
+}
+
+
 
 - (UIImage *)flipperImageForDateNavigationItem {
 	// returns a 30 x 30 image to display the flipper button in the navigation bar
@@ -134,49 +168,3 @@
 
 @end
 
-/*
- - (void) toggleDateButton:(id)sender {//Toggle  Save --> Schedule AND NOT Save --> Save
- if (firstButton.title == @"Save" && [sender tag] == 16) {//Change from Save to Schedule
- firstButton.image = [UIImage imageNamed:@"calendar_24.png"];
- firstButton.title = @"Set Date";
- firstButton.action = @selector(setAppointmentDate:);
- firstButton.tag = 11;
- 
- secondButton.title = @"Remind";
- secondButton.image = [UIImage imageNamed:@"alarm_24.png"];
- secondButton.action = @selector(setRecurring);
- }
- else {//Change back to Save
- firstButton.image = [UIImage imageNamed:@"save.png"];
- firstButton.title = @"Save";
- firstButton.action = @selector(saveMemo:);
- firstButton.tag = 1;
- 
- secondButton.image = [UIImage imageNamed:@"clock_running.png"];
- secondButton.title = @"Plan";
- secondButton.action = @selector(presentActionsPopover:);
- secondButton.tag = 2;
- }
- }
- 
- - (void) toggleStartButton:(id)sender {
- [firstButton setImage:[UIImage imageNamed:@"11-clock.png"]];
- [firstButton setAction:@selector(setStartTime:)];
- [firstButton setTitle:@"Start Time"];
- firstButton.tag = 12;
- }
- 
- - (void)toggleEndButton:(id)sender  {
- [firstButton setImage:[UIImage imageNamed:@"11-clock.png"]];
- [firstButton setAction:@selector(setEndTime:)];
- [firstButton setTitle:@"End Time"];   
- firstButton.tag = 13;
- 
- }
- - (void) toggleRecurButton:(id)sender {
- [firstButton setImage:[UIImage imageNamed:@"11-clock.png"]];
- [firstButton setAction:@selector(setRecurrance:)];
- [firstButton setTitle:@"Recurring"];   
- [firstButton setTag:4];
- }
- */

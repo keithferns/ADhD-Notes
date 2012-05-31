@@ -6,9 +6,12 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+
 #import <UIKit/UIKit.h>
+
+
 #import "NewItemOrEvent.h"
-@interface ToDoDetailViewController : UITableViewController{
+@interface ToDoDetailViewController : UITableViewController<UITextViewDelegate>{
     
     NewItemOrEvent *theItem;
     

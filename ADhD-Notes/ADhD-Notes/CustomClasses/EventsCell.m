@@ -23,7 +23,7 @@
     if (self) {
         [self setFrame:CGRectMake(0, 0, kCellWidth, kCellHeight)];
         //UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"white_line_page_background.png"]];
-        UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"lined-page.png"]];
+        UIImageView *backgroundImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"lined-page2.png"]];
 
         backgroundImage.frame = CGRectMake(1, 1, kCellWidth-2, kCellHeight-2);
         self.backgroundView = backgroundImage;

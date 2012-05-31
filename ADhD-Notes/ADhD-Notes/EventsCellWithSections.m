@@ -9,7 +9,6 @@
 #import "EventsCellWithSections.h"
 #import "Constants.h"
 
-
 @implementation EventsCellWithSections
 
 @synthesize dateLabel;
@@ -59,7 +58,6 @@
 
 @end
 
-
 /*
  - (id)initWithFrame:(CGRect)frame
  {
@@ -92,7 +90,6 @@
  //self.selectedBackgroundView.backgroundColor = kHorizontalTableSelectedBackgroundColor;
  
  self.transform = CGAffineTransformMakeRotation(M_PI * 0.5);
- 
  
  return self;
  }

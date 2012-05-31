@@ -1,6 +1,6 @@
 //
 //  EventTableViewController.m
-//  iDoit
+//  ADhD-Notes
 //
 //  Created by Keith Fernandes on 4/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -35,7 +35,6 @@
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
-    NSLog(@"EVENTTableViewController:ViewDidLoad > loading");
 
     [super viewDidLoad];
 
@@ -43,11 +42,10 @@
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
     
-        
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, kBottomViewRect.size.height-kTabBarHeight);
     self.tableView.backgroundColor = [UIColor clearColor];
-    
     self.tableView.bounces = NO;
+    self.clearsSelectionOnViewWillAppear = YES;
 
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
@@ -71,6 +69,8 @@
     [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
     NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
+        NSLog(@"EVENTtableViewcont:handleDidSaveNotification -->did not save");
+
 	}
     [self.tableView reloadData];
 }
@@ -159,7 +159,6 @@
     id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
     temp = [sectionInfo numberOfObjects];
     }
-    NSLog(@"EVENTTABLEVIEWCONTROLLER # OF ROWS = %d", temp);
         return temp;
     //return [[_fetchedResultsController fetchedObjects] count];
 }
@@ -167,7 +166,6 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
     return @"Events";
 }
-
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -192,10 +190,6 @@
     }
     return cell;
 }
-
-
-
-
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell
 forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0 || indexPath.row%2 == 0) {
@@ -207,7 +201,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         cell.backgroundColor = altCellColor;
     }
 }  
-
 
 /*
  // Override to support conditional editing of the table view.
@@ -252,13 +245,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
  return YES;
  }
  */
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - Table view delegate
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
-    
-    NSLog(@"EVENT SELECTED");
 }
 
 #pragma mark -

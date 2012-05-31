@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <EventKit/EventKit.h>
 
 @protocol NewItemOrEventDelegate <NSObject>
 
@@ -43,8 +43,8 @@
 @property (nonatomic, retain) NSDate * aDate, *startTime, *endTime;
 @property (nonatomic, retain) NSSet *collection;
 @property (nonatomic, retain) NSSet *tags;
-@property (nonatomic, retain) NSString *recurring;
-@property (nonatomic, retain) NSArray *listArray;
+@property (nonatomic, retain) NSString *recurring, *location, *alarm1, *alarm2, *alarm3, *alarm4;
+@property (nonatomic, retain) NSArray *listArray, *alarmArray, *tagArray;
 
 @property (nonatomic, retain) Appointment *theAppointment;
 @property (nonatomic, retain) ToDo *theToDo;
@@ -55,9 +55,11 @@
 @property (nonatomic, retain) Document *theDocument;
 @property (nonatomic, retain) SimpleNote *theSimpleNote;
 @property (nonatomic, retain) Liststring *theString;
+@property (nonatomic, retain) Tag *theTag;
 
 - (void) createNewSimpleNote;
-- (void) createNewStringFromText:(NSString *)mytext;
+- (void) createNewStringFromText:(NSString *)mytext withType:(NSInteger) theInt;
+- (void) createNewTagFromText:(NSString *)mytext forType: (NSInteger) myType;
 
 - (void) createNewList;
 - (void) createNewAppointment;
@@ -67,8 +69,7 @@
 - (void) createNewProject;
 
 - (void) saveSchedule;
-- (void) addDateField;
-- (void) updateSelectedDate:(NSDate *)date;
+- (void) updateSchedule;
 - (void) saveNewItem;
 - (void) deleteItem:(id)sender;
 - (void) updateText:(NSString *) currentText;

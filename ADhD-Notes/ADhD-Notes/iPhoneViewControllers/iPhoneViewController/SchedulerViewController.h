@@ -29,7 +29,7 @@
 
 
 - (void) addReminderFields;
-- (void) addTagFields;
+//- (void) addTagFields;
 - (void) textFieldResignFirstResponder;
 - (void) textFieldBecomeFirstResponder;
 - (void) moveToPreviousField;
