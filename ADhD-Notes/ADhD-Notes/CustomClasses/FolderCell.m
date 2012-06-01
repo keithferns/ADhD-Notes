@@ -9,7 +9,6 @@
 #import "FolderCell.h"
 @implementation FolderCell
 
-@synthesize folderName;
 
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {

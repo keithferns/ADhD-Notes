@@ -11,11 +11,9 @@
 
 @interface FolderCell : UITableViewCell {
     
-	UILabel *folderName;
 	
 }
 
-@property (nonatomic, retain) IBOutlet UILabel *folderName;
 
 
 @end

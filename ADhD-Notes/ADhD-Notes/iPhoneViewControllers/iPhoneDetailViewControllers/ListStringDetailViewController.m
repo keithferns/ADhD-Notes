@@ -52,6 +52,10 @@
         textField.placeholder = @"tap 'return' to add item";
         [textField setReturnKeyType:UIReturnKeyDefault];
     }
+    
+    if (theString != nil) {
+        textField.text = theString.aString;
+    }
     [self.view addSubview:textField];
 }
 
@@ -70,22 +74,21 @@
 
 - (void)save:(id)sender {
 	NSLog (@"SAVING");
-    /*
-	NSManagedObjectContext *context = [listString managedObjectContext];
+    
+	NSManagedObjectContext *context = [theList managedObjectContext];
 
-    if (!listString) {
+    if (!theString) {
         self.theString = [NSEntityDescription insertNewObjectForEntityForName:@"Liststring" inManagedObjectContext:context];
-        [theList.aStrings addAStringObject:theString];
+        self.theString.aString = textField.text;
+        [theList addAStringsObject:theString];
 		theString.order = [NSNumber numberWithInteger:[theList.aStrings count]];
     }
-	
 
 	NSError *error = nil;
 	if (![context save:&error]) {
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
 	}
-	*/
     [self.navigationController popViewControllerAnimated:YES];
 }
 

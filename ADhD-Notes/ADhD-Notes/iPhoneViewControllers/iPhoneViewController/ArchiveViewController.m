@@ -96,6 +96,7 @@
         foldersTableViewController.managedObjectContext = self.managedObjectContext;
         foldersTableViewController.theItem = self.theItem;
         [self.view addSubview:foldersTableViewController.tableView];
+        foldersTableViewController.tableView.rowHeight = 35.0;
         NSLog(@"foldersTableViewController VIEWCONTROLLER: passed managedObjectContext: %@",  foldersTableViewController.managedObjectContext);
     }
     if (filesTableViewController == nil) {

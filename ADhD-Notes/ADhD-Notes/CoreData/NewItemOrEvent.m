@@ -120,11 +120,13 @@
     self.type = [NSNumber numberWithInt:1];
     theList.type = [NSNumber numberWithInt:1];
     theList.aStrings = [NSSet setWithArray:listArray];
-    NSString *tempString = [NSString stringWithFormat:@"-"];
-    for (int i = 0; i<[listArray count]; i++) {
-        Liststring *myString = [listArray objectAtIndex:i];
+    Liststring *myString = [listArray objectAtIndex:0];
+    NSString *tempString = myString.aString;
+
+    for (int i = 1; i<[listArray count]; i++) {
+        myString = [listArray objectAtIndex:i];
+        tempString = [tempString stringByAppendingString:@"\n"];
         tempString = [tempString stringByAppendingString:myString.aString];
-        tempString = [tempString stringByAppendingString:@"\n-"];
     }
     theList.text = tempString;
 }
@@ -222,7 +224,7 @@
         //put up an alert view.
         return;
     }
-    else if (![self.text isEqualToString:text]){
+    else if (![self.text isEqualToString:currentText]){
         self.text = currentText;
         if (theToDo != nil){
             theToDo.text = self.text;
@@ -230,8 +232,8 @@
         else if (theAppointment != nil){
             theAppointment.text = self.text;
         }
-        else if (theMemo != nil){
-            theMemo.text = self.text;
+        else if (theSimpleNote != nil){
+            theSimpleNote.text = self.text;
         }
     }
     /*--Save the MOC--*/
@@ -245,13 +247,11 @@
 }
 
 - (void) saveNewItem {    
-    NSLog(@"NEWITEMOREVENT ADDING MOC: TRYING TO SAVE");
     /*--Save the MOC--*/
     NSError *error;
     if(![addingContext save:&error]){ 
         NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
     } 
-    NSLog(@"NEWITEMOREVENT ADDING MOC: SAVED");
     //
 }
 

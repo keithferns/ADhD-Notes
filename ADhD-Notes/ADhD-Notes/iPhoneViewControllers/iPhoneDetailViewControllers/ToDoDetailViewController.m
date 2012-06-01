@@ -6,11 +6,10 @@
 
 #import "ToDoDetailViewController.h"
 #import "SchedulerViewController.h"
-#import "CustomTextView.h"
 #import "CustomToolBar.h"
 
 @interface ToDoDetailViewController ()
-@property (nonatomic, retain) CustomTextView *theTextView;
+@property (nonatomic, retain) UITextView *theTextView;
 @property (nonatomic, retain) CustomToolBar *toolbar;
 
 @end
@@ -54,10 +53,14 @@
         self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
         self.navigationItem.leftBarButtonItem.target = self;   
     }
-    theTextView = [[CustomTextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
+    theTextView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
     theTextView.delegate = self;
     theTextView.editable = NO;  
     theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(16.0)];
+    theTextView.textColor = [UIColor whiteColor];
+    UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+    
+    [theTextView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
 
     if (toolbar == nil) {
         toolbar = [[CustomToolBar alloc] init];
@@ -304,6 +307,13 @@
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 1) {
+        cell.backgroundColor = [UIColor colorWithPatternImage:[[UIImage imageNamed:@"54700.png"]stretchableImageWithLeftCapWidth:320 topCapHeight:110]];;        
+    }
+}
+
+
 - (void) showTextBox:(id) sender {    
     UIAlertView *textBox = [[UIAlertView alloc] initWithTitle:nil message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Save",nil];
     [textBox setAlertViewStyle:UIAlertViewStylePlainTextInput];
@@ -355,6 +365,7 @@
         [theTextView resignFirstResponder];
         theTextView.inputAccessoryView = nil;
         theTextView.editable = self.editing;
+        theItem.addingContext = theItem.theSimpleNote.managedObjectContext;
         [theItem updateText:theTextView.text];
         [theItem saveNewItem];
         toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight-kNavBarHeight, kScreenWidth, kTabBarHeight);

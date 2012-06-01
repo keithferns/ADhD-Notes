@@ -15,7 +15,7 @@
 @interface DiaryViewController ()
 
 @property (nonatomic, retain) DiaryTableViewController *currentTableViewController;
-
+@property (nonatomic, retain) UITextView *textView;
 @end
 
 @implementation DiaryViewController
@@ -23,7 +23,7 @@
 @synthesize currentTableViewController;
 @synthesize dateCounter;
 @synthesize datelabel;
-@synthesize calendarView;
+@synthesize calendarView, textView;
 //@synthesize calendarDayTimelineView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -80,14 +80,47 @@
      //[self.scrollView addSubview:nextTableViewController.tableView];
      */
     
-    currentTableViewController = [[DiaryTableViewController alloc] init];
-    currentTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight, kScreenWidth, kScreenHeight-kNavBarHeight);
+  
     
-    [self.view addSubview:currentTableViewController.tableView];    
+    //[self.view addSubview:currentTableViewController.tableView];    
  
     //[self.view addSubview:self.calendarDayTimelineView];
+    
+    textView = [[UITextView alloc] initWithFrame:CGRectMake(0,44,320,420)];
+    [self.view addSubview:textView];
+    [textView setTextColor:[UIColor whiteColor]];
+    [self.textView setFont:[UIFont boldSystemFontOfSize:14]];
+    UIImage *patternImage = [[UIImage imageNamed:@"54700.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+    
+    [self.textView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
+
+    textView.editable = NO;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotesArray:) name:@"GetNotesArrayNotification" object:nil];
+    
+    
+    currentTableViewController = [[DiaryTableViewController alloc] init];
+    currentTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight, kScreenWidth, kScreenHeight-kNavBarHeight);
+
 }
 
+-(void) handleNotesArray: (NSNotification *) notif{
+    NSLog(@"GetNotesArrayNotification Received");
+    NSArray *notesArray = [NSArray arrayWithArray:[notif object]];
+    NSString *theString = @"";
+    NSLog (@"notes array count = %d", [notesArray count]);
+    for (int i = 0; i < [notesArray count]; i++) {
+        if ([[notesArray objectAtIndex:i] isKindOfClass:[Note class]]){
+        Note *theNote  = [notesArray objectAtIndex:i];
+        NSDateFormatter *df = [[NSDateFormatter alloc] init];
+        [df setDateFormat:@"h:mm a"];    
+            NSString *temp = [NSString stringWithFormat:@"\t\t\t\t\t\t\t     %@\n%@\n_______________________________________\n", [df stringFromDate:theNote.creationDate], theNote.text];
+        theString = [theString stringByAppendingString:temp];
+        }
+    }
+    NSLog(@"the string is %@", theString);
+    textView.text = theString;    
+}
 - (void) toggleTodayCalendarView:(id) sender{
     UISegmentedControl *segControl = (UISegmentedControl *)sender;
     NSLog(@"DiaryViewController:toggleTodayCalendarView -> Segment %d touched", segControl.selectedSegmentIndex);

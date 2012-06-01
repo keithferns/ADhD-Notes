@@ -52,6 +52,7 @@
     searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 40)];
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
+    self.tableView.separatorColor = [UIColor clearColor];
     searchBar.delegate = self;
     
     searchBar.tintColor = [UIColor blackColor];
@@ -247,13 +248,21 @@
 		mycell = (FolderCell *) cell;
 	}
     Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"folder.png"]];
+    imageView.frame = CGRectMake (0,0,120,40);
+    [cell.contentView addSubview:imageView];
+
+    UILabel *folderName = [[UILabel alloc] initWithFrame:CGRectMake(5,0,100,30)];
+    folderName.textAlignment = UITextAlignmentCenter;
+    [cell.contentView addSubview:folderName];
     
-    [mycell.folderName setText:aFolder.name];    
+    [folderName setText:aFolder.name];    
 }
  
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
     static NSString *CellIdentifier = @"FolderCell";
-    
+    Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
+
 	FolderCell *cell = (FolderCell *)[self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
 		NSArray *topLevelObjects = [[NSBundle mainBundle]
@@ -263,14 +272,19 @@
 		for (id currentObject in topLevelObjects){
 			if([currentObject isKindOfClass:[UITableViewCell class]]){
 				cell = (FolderCell *) currentObject;
+                UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"folder.png"]];
+                imageView.frame = CGRectMake (0,0,120,40);
+                [cell.contentView addSubview:imageView];
 				break;
 			}
 		}
 	}
     //[self configureCell:cell atIndexPath:indexPath];
-
-    Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
-    [cell.folderName setText:aFolder.name];    
+    UILabel *folderName = [[UILabel alloc] initWithFrame:CGRectMake(5,5,100,30)];
+    [cell.contentView addSubview:folderName];
+    folderName.backgroundColor = [UIColor clearColor];
+    folderName.textAlignment = UITextAlignmentCenter;
+    [folderName setText:aFolder.name];    
     
     return cell;
 }

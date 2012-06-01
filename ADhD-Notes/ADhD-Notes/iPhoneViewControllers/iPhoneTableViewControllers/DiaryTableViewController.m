@@ -88,7 +88,10 @@ if (managedObjectContext == nil) {
 NSError *error;
 if (![[self fetchedResultsController] performFetch:&error]) {
 }
-
+    
+    NSArray *theArray = [_fetchedResultsController fetchedObjects];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetNotesArrayNotification" object:theArray];
 
 //KVO (Key Value Observing). Do a search on "Key-Value Observing Quick Start" in the XCode help system for more info.  You would want to make objects that need to be notified of changes call observeValueForKeyPathfObject:change:context: on the data container object. Then, they will get notified automatically when the object changes.
 }
@@ -114,6 +117,11 @@ NSLog(@"NSManagedObjectContextDidSaveNotification Received By DiaryTableViewCont
     NSError *error;
     if (![[self fetchedResultsController] performFetch:&error]) {
     }
+    
+    NSArray *theArray = [_fetchedResultsController fetchedObjects];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetNotesArrayNotification" object:theArray];
+    
     [self.tableView reloadData];
 }
 

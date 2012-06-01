@@ -61,7 +61,6 @@
 		537320441540E13900FA376E /* NotePad_nav.png in Resources */ = {isa = PBXBuildFile; fileRef = 5373203B1540E13900FA376E /* NotePad_nav.png */; };
 		537320451540E13900FA376E /* tab_notepad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5373203C1540E13900FA376E /* tab_notepad.png */; };
 		537320461540E13900FA376E /* todo_nav.png in Resources */ = {isa = PBXBuildFile; fileRef = 5373203D1540E13900FA376E /* todo_nav.png */; };
-		537320591540E2BB00FA376E /* CustomTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320481540E2BB00FA376E /* CustomTextView.m */; };
 		5373205A1540E2BB00FA376E /* CustomToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5373204A1540E2BB00FA376E /* CustomToolBar.m */; };
 		5373205B1540E2BB00FA376E /* EventsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5373204C1540E2BB00FA376E /* EventsCell.m */; };
 		5373205C1540E2BB00FA376E /* FileCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5373204E1540E2BB00FA376E /* FileCustomCell.m */; };
@@ -82,6 +81,11 @@
 		5373207A1540EA4600FA376E /* tag_add_24.png in Resources */ = {isa = PBXBuildFile; fileRef = 5373206E1540EA4600FA376E /* tag_add_24.png */; };
 		5373207B1540EA4600FA376E /* tag_add_48.png in Resources */ = {isa = PBXBuildFile; fileRef = 5373206F1540EA4600FA376E /* tag_add_48.png */; };
 		537320891540F1C400FA376E /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 537320881540F1C400FA376E /* SettingViewController.m */; };
+		53798EE215783C22008D7CFF /* lined_paper2.png in Resources */ = {isa = PBXBuildFile; fileRef = 53798EE115783C22008D7CFF /* lined_paper2.png */; };
+		53798EE415783D05008D7CFF /* lined_paper3.png in Resources */ = {isa = PBXBuildFile; fileRef = 53798EE315783D05008D7CFF /* lined_paper3.png */; };
+		53798EE815783E66008D7CFF /* lined_paper5.png in Resources */ = {isa = PBXBuildFile; fileRef = 53798EE715783E66008D7CFF /* lined_paper5.png */; };
+		53798EEC1578445B008D7CFF /* lined_paper4.png in Resources */ = {isa = PBXBuildFile; fileRef = 53798EEB1578445B008D7CFF /* lined_paper4.png */; };
+		53798EEE15784AAC008D7CFF /* lined_paper4_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 53798EED15784AAB008D7CFF /* lined_paper4_1.png */; };
 		5383AC8B154108E00083A240 /* DiaryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AC8A154108E00083A240 /* DiaryViewController.m */; };
 		5383ACA2154113CB0083A240 /* WEPopoverContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AC8F154113CB0083A240 /* WEPopoverContainerView.m */; };
 		5383ACA3154113CB0083A240 /* WEPopoverContentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5383AC91154113CB0083A240 /* WEPopoverContentViewController.m */; };
@@ -154,6 +158,7 @@
 		53C93328154EED5D00145938 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C93327154EED5D00145938 /* Appointment.m */; };
 		53C9332B154EEE2700145938 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C9332A154EEE2700145938 /* Item.m */; };
 		53D1EE481577ECBB001550C4 /* ListStringDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D1EE471577ECBB001550C4 /* ListStringDetailViewController.m */; };
+		53D1EE4C15781D71001550C4 /* TagsDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D1EE4B15781D71001550C4 /* TagsDetailViewController.m */; };
 		53D59C05156AB8BB005F5004 /* List.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D59C04156AB8BB005F5004 /* List.m */; };
 		53D59C09156B2A3C005F5004 /* folder_open_go.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C08156B2A3C005F5004 /* folder_open_go.png */; };
 		53D59C0B156B3C7D005F5004 /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 53D59C0A156B3C7C005F5004 /* folder.png */; };
@@ -263,8 +268,6 @@
 		5373203B1540E13900FA376E /* NotePad_nav.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NotePad_nav.png; path = "Images/TabNavBar Images/NotePad_nav.png"; sourceTree = "<group>"; };
 		5373203C1540E13900FA376E /* tab_notepad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tab_notepad.png; path = "Images/TabNavBar Images/tab_notepad.png"; sourceTree = "<group>"; };
 		5373203D1540E13900FA376E /* todo_nav.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = todo_nav.png; path = "Images/TabNavBar Images/todo_nav.png"; sourceTree = "<group>"; };
-		537320471540E2BB00FA376E /* CustomTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomTextView.h; path = CustomClasses/CustomTextView.h; sourceTree = "<group>"; };
-		537320481540E2BB00FA376E /* CustomTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomTextView.m; path = CustomClasses/CustomTextView.m; sourceTree = "<group>"; };
 		537320491540E2BB00FA376E /* CustomToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomToolBar.h; path = CustomClasses/CustomToolBar.h; sourceTree = "<group>"; };
 		5373204A1540E2BB00FA376E /* CustomToolBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomToolBar.m; path = CustomClasses/CustomToolBar.m; sourceTree = "<group>"; };
 		5373204B1540E2BB00FA376E /* EventsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventsCell.h; path = CustomClasses/EventsCell.h; sourceTree = "<group>"; };
@@ -291,6 +294,11 @@
 		5373206F1540EA4600FA376E /* tag_add_48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tag_add_48.png; path = "Images/ToolBar Images/tag_add_48.png"; sourceTree = "<group>"; };
 		537320871540F1C400FA376E /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SettingViewController.h; path = iPhoneViewControllers/iPhoneViewController/SettingViewController.h; sourceTree = "<group>"; };
 		537320881540F1C400FA376E /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SettingViewController.m; path = iPhoneViewControllers/iPhoneViewController/SettingViewController.m; sourceTree = "<group>"; };
+		53798EE115783C22008D7CFF /* lined_paper2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lined_paper2.png; sourceTree = "<group>"; };
+		53798EE315783D05008D7CFF /* lined_paper3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lined_paper3.png; sourceTree = "<group>"; };
+		53798EE715783E66008D7CFF /* lined_paper5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lined_paper5.png; sourceTree = "<group>"; };
+		53798EEB1578445B008D7CFF /* lined_paper4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lined_paper4.png; sourceTree = "<group>"; };
+		53798EED15784AAB008D7CFF /* lined_paper4_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lined_paper4_1.png; sourceTree = "<group>"; };
 		5383AC89154108E00083A240 /* DiaryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiaryViewController.h; path = iPhoneViewControllers/iPhoneViewController/DiaryViewController.h; sourceTree = "<group>"; };
 		5383AC8A154108E00083A240 /* DiaryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DiaryViewController.m; path = iPhoneViewControllers/iPhoneViewController/DiaryViewController.m; sourceTree = "<group>"; };
 		5383AC8E154113CB0083A240 /* WEPopoverContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WEPopoverContainerView.h; sourceTree = "<group>"; };
@@ -410,6 +418,8 @@
 		53C9332A154EEE2700145938 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = CoreData/ManagedObjects/Item.m; sourceTree = "<group>"; };
 		53D1EE461577ECBB001550C4 /* ListStringDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListStringDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/ListStringDetailViewController.h; sourceTree = "<group>"; };
 		53D1EE471577ECBB001550C4 /* ListStringDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ListStringDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/ListStringDetailViewController.m; sourceTree = "<group>"; };
+		53D1EE4A15781D71001550C4 /* TagsDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TagsDetailViewController.h; path = iPhoneViewControllers/iPhoneDetailViewControllers/TagsDetailViewController.h; sourceTree = "<group>"; };
+		53D1EE4B15781D71001550C4 /* TagsDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TagsDetailViewController.m; path = iPhoneViewControllers/iPhoneDetailViewControllers/TagsDetailViewController.m; sourceTree = "<group>"; };
 		53D59C03156AB8BB005F5004 /* List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = List.h; path = CoreData/ManagedObjects/List.h; sourceTree = "<group>"; };
 		53D59C04156AB8BB005F5004 /* List.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = List.m; path = CoreData/ManagedObjects/List.m; sourceTree = "<group>"; };
 		53D59C08156B2A3C005F5004 /* folder_open_go.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder_open_go.png; sourceTree = "<group>"; };
@@ -718,8 +728,11 @@
 		5367F28F15520C3600E1994A /* CustomTextView */ = {
 			isa = PBXGroup;
 			children = (
-				537320471540E2BB00FA376E /* CustomTextView.h */,
-				537320481540E2BB00FA376E /* CustomTextView.m */,
+				53798EE115783C22008D7CFF /* lined_paper2.png */,
+				53798EE315783D05008D7CFF /* lined_paper3.png */,
+				53798EEB1578445B008D7CFF /* lined_paper4.png */,
+				53798EED15784AAB008D7CFF /* lined_paper4_1.png */,
+				53798EE715783E66008D7CFF /* lined_paper5.png */,
 			);
 			name = CustomTextView;
 			sourceTree = "<group>";
@@ -1053,6 +1066,15 @@
 			name = ListStringDetailViewController;
 			sourceTree = "<group>";
 		};
+		53D1EE4915781D35001550C4 /* TagsDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				53D1EE4A15781D71001550C4 /* TagsDetailViewController.h */,
+				53D1EE4B15781D71001550C4 /* TagsDetailViewController.m */,
+			);
+			name = TagsDetailViewController;
+			sourceTree = "<group>";
+		};
 		53D59C07156AD3A4005F5004 /* AppointmentDetailViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1065,6 +1087,7 @@
 		53D59C10156B46F4005F5004 /* MemoDetailViewController */ = {
 			isa = PBXGroup;
 			children = (
+				53D1EE4915781D35001550C4 /* TagsDetailViewController */,
 				531E10D61561F4B50074321A /* MemoDetailViewController.h */,
 				531E10D71561F4B60074321A /* MemoDetailViewController.m */,
 			);
@@ -1259,6 +1282,11 @@
 				53D59C17156C3ACA005F5004 /* check.png in Resources */,
 				53D59C18156C3ACA005F5004 /* uncheck.png in Resources */,
 				53616B18156E054100501F45 /* lined-page2.png in Resources */,
+				53798EE215783C22008D7CFF /* lined_paper2.png in Resources */,
+				53798EE415783D05008D7CFF /* lined_paper3.png in Resources */,
+				53798EE815783E66008D7CFF /* lined_paper5.png in Resources */,
+				53798EEC1578445B008D7CFF /* lined_paper4.png in Resources */,
+				53798EEE15784AAC008D7CFF /* lined_paper4_1.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1299,7 +1327,6 @@
 				5373202B1540E0BD00FA376E /* ArchiveViewController.m in Sources */,
 				537320321540E0E800FA376E /* CalendarViewController.m in Sources */,
 				537320341540E0E800FA376E /* WriteNowViewController.m in Sources */,
-				537320591540E2BB00FA376E /* CustomTextView.m in Sources */,
 				5373205A1540E2BB00FA376E /* CustomToolBar.m in Sources */,
 				5373205B1540E2BB00FA376E /* EventsCell.m in Sources */,
 				5373205C1540E2BB00FA376E /* FileCustomCell.m in Sources */,
@@ -1380,6 +1407,7 @@
 				53C1D88F156F25420071683A /* Alarm.m in Sources */,
 				53C7048615728173003903CF /* Tag.m in Sources */,
 				53D1EE481577ECBB001550C4 /* ListStringDetailViewController.m in Sources */,
+				53D1EE4C15781D71001550C4 /* TagsDetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

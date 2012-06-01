@@ -7,7 +7,6 @@
 
 #import "ADhD_NotesAppDelegate.h"
 #import "CustomToolBar.h"
-#import "CustomTextView.h"
 #import "NewItemOrEvent.h"
 #import "SchedulerViewController.h"
 #import "CalendarViewController.h"
@@ -23,7 +22,7 @@
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic,retain) UIView *topView, *bottomView; 
-@property (nonatomic, retain) CustomTextView *textView;
+@property (nonatomic, retain) UITextView *textView;
 @property (nonatomic, retain) UITextField *textField;
 @property (nonatomic, retain) CustomToolBar *toolbar;
 @property (nonatomic, retain) WEPopoverController *actionsPopover;
@@ -78,7 +77,10 @@
     }
     if (topView.superview == nil && topView == nil) {
         topView = [[UIView alloc] initWithFrame:kTopViewRect];
-        topView.backgroundColor = [UIColor blackColor];
+        //topView.backgroundColor = [UIColor blackColor];
+        UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
+        
+        [topView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
     }    
     //View Heirarchy: topView - bottomview
     [self.view addSubview:topView];
@@ -97,14 +99,21 @@
     //Initialize and add the textView. the TV is a basic part of initial view.     
     if (self.textView.superview == nil) {
         if (self.textView == nil){
-            self.textView = [[CustomTextView alloc] initWithFrame:kTextViewRect];
+            self.textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 320, 150)];
         }
         [self.topView addSubview:textView];
         self.textView.delegate = self;    
         self.textView.inputAccessoryView = toolbar;
+        self.textView.scrollEnabled = YES;
+        self.textView.contentSize = CGSizeMake (320, 150);
+        self.textView.textColor = [UIColor whiteColor];
+        [self.textView setFont:[UIFont boldSystemFontOfSize:16]];
+        UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+        
+        [self.textView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
     }    
     if (textField == nil) {
-        textField = [[UITextField alloc] initWithFrame: CGRectMake (5,0,310,45)];
+        textField = [[UITextField alloc] initWithFrame: CGRectMake (320,0,310,45)];
         textField.textColor = [UIColor whiteColor];
         UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
         [textField.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
@@ -112,14 +121,17 @@
         textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         
         [textField setFont:[UIFont systemFontOfSize:18]];
-        textField.layer.borderWidth = 2.0;
-        textField.layer.borderColor = [UIColor darkGrayColor].CGColor;      
+        //textField.layer.borderWidth = 2.0;
+        //textField.layer.borderColor = [UIColor darkGrayColor].CGColor;
+        textField.borderStyle = UITextBorderStyleLine;
         textField.inputAccessoryView = toolbar;
         [textField setDelegate:self];
         textField.placeholder = @"tap 'return' to add item";
         [textField setReturnKeyType:UIReturnKeyDefault];
+        textField.clearButtonMode = UITextFieldViewModeAlways;
         
-        listTableView = [[UITableView alloc] initWithFrame:CGRectMake (5,50,310,topView.frame.size.height-50)];
+        
+        listTableView = [[UITableView alloc] initWithFrame:CGRectMake (320,50,310,topView.frame.size.height-50)];
         listTableView.rowHeight = 33.0;
         listTableView.tag = 1;
         listTableView.backgroundColor = [UIColor blackColor];
@@ -157,14 +169,31 @@
 - (void) toggleNoteListView {    
     switch (segmentedControl.selectedSegmentIndex) {
         case 0:
-            [textField removeFromSuperview];
-
+                {
             if (textView.superview == nil){
+                
                 [topView addSubview:textView];
             }
+            
+             [UIView beginAnimations:nil context:nil];
+             [UIView setAnimationDelegate:self];
+             [UIView setAnimationDuration:0.5];
+             UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
+            
+             [topView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
+                CGRect frame = textView.frame;
+                frame.origin.x = 0.0;
+                textView.frame = frame;
+                textField.frame = CGRectMake (320,0,310,45);
+                listTableView.frame = CGRectMake (320,50,310,topView.frame.size.height-50);
+
+            [UIView commitAnimations];
+            
+             //[textField removeFromSuperview];
+                }
             break;
         case 1:
-            [textView removeFromSuperview];
+            {
             if (listArray == nil){
                 listArray = [[NSArray alloc] init];
             }
@@ -172,6 +201,21 @@
                 [topView addSubview:textField];
                 [textField becomeFirstResponder];
                 [topView addSubview: listTableView];
+            }
+            
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDelegate:self];
+            [UIView setAnimationDuration:0.5];
+            
+            [topView.layer setBackgroundColor:[UIColor blackColor].CGColor];
+            CGRect frame = textView.frame;
+            frame.origin.x = -320.0;
+            textView.frame = frame;
+            textField.frame = CGRectMake (5,0,310,45);
+            listTableView.frame = CGRectMake (5,50,310,topView.frame.size.height-50);
+            
+            [UIView commitAnimations];
+            //[textView removeFromSuperview];
             }
             break;
     }

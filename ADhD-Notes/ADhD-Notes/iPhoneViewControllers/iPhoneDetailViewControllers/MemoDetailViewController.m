@@ -5,14 +5,14 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 
 #import "MemoDetailViewController.h"
-#import "CustomTextView.h"
 #import "CustomToolBar.h"
 #import "ArchiveViewController.h"
 #import "Constants.h"
+#import "TagsDetailViewController.h"
 
 @interface MemoDetailViewController ()
 
-@property (nonatomic, retain) CustomTextView *theTextView;
+@property (nonatomic, retain) UITextView *theTextView;
 @property (nonatomic, retain) CustomToolBar *toolbar;
 @end
 
@@ -62,10 +62,14 @@
     self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
     self.navigationItem.leftBarButtonItem.target = self;   
     }
-    theTextView = [[CustomTextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
+    theTextView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
     theTextView.delegate = self;
     theTextView.editable = NO;
     theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(16.0)];
+    theTextView.textColor = [UIColor whiteColor];
+    UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+    
+    [theTextView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
 
     if (toolbar == nil) {
         toolbar = [[CustomToolBar alloc] init];
@@ -266,7 +270,6 @@
          [cell.contentView addSubview:folderButton];
         } else if (indexPath.section == 1){
         cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
-
         [theTextView setText:theItem.theSimpleNote.text];
       
         [cell.contentView addSubview: theTextView];        
@@ -303,6 +306,14 @@
         [cell.contentView addSubview:tagButton];        
         }
     return cell;
+}
+
+
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 1) {
+        cell.backgroundColor = [UIColor colorWithPatternImage:[[UIImage imageNamed:@"54700.png"]stretchableImageWithLeftCapWidth:320 topCapHeight:110]];;        
+    }
 }
 
 - (void) showTextBox:(id) sender {    
@@ -360,6 +371,7 @@
         [theTextView resignFirstResponder];
         theTextView.inputAccessoryView = nil;
         theTextView.editable = self.editing;
+        theItem.addingContext = theItem.theSimpleNote.managedObjectContext;
         [theItem updateText:theTextView.text];
         [theItem saveNewItem];
         toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight-kNavBarHeight, kScreenWidth, kTabBarHeight);
@@ -408,6 +420,17 @@
 
 
 #pragma mark - Table view delegate
+
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {	
+    if (indexPath.section == 2){
+        TagsDetailViewController *detailViewController = [[TagsDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        detailViewController.theSimpleNote = theItem.theSimpleNote;
+        [self.navigationController pushViewController:detailViewController animated:YES];
+    
+    }
+}
+
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

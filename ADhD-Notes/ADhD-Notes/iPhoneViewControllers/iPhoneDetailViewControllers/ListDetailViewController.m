@@ -10,19 +10,20 @@
 #import "Constants.h"
 
 @interface ListDetailViewController ()
+
 @property (nonatomic, retain) CustomToolBar *toolbar;
+@property (nonatomic, retain) NSMutableArray *sortedStrings;
 
 @end
 
 @implementation ListDetailViewController
 
-@synthesize theItem, saving, toolbar;
+@synthesize theItem, saving, toolbar, sortedStrings;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
-    }
+          }
     return self;
 }
 
@@ -34,6 +35,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];    
+    
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+    sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
+    [sortedStrings sortUsingDescriptors:sortDescriptors];  
+    
     self.tableView.backgroundColor = [UIColor blackColor];
     self.tableView.bounces = NO;
     self.tableView.allowsSelection = NO;
@@ -79,6 +86,12 @@
 }
 
 - (void) viewWillAppear:(BOOL) animated {
+    
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+    sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
+    [sortedStrings sortUsingDescriptors:sortDescriptors];  
+    
     [self.tableView reloadData];
 }
 
@@ -268,12 +281,7 @@
         cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
         NSInteger listCount = [theItem.theList.aStrings count];
         //FIXME: GET ORDERING
-        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-        NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-        NSMutableArray *sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
-        [sortedStrings sortUsingDescriptors:sortDescriptors];
-      
-
+       
         if (indexPath.row < listCount) {
             Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
             
@@ -288,7 +296,6 @@
             [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
             button.backgroundColor = [UIColor clearColor];
             cell.accessoryView = button;
-            
             
 			static NSString *ListCellIdentifier = @"ListCell";
 			cell = [tableView dequeueReusableCellWithIdentifier:ListCellIdentifier];
@@ -314,6 +321,8 @@
         }
           
     }else if (indexPath.section == 2){
+        cell.editingAccessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 0, 40, 40)];
         label.backgroundColor = [UIColor blackColor];
         label.textColor = [UIColor lightGrayColor];
@@ -356,10 +365,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {	
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-    NSMutableArray *sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
-    [sortedStrings sortUsingDescriptors:sortDescriptors];
     
 	Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
 	BOOL checked = [listItem.checked boolValue];
@@ -471,10 +476,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.section == 1) {
         // Delete the row from the data source
         //FIXME: GET ORDERING
-        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-        NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-        NSMutableArray *sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
-        [sortedStrings sortUsingDescriptors:sortDescriptors];
+       
         Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
         [theItem.theList removeAStringsObject:listItem];
         [sortedStrings removeObject:listItem];
@@ -497,15 +499,17 @@
         [self tableView: self.tableView accessoryButtonTappedForRowWithIndexPath: indexPath];
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
-    NSInteger *listCount = [theItem.theList.aStrings count];
+    NSInteger listCount = [theItem.theList.aStrings count];
     if (indexPath.section == 1) {
         ListStringDetailViewController *detailViewController = [[ListStringDetailViewController alloc] init];
+        detailViewController.theList = self.theItem.theList;
 
         if (indexPath.row < listCount) {
-            detailViewController.l
+            detailViewController.theString = [sortedStrings objectAtIndex:indexPath.row];
         }
+        [self.navigationController pushViewController:detailViewController animated:YES];
+
     }
-    [self.navigationController pushViewController:detailViewController animated:YES];
 
 }
 
