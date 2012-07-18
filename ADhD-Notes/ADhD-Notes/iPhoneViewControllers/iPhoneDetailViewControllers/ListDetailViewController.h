@@ -12,10 +12,13 @@
 @interface ListDetailViewController : UITableViewController<UIGestureRecognizerDelegate>{
 
 NewItemOrEvent *theItem;
+    
 }
 
 @property (nonatomic,retain) NewItemOrEvent *theItem;
 @property (nonatomic, readwrite) BOOL saving;
+@property (nonatomic, retain) List *theList;
+
 
 //- (void) handleChecking:(UITapGestureRecognizer *)tapRecognizer;
 

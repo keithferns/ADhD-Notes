@@ -2,7 +2,7 @@
 //  List.h
 //  ADhD-Notes
 //
-//  Created by Keith Fernandes on 5/21/12.
+//  Created by Keith Fernandes on 6/11/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -10,12 +10,13 @@
 #import <CoreData/CoreData.h>
 #import "Memo.h"
 
-@class Liststring;
+@class Liststring, ToDo;
 
 @interface List : Memo
 
 @property (nonatomic, retain) NSString * category;
 @property (nonatomic, retain) NSSet *aStrings;
+@property (nonatomic, retain) ToDo *todo;
 @end
 
 @interface List (CoreDataGeneratedAccessors)

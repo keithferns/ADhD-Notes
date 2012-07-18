@@ -8,25 +8,23 @@
 
 #import <UIKit/UIKit.h>
 
-#import "WEPopoverController.h"
 #import "NewItemOrEvent.h"
 
 
-@interface ArchiveViewController : UIViewController <PopoverControllerDelegate, UIAlertViewDelegate, UITableViewDelegate>{
+@interface ArchiveViewController : UIViewController <WEPopoverControllerDelegate, UIAlertViewDelegate, UITableViewDelegate>{
+    
     NewItemOrEvent *theItem;
     BOOL saving;
     NSManagedObjectContext *managedObjectContext;
+
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain) WEPopoverController *actionsPopover;
 @property (nonatomic, retain) NewItemOrEvent *theItem;
 @property (nonatomic, readwrite) BOOL saving;
+@property (nonatomic, readwrite) BOOL appending;
+@property (nonatomic, retain) UISegmentedControl *archivingControl;
 
-
-- (UIView *) addItemsView: (CGRect) frame;
-
-- (UIView *)organizerView: (CGRect)frame;
 - (void) presentActionsPopover:(id) sender;
 
 @end

@@ -13,7 +13,7 @@
 @implementation HorizontalCellsWithSections
 
 @synthesize hTableView = _hTableView;
-@synthesize myObjects;
+@synthesize myObjects, name;
 
 - (id)initWithFrame:(CGRect)frame {
    if ((self = [super initWithFrame:frame])){
@@ -47,6 +47,25 @@
     return @"HorizontalCellsWithSections";
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    CGFloat result;
+    if (name == nil) {
+        result = 0 ;
+    }else{
+        result = 20;
+        }
+    return result;
+}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    NSString *result;
+    if (name == nil) {
+        result = @"" ;
+    }else{
+        result =  name;
+    }
+    return result;
+}
+
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -55,7 +74,6 @@
     if (cell == nil) {
         cell = [[EventsCellWithSections alloc] init];
     }
-    //CHANGING FROM 0 to indexpath.row
 
     if ([[myObjects objectAtIndex:0] isKindOfClass:[Appointment class]]) {
         Appointment *currentAppointment = [myObjects objectAtIndex:indexPath.row];
@@ -97,19 +115,16 @@
     NSIndexPath *myIndexPath = [tableView indexPathForSelectedRow];
     NSLog(@"Selected Row is %i", [myIndexPath row]);
     NSLog(@"Selected Section is %i", [myIndexPath section]);
-    if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Appointment class]]) {
-    }    
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[myObjects objectAtIndex:indexPath.row]];
+
     if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Appointment class]]) {
-        NSLog(@"Object is Appointment");
-        Appointment *tempAppointment  =  [myObjects objectAtIndex:indexPath.row];
-        NSLog(@"My Appointment Text is %@", tempAppointment.text);
-    } else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[ToDo class]]){
-        NSLog(@"Object is Task");
-        //Task *tempTask = [myObjects objectAtIndex:indexPath.row];
-    } else{
-        NSLog(@"Object is Memo");
-        //[[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
+        //
+          } else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[ToDo class]]){
+    } else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[List class]]) {
+        
+        NSLog(@"EventsTableViewController: didSelectRow");
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ListSelectedNotification" object:[myObjects objectAtIndex:indexPath.row]];     
     }
 }
 

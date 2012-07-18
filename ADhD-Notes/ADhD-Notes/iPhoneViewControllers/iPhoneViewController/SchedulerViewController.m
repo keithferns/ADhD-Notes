@@ -10,6 +10,15 @@
 
 @interface SchedulerViewController ()
 @property (nonatomic, retain) EventsTableViewController2 *tableViewController;
+@property (nonatomic, retain) UIView *alarmView, *tagView, *topView;
+@property (nonatomic, retain) UITextField *dateField, *startTimeField, *endTimeField, *recurringField, *locationField, *dayField;
+@property (nonatomic, retain) UITextField *alarm1Field, *alarm2Field,*alarm3Field;
+@property (nonatomic, retain) UIDatePicker *datePicker,*timePicker;
+@property (nonatomic, retain) NSNumber *editing;
+@property (nonatomic, retain) UIPickerView *recurringPicker, *locationPicker, *alarmPicker, *dayPicker;
+@property (nonatomic, retain) NSArray *recurringArray, *locationArray, *alarmArray, *dayArray;
+@property (nonatomic, retain) CustomToolBar *toolbar;
+@property (nonatomic, readwrite) BOOL saving;
 
 @end
 
@@ -17,22 +26,25 @@
 
 @implementation SchedulerViewController
 
-@synthesize toolbar, theItem, tableViewController, alarmView, tagView, topView, dateField, startTimeField, endTimeField, recurringField, locationField;
-@synthesize alarm1Field, alarm2Field, alarm3Field, alarm4Field, tag1Field, tag2Field, tag3Field, tagButton, datePicker, timePicker;
-@synthesize recurringPicker, alarmPicker, tagPicker, locationPicker, recurringArray, alarmArray, tagArray, locationArray, editing;
+@synthesize toolbar, theItem, tableViewController, alarmView, tagView, topView, dateField, startTimeField, endTimeField, recurringField, locationField, dayField;
+@synthesize alarm1Field, alarm2Field, alarm3Field, datePicker, timePicker;
+@synthesize recurringPicker, alarmPicker, dayPicker, locationPicker, recurringArray, alarmArray, dayArray, locationArray, editing, saving;
 
 #pragma mark - ViewManagement
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
+    self.saving = NO;
+    /*
     self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
     self.navigationItem.leftBarButtonItem.target = self;
     self.navigationItem.leftBarButtonItem.action = @selector(cancelScheduling);
+    */
+
     
     self.navigationItem.rightBarButtonItem =[self.navigationController addDoneButton];
     [self.navigationItem.rightBarButtonItem setTarget:self];
-    //FIXME:
     [self.navigationItem.rightBarButtonItem setAction:@selector(saveSchedule)];
     
     if (toolbar == nil) {
@@ -73,7 +85,6 @@
     
     [dateFormatter setDateFormat:@"h:mm a"];
 
-    
     timePicker = [[UIDatePicker alloc] initWithFrame:CGRectZero];
     timePicker.datePickerMode = UIDatePickerModeTime;
     [timePicker setMinuteInterval:10];
@@ -99,35 +110,67 @@
     locationPicker.showsSelectionIndicator = YES;
     [locationPicker setTag:2];
     
+    dayPicker = [[UIPickerView alloc] initWithFrame:CGRectZero];
+    [dayPicker setDataSource:self];
+    [dayPicker setDelegate:self];
+    dayPicker.showsSelectionIndicator = YES;
+    [dayPicker setTag:4];
+    
     recurringArray = [[NSArray alloc] initWithObjects:@"Never",@"Daily",@"Weekly", @"Fortnightly", @"Monthy", @"Annualy", nil];
     locationArray = [[NSArray alloc] initWithObjects:@"Home", @"Work", @"School", @"Gym", nil];
-    
+    dayArray = [[NSArray alloc] initWithObjects:@"Someday", @"Today", @"Tomorrow", @"Next Week", @"Next Month", nil];
+        
+    if ([theItem.type intValue] == 3) {
+        dayField = [[UITextField alloc] initWithFrame:CGRectMake(5, 40, 150, 35)];
+        dayField.borderStyle = UITextBorderStyleRoundedRect;
+        dayField.tag = 2;
+        dayField.placeholder = @"Due: Someday";
+        dayField.inputView = dayPicker;
+        [dayField setFont:[UIFont systemFontOfSize:textFieldFont]];
+        dayField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    }
     topView = [[UIView alloc] initWithFrame:kTopViewRect];
     topView.backgroundColor = [UIColor blackColor]; 
     [self.view addSubview:topView];
         
     NSDate *temp = [timePicker date];
-    
-    startTimeField = [[UITextField alloc] initWithFrame:CGRectMake(5, 40, 75, 35)];
-    startTimeField.borderStyle = UITextBorderStyleRoundedRect;
-    startTimeField.text = [dateFormatter stringFromDate:temp];
-    startTimeField.tag = 2;
-    startTimeField.inputView = timePicker;
-    [startTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
-    startTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;                         
-    if (theItem.endTime != nil){
-        temp = theItem.endTime;
-    }else{
-        temp = [temp dateByAddingTimeInterval:60*60];
-    }
-    endTimeField = [[UITextField alloc] initWithFrame:CGRectMake(80, 40, 75, 35)];
-    endTimeField.borderStyle = UITextBorderStyleRoundedRect;
-    endTimeField.text = [dateFormatter stringFromDate:temp];
-    endTimeField.tag = 3;
-    endTimeField.inputView = timePicker;
-    [endTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
-    endTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    
+    if ([theItem.type intValue] == 2){
+            startTimeField = [[UITextField alloc] initWithFrame:CGRectMake(5, 40, 75, 35)];
+            startTimeField.borderStyle = UITextBorderStyleRoundedRect;
+            startTimeField.text = [dateFormatter stringFromDate:temp];
+            startTimeField.tag = 2;
+            startTimeField.inputView = timePicker;
+            [startTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
+            startTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;                         
+            if (theItem.endTime != nil){
+                temp = theItem.endTime;
+            }else {
+                temp = [temp dateByAddingTimeInterval:60*60];
+            }
+            endTimeField = [[UITextField alloc] initWithFrame:CGRectMake(80, 40, 75, 35)];
+            endTimeField.borderStyle = UITextBorderStyleRoundedRect;
+            endTimeField.text = [dateFormatter stringFromDate:temp];
+            endTimeField.tag = 3;
+            endTimeField.inputView = timePicker;
+            [endTimeField setFont:[UIFont systemFontOfSize:textFieldFont]];
+            endTimeField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        
+            locationField = [[UITextField alloc] initWithFrame:CGRectMake(5, 110, 150, 35)];
+            locationField.borderStyle = UITextBorderStyleRoundedRect;
+            locationField.placeholder = @"Place";
+            locationField.tag = 5;
+            [locationField setFont:[UIFont systemFontOfSize:textFieldFont]];
+            locationField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+            locationField.inputView = locationPicker;
+        
+            [topView addSubview:startTimeField];
+            [topView addSubview:endTimeField];    
+            [topView addSubview:locationField];
+            startTimeField.delegate = self;
+            endTimeField.delegate = self;
+            locationField.delegate = self;
+        
+        }
     recurringField = [[UITextField alloc] initWithFrame:CGRectMake(5, 75, 150, 35)];
     recurringField.borderStyle = UITextBorderStyleRoundedRect;
     [topView addSubview:recurringField];
@@ -136,20 +179,10 @@
     [recurringField setFont:[UIFont systemFontOfSize:textFieldFont]];
     recurringField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     recurringField.inputView = recurringPicker;
-    
-    locationField = [[UITextField alloc] initWithFrame:CGRectMake(5, 110, 150, 35)];
-    locationField.borderStyle = UITextBorderStyleRoundedRect;
-    locationField.placeholder = @"Place";
-    locationField.tag = 5;
-    [locationField setFont:[UIFont systemFontOfSize:textFieldFont]];
-    locationField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    locationField.inputView = locationPicker;
-    
+        
     [topView addSubview:dateField];
-    [topView addSubview:startTimeField];
-    [topView addSubview:endTimeField];    
-    [topView addSubview:locationField];
-    
+    [topView addSubview:dayField];
+
     if (tableViewController == nil) {
         tableViewController = [[EventsTableViewController2 alloc] initWithStyle:UITableViewStylePlain];
         tableViewController.calendarIsVisible = YES;
@@ -160,12 +193,11 @@
     [topView addSubview:tableViewController.tableView];
         
     dateField.delegate = self;
-    startTimeField.delegate = self;
-    endTimeField.delegate = self;
+    dayField.delegate = self;
     recurringField.delegate = self;
-    locationField.delegate = self;
     
     dateField.inputAccessoryView = self.toolbar;
+    dayField.inputAccessoryView = self.toolbar;
     startTimeField.inputAccessoryView = self.toolbar;
     endTimeField.inputAccessoryView = self.toolbar;
     recurringField.inputAccessoryView = self.toolbar;
@@ -174,16 +206,30 @@
 
 - (void)viewDidUnload {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
+    tableViewController = nil;
+    theItem = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated{
+
     [dateField becomeFirstResponder];    
 }
 
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    if (!self.saving) {
+        NSLog(@"Canceling Scheduling");
+        theItem.type = nil;
+    }
+}
+
+/*
 - (void) cancelScheduling{
+    NSLog(@"Canceling Scheduling");
+    theItem.type = nil;
     [self.navigationController popViewControllerAnimated:YES];
 }
+*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -206,7 +252,6 @@
         
         //Check if any of the alarmFields exist, if YES, then add the alarmFields
         if (alarm1Field == nil) {
-            
             alarm1Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 5, 155, 35)];
             alarm1Field.borderStyle = UITextBorderStyleRoundedRect;
             [alarmView addSubview:alarm1Field];
@@ -233,25 +278,14 @@
             alarm3Field.inputView = alarmPicker;
             [alarm3Field setFont:[UIFont systemFontOfSize:textFieldFont]];
             alarm3Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-            
-            alarm4Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 110, 155, 35)];
-            alarm4Field.borderStyle = UITextBorderStyleRoundedRect;
-            [alarmView addSubview:alarm4Field];
-            alarm4Field.placeholder = @"Alarm 4:";
-            alarm4Field.tag = 9;
-            alarm4Field.inputView = alarmPicker;
-            [alarm4Field setFont:[UIFont systemFontOfSize:textFieldFont]];
-            alarm4Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;  
-            
+             
             alarm1Field.delegate = self;
             alarm2Field.delegate = self;
             alarm3Field.delegate = self;
-            alarm4Field.delegate = self;
 
             alarm1Field.inputAccessoryView = self.toolbar;
             alarm2Field.inputAccessoryView = self.toolbar;
             alarm3Field.inputAccessoryView = self.toolbar;
-            alarm4Field.inputAccessoryView = self.toolbar;
         }
     }
     [UIView beginAnimations:nil context:nil];
@@ -267,118 +301,30 @@
         frame.origin.y = - tableViewController.tableView.frame.size.height;
         tableViewController.tableView.frame = frame;
     }
-    if (tagView.superview !=nil){
-        frame = tagView.frame;
-        frame.origin.y = tagView.frame.size.height;
-        tagView.frame = frame;
-    }
+
     [UIView commitAnimations];
-}
-/*
-- (void) addTagFields {
-    if (tagView.superview == nil) {
-        if (tagView == nil){
-            tagView = [[UIView alloc] initWithFrame:CGRectMake(155, topView.frame.size.height, kScreenWidth-155, topView.frame.size.height)];
-        }
-        [topView addSubview:tagView];
-        
-        tagPicker = [[UIPickerView alloc] initWithFrame:CGRectZero];
-        [tagPicker setDataSource:self];
-        [tagPicker setDelegate:self];
-        tagPicker.showsSelectionIndicator = YES;
-        [tagPicker setTag:4];
-        
-        tagArray = [[NSArray alloc] initWithObjects:@"Bill",@"Anniversary", @"Doctor", nil];
-        
-        //Check if any of the alarmFields exist, if YES, then add the alarmFields
-        if (tag1Field == nil) {
-            NSLog(@"Adding Tag Fields");
-            
-            tag1Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 5, 155, 35)];
-            tag1Field.borderStyle = UITextBorderStyleRoundedRect;
-            [tagView addSubview:tag1Field];
-            tag1Field.placeholder = @"Tag 1:";
-            tag1Field.tag = 10;
-            tag1Field.inputView = tagPicker;
-            [tag1Field setFont:[UIFont systemFontOfSize:textFieldFont]];
-            tag1Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-            
-            tag2Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 40, 155, 35)];
-            tag2Field.borderStyle = UITextBorderStyleRoundedRect;
-            [tagView addSubview:tag2Field];
-            tag2Field.placeholder = @"Tag 2:";
-            tag2Field.tag = 11;
-            tag2Field.inputView = tagPicker;
-            [tag2Field setFont:[UIFont systemFontOfSize:textFieldFont]];
-            tag2Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-            
-            tag3Field = [[UITextField alloc] initWithFrame:CGRectMake(0, 75, 155, 35)];
-            tag3Field.borderStyle = UITextBorderStyleRoundedRect;
-            [tagView addSubview:tag3Field];
-            tag3Field.placeholder = @"Tag 3:";
-            tag3Field.tag = 12;
-            tag3Field.inputView = tagPicker;
-            [tag3Field setFont:[UIFont systemFontOfSize:textFieldFont]];
-            tag3Field.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-            
-            tag1Field.delegate = self;
-            tag2Field.delegate = self;
-            tag3Field.delegate = self;
-            
-            tag1Field.inputAccessoryView = self.toolbar;
-            tag2Field.inputAccessoryView = self.toolbar;
-            tag3Field.inputAccessoryView = self.toolbar;
-            
-            tagButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 110, 155, 35)];
-            [tagButton setImage:[UIImage imageNamed:@"tag_add_24"] forState:UIControlStateNormal];
-            [tagView addSubview:tagButton];        
-        }
-    }
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
-    [UIView setAnimationDelegate:self];
-    [UIView setAnimationDidStopSelector:@selector(finishedTagTransition)];
     
-    CGRect frame = tagView.frame;
-    frame.origin.y = 0;
-    tagView.frame = frame;
-    if (tableViewController.tableView.superview != nil){
-        frame = tableViewController.tableView.frame;
-        frame.origin.y = - tableViewController.tableView.frame.size.height;
-        tableViewController.tableView.frame = frame;
-    }
-    if (alarmView.superview !=nil) {
-        frame = alarmView.frame;
-        frame.origin.y = alarmView.frame.size.height;
-        alarmView.frame = frame;
-    }
-    [UIView commitAnimations];
+    UISlider *proritySlider = [[UISlider alloc] initWithFrame:CGRectMake(5, 110, 300, 35)];
+    [topView addSubview:proritySlider];
+    
 }
-*/
 
 - (void) finishedAlarmTransition{
     [tableViewController.tableView removeFromSuperview];
-    [tagView removeFromSuperview];
-}
-
-- (void) finishedTagTransition{
-    [tableViewController.tableView removeFromSuperview];
-    [alarmView removeFromSuperview];
+    //[tagView removeFromSuperview];
 }
 
 
 #pragma Mark - Dates and Times
 
 - (void) saveSchedule {
-    
+    self.saving = YES;
     theItem.recurring  = recurringField.text;
     if (alarm2Field.text != nil) {
     [theItem createNewStringFromText:self.alarm1Field.text withType:2];
     } else if (alarm1Field.text != nil){
     [theItem createNewStringFromText:self.alarm2Field.text withType:2];
     }
-    //[theItem createNewStringFromText:self.alarm3Field.text withType:2];
-    //[theItem createNewStringFromText:self.alarm4Field.text withType:2];
     
     [theItem saveSchedule];
     
@@ -416,9 +362,8 @@
         case 8:
             [self.alarm3Field resignFirstResponder];
             break;
-        case 9:
-            [self.alarm4Field resignFirstResponder];
-            break;
+     
+        /*
         case 10:
             [self.tag1Field resignFirstResponder];
             break;
@@ -428,6 +373,7 @@
         case 12:
             [self.tag3Field resignFirstResponder];
             break;
+         */
         default:
             break;
     }    
@@ -460,9 +406,8 @@
         case 8:
             [self.alarm3Field becomeFirstResponder];
             break;
-        case 9:
-            [self.alarm4Field becomeFirstResponder];
-            break;
+
+        /*
         case 10:
             [self.tag1Field becomeFirstResponder];
             break;
@@ -472,6 +417,7 @@
         case 12:
             [self.tag3Field becomeFirstResponder];
             break;
+         */
         default:
             break;
     }
@@ -527,28 +473,9 @@
         case 8:
             self.editing = [NSNumber numberWithInt:8];
             toolbar.firstButton.enabled = YES;
-            toolbar.secondButton.enabled = YES;
-            break;
-        case 9:
-            self.editing = [NSNumber numberWithInt:9];
-            toolbar.firstButton.enabled = YES;
             toolbar.secondButton.enabled = NO;
             break;
-        case 10:
-            self.editing = [NSNumber numberWithInt:10];
-            toolbar.firstButton.enabled = YES;
-            toolbar.secondButton.enabled = YES;
-            break;        
-        case 11:
-            self.editing = [NSNumber numberWithInt:11];
-            toolbar.firstButton.enabled = YES;
-            toolbar.secondButton.enabled = YES;
-            break;
-        case 12:
-            self.editing = [NSNumber numberWithInt:12];
-            toolbar.firstButton.enabled = YES;
-            toolbar.secondButton.enabled = NO;
-            break;
+ 
         default:
             break;
     }
@@ -605,13 +532,15 @@
                 case 8:
                     self.alarm3Field.text = [alarmArray objectAtIndex:row];
                     break;
-                case 9:
-                    self.alarm4Field.text = [alarmArray objectAtIndex:row];
-                    break;
+              
                 default:
                     break;
             }
             break;
+        case 4:
+            self.dayField.text = [dayArray objectAtIndex:row];
+            break;
+        /*
         case 4:
             switch ([editing intValue]) {
                 case 10:
@@ -627,6 +556,7 @@
                     break;
             }
             break;
+         */
         default:
             break;
     }
@@ -646,7 +576,13 @@
             numberofrows =  [alarmArray count];
             break;
         case 4:
+            numberofrows = [dayArray count];
+            break;
+        /*
+        case 4:
             numberofrows = [tagArray count];
+            break;
+         */
         default:
             break;
     }
@@ -671,8 +607,12 @@
             titleforrow =  [alarmArray objectAtIndex:row];
             break;
         case 4:
+            titleforrow = [dayArray objectAtIndex:row];
+        /*
+        case 4:
             titleforrow = [tagArray objectAtIndex:row];
             break;
+         */
         default:
             break;
     }

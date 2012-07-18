@@ -10,6 +10,7 @@
 
 @interface TagsDetailViewController : UITableViewController
 
-@property (nonatomic, retain) SimpleNote *theSimpleNote;
-
+@property (nonatomic,retain) NSMutableArray *theArray;
+@property (nonatomic, retain) Tag *theTag;
+@property (nonatomic, retain) Item *theItem;
 @end

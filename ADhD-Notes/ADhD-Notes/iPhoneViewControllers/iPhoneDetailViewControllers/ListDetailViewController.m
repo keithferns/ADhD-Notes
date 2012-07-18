@@ -5,6 +5,7 @@
 
 #import "ListDetailViewController.h"
 #import "ListStringDetailViewController.h"
+#import "TagsDetailViewController.h"
 #import "ArchiveViewController.h"
 #import "CustomToolBar.h"
 #import "Constants.h"
@@ -13,17 +14,54 @@
 
 @property (nonatomic, retain) CustomToolBar *toolbar;
 @property (nonatomic, retain) NSMutableArray *sortedStrings;
+@property (nonatomic, retain) NSIndexPath *lastIndexPath;
+@property (nonatomic, retain) NSIndexPath *selectedIndexPath;
+
 
 @end
 
 @implementation ListDetailViewController
 
-@synthesize theItem, saving, toolbar, sortedStrings;
+@synthesize theItem, saving, toolbar, sortedStrings, theList, lastIndexPath, selectedIndexPath;
 
 - (id)initWithStyle:(UITableViewStyle)style {
-    self = [super initWithStyle:style];
     if (self) {
-          }
+        
+        self.tableView.backgroundColor = [UIColor blackColor];
+        self.tableView.bounces = NO;
+        self.tableView.allowsSelection = YES;
+        self.tableView.allowsSelectionDuringEditing = YES;
+        self.tableView.userInteractionEnabled = YES;
+        self.tableView.separatorColor = [UIColor blackColor];
+        
+        UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 44)];
+        // headerText.delegate = self;
+        headerText.borderStyle = UITextBorderStyleNone;
+        headerText.backgroundColor = [UIColor clearColor];
+        headerText.placeholder = @"Title";
+        [headerText setFont:[UIFont systemFontOfSize:20]];
+        headerText.textColor = [UIColor whiteColor];
+        headerText.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        headerText.textAlignment = UITextAlignmentCenter;
+        headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
+        
+        self.navigationItem.titleView = headerText;
+
+        if (toolbar == nil) {
+            toolbar = [[CustomToolBar alloc] init];
+            toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight-kNavBarHeight, kScreenWidth, kTabBarHeight);            
+            [toolbar.firstButton setTarget:self];
+            [toolbar.secondButton setTarget:self];
+            [toolbar.thirdButton setTarget:self];
+            [toolbar.fourthButton setTarget:self];
+            [toolbar.fifthButton setTarget:self];
+            [toolbar changeToDetailButtons];
+            toolbar.firstButton.enabled = YES;
+            toolbar.secondButton.enabled = YES;
+            toolbar.fourthButton.enabled = YES;
+        }
+        
+    }
     return self;
 }
 
@@ -36,62 +74,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];    
     
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-    sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
-    [sortedStrings sortUsingDescriptors:sortDescriptors];  
-    
-    self.tableView.backgroundColor = [UIColor blackColor];
-    self.tableView.bounces = NO;
-    self.tableView.allowsSelection = NO;
-    self.tableView.allowsSelectionDuringEditing = YES;
-    self.tableView.userInteractionEnabled = YES;
-    self.tableView.separatorColor = [UIColor blackColor];
-    
-    UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 44)];
-    // headerText.delegate = self;
-    headerText.borderStyle = UITextBorderStyleNone;
-    headerText.backgroundColor = [UIColor clearColor];
-    headerText.placeholder = @"Title";
-    [headerText setFont:[UIFont systemFontOfSize:20]];
-    headerText.textColor = [UIColor whiteColor];
-    headerText.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    headerText.textAlignment = UITextAlignmentCenter;
-    headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
-    
-    self.navigationItem.titleView = headerText;
-    
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    if (saving) {
-        self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
-        self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
-        self.navigationItem.leftBarButtonItem.target = self;   
+    if (theItem == nil) {
+        theItem = [[NewItemOrEvent alloc] init];
+        theItem.theList = self.theList;
     }
-    
-    if (toolbar == nil) {
-        toolbar = [[CustomToolBar alloc] init];
-        
-        toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight-kNavBarHeight, kScreenWidth, kTabBarHeight);
-        [toolbar.firstButton setTarget:self];
-        [toolbar.secondButton setTarget:self];
-        [toolbar.thirdButton setTarget:self];
-        [toolbar.fourthButton setTarget:self];
-        [toolbar.fifthButton setTarget:self];
-        [toolbar changeToDetailButtons];
-        toolbar.firstButton.enabled = YES;
-        toolbar.secondButton.enabled = YES;
-        toolbar.fourthButton.enabled = YES;
+    if (self.saving == NO){
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     }
 }
 
 - (void) viewWillAppear:(BOOL) animated {
-    
+    NSLog (@"ListDetailViewController: viewWillAppear");
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-    sortedStrings = [[NSMutableArray alloc] initWithArray:[theItem.theList.aStrings allObjects]];
+    sortedStrings = [[NSMutableArray alloc] initWithArray:[theList.aStrings allObjects]];
     [sortedStrings sortUsingDescriptors:sortDescriptors];  
-    
+    NSLog(@"ListDetailViewController: sortedStrings count = %d", [sortedStrings count]);
     [self.tableView reloadData];
 }
 
@@ -100,16 +98,10 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil];
 }
 
-- (void) presentArchiver: (id) sender {    
-    NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
-    [addingContext setPersistentStoreCoordinator:[theItem.addingContext persistentStoreCoordinator]];    
-    ArchiveViewController *archiveViewController = [[ArchiveViewController alloc] init];
-    //archiveViewController.managedObjectContext = addingContext;
-    archiveViewController.hidesBottomBarWhenPushed = YES;
-    archiveViewController.saving = YES;
-    archiveViewController.theItem = self.theItem;
-    [self.navigationController pushViewController:archiveViewController animated:YES];
+- (void) presentArchiver {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ListItemSelectedNotification" object:nil];
 }
+
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -128,13 +120,11 @@
             rows = 1;
             break;
         case 1:// Text
-            rows = [theItem.theList.aStrings count];
-            
+            rows = [theList.aStrings count];
             if (self.editing == YES) {
                 NSLog (@"ListDetailViewController:numberOfRows -> adding a row");
                 rows++;
             }
-
             break;
         case 2://tags
             rows = 1;
@@ -142,7 +132,6 @@
         default:
             break;
     }
-    NSLog (@"ListDetailViewController:numberOfRows -> Numbers of rows = %d", rows);
 
     return rows;
 }
@@ -154,10 +143,20 @@
             result = 50;
             break;
         case 1:
-            result = 33;
+            if (indexPath.row != self.selectedIndexPath.row){
+                result = 40;
+            }
+            else {
+                
+             Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
+
+            CGSize size = [listItem.aString sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:CGSizeMake(300, 60) lineBreakMode:UILineBreakModeWordWrap];
+            result = MAX (size.height+20, 40);
+                
+           }
             break;
         case 2:
-            result = 33;
+            result = 40;
             break;
         default:
             break;
@@ -237,7 +236,7 @@
         dateLabel.backgroundColor = [UIColor blackColor];
         dateLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(14.0)];
         dateLabel.textColor = [UIColor whiteColor];
-        NSString *date = [dateFormatter stringFromDate:theItem.theList.creationDate];
+        NSString *date = [dateFormatter stringFromDate:theList.creationDate];
         dateLabel.textAlignment = UITextAlignmentLeft;
         NSString *temp = [NSString stringWithFormat:@"%@", date];
         dateLabel.text = temp;
@@ -249,7 +248,7 @@
         timeLabel.backgroundColor = [UIColor blackColor];
         timeLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(14.0)];
         timeLabel.textColor = [UIColor whiteColor];
-        date = [dateFormatter stringFromDate:theItem.theList.creationDate];
+        date = [dateFormatter stringFromDate:theList.creationDate];
         timeLabel.textAlignment = UITextAlignmentLeft;
         temp = [NSString stringWithFormat:@"%@", date];
         timeLabel.text = temp;
@@ -268,19 +267,17 @@
         [cell.contentView addSubview: placeLabel];
         
         UIButton *folderButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 5, 55, 45)];
-        NSString *folderName = [[theItem.theList.collection anyObject] name];
+        NSString *folderName = [[theList.collection anyObject] name];
         [folderButton setTitle:folderName forState:UIControlStateNormal];
         folderButton.titleLabel.font = [UIFont systemFontOfSize: 12];
         folderButton.titleLabel.shadowOffset = CGSizeMake (1.0, 0.0);
         folderButton.titleLabel.lineBreakMode = UILineBreakModeTailTruncation;
         [folderButton setTitleColor:[UIColor blackColor] forState: UIControlStateNormal];
         [folderButton setBackgroundImage:[UIImage imageNamed:@"folder.png"] forState:UIControlStateNormal];
-        [folderButton addTarget:self action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
+        [folderButton addTarget:self action:@selector(presentArchiver) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:folderButton];
     } else if (indexPath.section == 1){
-        cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        NSInteger listCount = [theItem.theList.aStrings count];
-        //FIXME: GET ORDERING
+        NSInteger listCount = [theList.aStrings count];
        
         if (indexPath.row < listCount) {
             Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
@@ -295,18 +292,19 @@
             // set the button's target to this table view controller so we can interpret touch events and map that to a NSIndexSet
             [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
             button.backgroundColor = [UIColor clearColor];
-            cell.accessoryView = button;
             
 			static NSString *ListCellIdentifier = @"ListCell";
 			cell = [tableView dequeueReusableCellWithIdentifier:ListCellIdentifier];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ListCellIdentifier];
+                cell.textLabel.textColor = [UIColor whiteColor];
+                cell.textLabel.numberOfLines = 0;
+                cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
+
             }
-            cell.textLabel.textColor = [UIColor whiteColor];
             cell.textLabel.text = listItem.aString;
             cell.accessoryView = button;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            
         }
         else {
             // If the row is outside the range, it's the row that was added to allow insertion (see tableView:numberOfRowsInSection:) so give it an appropriate label.
@@ -336,7 +334,7 @@
         tagLabel.textColor = [UIColor whiteColor];
         tagLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldMT" size:(14.0)];
         NSArray *tempArray = [[NSArray alloc] init];
-        tempArray = [theItem.theList.tags allObjects];
+        tempArray = [theList.tags allObjects];
         NSString *tempString = @"";
         for (int i = 0; i<[tempArray count]; i++) {
             tempString = [tempString stringByAppendingString:[[tempArray objectAtIndex:i] name]];
@@ -389,7 +387,7 @@
     NSString *string = [alertView buttonTitleAtIndex:buttonIndex];
     if ([string isEqualToString:@"Save"]){
         UITextField *theTextField = [alertView textFieldAtIndex:0];
-        theItem.addingContext = theItem.theList.managedObjectContext;
+        theItem.addingContext = theList.managedObjectContext;
         if ([alertView.title isEqualToString:@"New Tag:"]){
             [theItem createNewTagFromText:theTextField.text forType:1];
         }
@@ -412,31 +410,31 @@
 #pragma mark Editing
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    
+    NSLog(@"SET EDITING CALLED");
     [super setEditing:editing animated:animated];
 	[self.navigationItem setHidesBackButton:editing animated:YES];
 	
 	[self.tableView beginUpdates];
 	
-    NSUInteger itemsCount = [theItem.theList.aStrings count];
+    NSUInteger itemsCount = [theList.aStrings count];
     NSArray *itemsInsertIndexPath = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:itemsCount inSection:1]];
     
     if (editing == YES) {
-        NSLog (@"ListDetailViewController: setEditing -> Is Editing");
-        [self.tableView insertRowsAtIndexPaths:itemsInsertIndexPath withRowAnimation:UITableViewRowAnimationTop];
-	} else {
-        NSLog (@"ListDetailViewController: setEditing -> Is NOT Editing");
-
-        [self.tableView deleteRowsAtIndexPaths:itemsInsertIndexPath withRowAnimation:UITableViewRowAnimationTop];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"TableViewIsEditingNotification" object:nil];
+            NSLog (@"ListDetailViewController: setEditing -> Is Editing");
+            [self.tableView insertRowsAtIndexPaths:itemsInsertIndexPath withRowAnimation:UITableViewRowAnimationTop];
+        } else {
+            NSLog (@"ListDetailViewController: setEditing -> Is NOT Editing");
+              [[NSNotificationCenter defaultCenter] postNotificationName:@"TableViewIsEditingNotification" object:nil];  
+            [self.tableView deleteRowsAtIndexPaths:itemsInsertIndexPath withRowAnimation:UITableViewRowAnimationTop];
     }
     
     [self.tableView endUpdates];
 	
-	
 	 //If editing is finished, save the managed object context.
 	 
 	if (editing == NO) {
-		NSManagedObjectContext *context = theItem.theList.managedObjectContext;
+		NSManagedObjectContext *context = theList.managedObjectContext;
 		NSError *error = nil;
 		if (![context save:&error]) {
 			
@@ -460,7 +458,8 @@
 	UITableViewCellEditingStyle style = UITableViewCellEditingStyleNone;
     if (indexPath.section == 1) {
         // If this is the last item, it's the insertion row.
-        if (indexPath.row == [theItem.theList.aStrings count]) {
+        
+         if (indexPath.row == [theList.aStrings count]) {
             style = UITableViewCellEditingStyleInsert;
         }
         else {
@@ -478,7 +477,8 @@
         //FIXME: GET ORDERING
        
         Liststring *listItem = [sortedStrings objectAtIndex:indexPath.row];
-        [theItem.theList removeAStringsObject:listItem];
+        [theList removeAStringsObject:listItem];
+        theList.editDate = [[NSDate date] timelessDate];
         [sortedStrings removeObject:listItem];
         
         NSManagedObjectContext *context = listItem.managedObjectContext;
@@ -495,30 +495,46 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(!self.editing){
+    if(!self.editing && indexPath.section == 1){
+
+        if (indexPath.section == lastIndexPath.section && indexPath.row == lastIndexPath.row) {
+            NSLog(@"Same Cell selected");
+            return;
+        }
+        self.selectedIndexPath = indexPath;
+        [self.tableView deselectRowAtIndexPath:lastIndexPath animated:YES];
+        [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, lastIndexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
+        self.lastIndexPath = indexPath;
+        /*
         [self tableView: self.tableView accessoryButtonTappedForRowWithIndexPath: indexPath];
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }
-    NSInteger listCount = [theItem.theList.aStrings count];
+         */
+    }else {
+        
+    NSInteger listCount = [theList.aStrings count];
     if (indexPath.section == 1) {
-        ListStringDetailViewController *detailViewController = [[ListStringDetailViewController alloc] init];
-        detailViewController.theList = self.theItem.theList;
-
-        if (indexPath.row < listCount) {
-            detailViewController.theString = [sortedStrings objectAtIndex:indexPath.row];
+        if (indexPath.row == listCount) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ListItemSelectedNotification" object:self.theList];
+        }else if (indexPath.row < listCount) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ListItemSelectedNotification" object:[sortedStrings objectAtIndex:indexPath.row]];
         }
-        [self.navigationController pushViewController:detailViewController animated:YES];
-
     }
-
+    if (indexPath.section == 2) {
+        TagsDetailViewController *detailViewController = [[TagsDetailViewController alloc] init];
+        NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+        
+       [tempArray addObjectsFromArray:[self.theList.tags allObjects]];
+        detailViewController.theArray = tempArray;
+        detailViewController.theItem = (Item *)self.theItem.theList;
+        [self.navigationController pushViewController:detailViewController animated:YES];
+        }
+    }
 }
-
 
 - (void) toggleCalendar:(id) sender{
     //
     return;
 }
-
 
 - (void) presentActionsPopover:(id) sender{
     return;

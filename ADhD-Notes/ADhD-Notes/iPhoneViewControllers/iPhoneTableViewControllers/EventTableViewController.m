@@ -85,13 +85,11 @@
 }
 
 - (void)viewDidUnload{
-    [super viewDidUnload];
-    
+    [super viewDidUnload];    
     self.managedObjectContext = nil;
 	self.fetchedResultsController.delegate = nil;
 	self.fetchedResultsController = nil;
 }
-
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     // Return YES for supported orientations
@@ -103,47 +101,30 @@
 #pragma mark Fetched results controller
 
 - (NSFetchedResultsController *) fetchedResultsController{
-    [NSFetchedResultsController deleteCacheWithName:@"Root"];
-    
-    //check if an instance of fetchedResultsController exists.  If it does, return fetchedResultsController
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];    
     if (_fetchedResultsController!=nil) {
 		return _fetchedResultsController;
 	}
-    //Else create a new fetchedResultsController
-    //Create a new fetchRequest
-    
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    //set the entity to retrieved by this fetchrequest
-    
-    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
-       
+    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];       
     selectedDate = [[NSDate date] timelessDate];
-
-    NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
+    NSDate *endDate = [selectedDate dateByAddingTimeInterval:7*24*60*60];
+    NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"%@ <= aDate AND aDate <= %@", selectedDate,endDate];
     [request setPredicate:checkDate];
-    
-	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-    
-	[request setSortDescriptors:[NSArray arrayWithObjects:timeDescriptor, nil]];
-    
+    NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:YES];
+	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];    
+	[request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
 	[request setFetchBatchSize:10];
-    
-    //Init a temp fetchedResultsController and set its fetchRequest to the current fetchRequest
-    
-	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
-    // NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
-    
+	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"aDate" cacheName:@"Root"];
 	newController.delegate = self;
 	self.fetchedResultsController = newController;
-        
 	return _fetchedResultsController;
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    //return [[_fetchedResultsController sections] count];
-    return 1;
+    return [[_fetchedResultsController sections] count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -164,7 +145,45 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
-    return @"Events";
+    NSString *hTitle = @"";
+    id <NSFetchedResultsSectionInfo> theSection = [[_fetchedResultsController sections] objectAtIndex:section];
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"EEE, MM d"];
+    NSLog(@"Section name is %@", [theSection name]);
+    //hTitle = [df stringFromDate:[theSection name]];
+    /*
+    NSInteger numericSection = [[theSection name] integerValue];
+    NSInteger year = numericSection / 10000;
+    NSInteger tempmonth = numericSection - (year * 10000);
+    NSInteger month = tempmonth/100;
+    NSInteger day = tempmonth - (month *100);
+    hTitle = [NSString stringWithFormat:@"%d/%d/%d", month,day,year%2000];
+    */
+    return hTitle;
+}
+
+- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    UIView *hView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, 18)];
+    hView.backgroundColor = [UIColor blackColor];
+    
+    UILabel *tLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kCellHeight, 18)];
+    tLabel.backgroundColor = [UIColor blackColor];
+    tLabel.textColor = [UIColor whiteColor];
+    tLabel.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(14.0)];
+    tLabel.textAlignment = UITextAlignmentCenter;
+    [hView addSubview:tLabel];
+    NSString *hTitle = @"";
+    id <NSFetchedResultsSectionInfo> theSection = [[_fetchedResultsController sections] objectAtIndex:section];
+
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"yyyy-MM-dd hh:mm:ss zzzz"];
+    NSDate *tDate = [df dateFromString:[theSection name]];
+    [df setDateFormat:@"EEE, MMM d"];
+    hTitle = [df stringFromDate:tDate];
+
+    tLabel.text = hTitle;
+    
+    return hView;
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -262,7 +281,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
 	
-	
     switch(type) {
 			
         case NSFetchedResultsChangeInsert:
@@ -306,8 +324,5 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
     // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
     [self.tableView endUpdates];
 }
-
-
-
 
 @end

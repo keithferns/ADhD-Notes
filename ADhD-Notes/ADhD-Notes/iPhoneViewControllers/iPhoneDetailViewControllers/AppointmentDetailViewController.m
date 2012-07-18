@@ -6,17 +6,22 @@
 #import "AppointmentDetailViewController.h"
 #import "SchedulerViewController.h"
 #import "CustomToolBar.h"
+#import "TagsDetailViewController.h"
+#import "MailComposerViewController.h"
+#import "WEPopoverController.h"
+#import "CustomPopoverView.h"
 
 @interface AppointmentDetailViewController ()
 
 @property (nonatomic, retain) UITextView *theTextView;
 @property (nonatomic, retain) CustomToolBar *toolbar;
+@property (nonatomic, retain) WEPopoverController *actionsPopover;
 
 @end
 
 @implementation AppointmentDetailViewController
 
-@synthesize theItem, saving, theTextView, toolbar;
+@synthesize theItem, saving, theTextView, toolbar, actionsPopover;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -33,6 +38,7 @@
     self.tableView.separatorColor = [UIColor blackColor];
     self.tableView.allowsSelection = NO;
     self.tableView.allowsSelectionDuringEditing = YES;
+    
     UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 24)];
    // headerText.delegate = self;
     headerText.borderStyle = UITextBorderStyleNone;
@@ -45,11 +51,6 @@
     headerText.clearButtonMode = UITextFieldViewModeWhileEditing;
     
     self.navigationItem.titleView = headerText;
-    if (saving) {
-    self.navigationItem.leftBarButtonItem = [self.navigationController addAddButton]; 
-    self.navigationItem.leftBarButtonItem.action = @selector(startNewItem:);
-    self.navigationItem.leftBarButtonItem.target = self;   
-    }
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     theTextView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
@@ -58,7 +59,6 @@
     theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(16.0)];
     theTextView.textColor = [UIColor whiteColor];
     UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
-    
     [theTextView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
     
     theItem.addingContext = theItem.theAppointment.managedObjectContext;
@@ -84,13 +84,22 @@
     [self.view addSubview:toolbar];
 }
 
+- (void) goToMain: (id) sender {    
+
+    self.tabBarController.selectedIndex = 0;
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
 
 - (void) viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     [self.tableView  reloadData];
 }
 
-
-
+- (void) viewWillDisappear: (BOOL) animated {
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil];
+    self.tabBarController.selectedIndex = 0;
+}
 
 - (void)viewDidUnload {
     [super viewDidUnload];
@@ -101,8 +110,6 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
-
 
 - (void) startNewItem:(id) sender{
     [self.navigationController popViewControllerAnimated:YES];
@@ -129,9 +136,6 @@
                 case 2: //Alarms
                     rows = 1;
                     break;
-              //  case 3: //Tags
-              //      rows = 1;
-              //       break;
                 default:
                     break;
             }
@@ -150,9 +154,7 @@
         case 2: 
             result = 33;
             break;
-        //case 3:
-            //result = 33;
-            //break;
+
         default:
             break;
         }
@@ -183,11 +185,13 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     CGFloat fHeight;
-    if (section == 0) {
-        fHeight = 5.0;
+    if (section == 2) {
+        fHeight = 20.0;
     }
-    else {
-        fHeight = 0.0;
+    else if (section == 1){
+        fHeight = 5.0;
+    } else {
+        fHeight = 5.0;
     }
     return fHeight;
 }
@@ -215,6 +219,7 @@
     footerView.backgroundColor = [UIColor blackColor];
     return footerView;
 }
+ 
  
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {   
     static NSString *CellIdentifier = @"CellIdentifier";
@@ -396,7 +401,7 @@
         [theTextView resignFirstResponder];
         theTextView.inputAccessoryView = nil;
         theTextView.editable = self.editing;
-        theItem.addingContext = theItem.theSimpleNote.managedObjectContext;
+        theItem.addingContext = theItem.theAppointment.managedObjectContext;
         [theItem updateText:theTextView.text];
         [theItem saveNewItem];
         toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight-kNavBarHeight, kScreenWidth, kTabBarHeight);
@@ -465,14 +470,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
 
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
+    if(self.editing){
+        if (indexPath.section == 2) {
+            TagsDetailViewController *detailViewController = [[TagsDetailViewController alloc] init];
+            NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+            
+            [tempArray addObjectsFromArray:[self.theItem.theAppointment.tags allObjects]];
+            detailViewController.theArray = tempArray;
+            detailViewController.theItem = (Item *)self.theItem.theAppointment;
+            [self.navigationController pushViewController:detailViewController animated:YES];
+        }
+    }
 }
 
 - (void) toggleCalendar:(id) sender{
@@ -481,8 +489,90 @@
 }
 
 
+#pragma mark - Popover Management
 - (void) presentActionsPopover:(id) sender{
+    
+    if([actionsPopover isPopoverVisible]) {
+        [actionsPopover dismissPopoverAnimated:YES];
+        [actionsPopover setDelegate:nil];
+        actionsPopover = nil;
+        return;
+    }
+    
+    if(!actionsPopover) {
+        UIViewController *viewCon = [[UIViewController alloc] init];
+        
+        switch ([sender tag]) {
+            case 1:
+                break;
+
+            case 2:
+            {
+                CGSize size = CGSizeMake(200, 120);
+                viewCon.contentSizeForViewInPopover = size;
+                CustomPopoverView *addView = [[CustomPopoverView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+                [addView toolbarSaveButton];
+                viewCon.view = addView;
+                actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
+                [actionsPopover setDelegate:(id)self];
+                if (self.editing){
+                    [actionsPopover presentPopoverFromRect:CGRectMake(85, 165, 50, 40) inView:self.view
+                                  permittedArrowDirections: UIPopoverArrowDirectionDown animated:YES ];  
+                }else {
+                    [addView.button1 addTarget:self action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
+                    [addView.button2 addTarget:self action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
+                    [addView.button3 addTarget:self action:@selector(appendToList:) forControlEvents:UIControlEventTouchUpInside];
+                    [addView.button4 addTarget:self action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
+                    [actionsPopover presentPopoverFromRect:CGRectMake(85, 370, 50, 40) inView:self.view
+                                  permittedArrowDirections: UIPopoverArrowDirectionDown animated:YES];  
+                }
+            }
+                break;
+                
+            case 3:
+                break;        
+            case 4:
+            {
+                CGSize size = CGSizeMake(100, 120);
+                viewCon.contentSizeForViewInPopover = size;                
+                CustomPopoverView *addView = [[CustomPopoverView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+                [addView toolbarSendButton];
+                viewCon.view = addView;
+                
+                actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
+                [actionsPopover setDelegate:(id)self];
+                if (self.editing) {
+                    [actionsPopover presentPopoverFromRect:CGRectMake(205, 165, 50, 50) inView:self.view
+                                  permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES]; 
+                }else {
+                    [addView.button1 addTarget:self action:@selector(sendItem:) forControlEvents:UIControlEventTouchUpInside];
+                    [addView.button2 addTarget:self action:@selector(sendItem:) forControlEvents:UIControlEventTouchUpInside];
+
+                    [actionsPopover presentPopoverFromRect:CGRectMake(205, 370, 50, 50) inView:self.view
+                                  permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES]; 
+                }
+            }
+                break;
+            default:
+                break;
+        }   
+    }
     return;
 }
+
+
+#pragma mark WEPopoverControllerDelegate implementation
+
+- (void)popoverControllerDidDismissPopover:(WEPopoverController *)thePopoverController {
+	//Safe to release the popover here
+	self.actionsPopover = nil;
+}
+
+- (BOOL)popoverControllerShouldDismissPopover:(WEPopoverController *)thePopoverController {
+	//The popover is automatically dismissed if you click outside it, unless you return NO here
+    [self popoverControllerDidDismissPopover:actionsPopover];
+	return YES;
+}
+
 
 @end

@@ -7,17 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "NewItemOrEvent.h"
 
 @interface FilesTableViewController : UITableViewController<NSFetchedResultsControllerDelegate, UISearchBarDelegate> {
+
     NSFetchedResultsController *_fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
-    UISearchBar *searchBar;
+    BOOL saving;
+    NewItemOrEvent *theItem;
+
+
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
-@property (nonatomic, retain) UISearchBar *searchBar;
+@property (nonatomic, readwrite) BOOL saving;
+@property (nonatomic,retain) NewItemOrEvent *theItem;
+
 
 - (NSFetchedResultsController *) fetchedResultsControllerWithPredicate:(NSPredicate *)aPredicate; 
 

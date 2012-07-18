@@ -13,12 +13,9 @@
 
 
 @interface DiaryViewController : UIViewController<TKCalendarMonthViewDelegate>{
-    NSInteger dateCounter;
 }
 
-@property NSInteger dateCounter;
 @property (nonatomic, retain) TKCalendarMonthView *calendarView;
-@property (nonatomic, retain) UILabel *datelabel;
 /*
 <TKCalendarDayTimelineViewDelegate>{
     TKCalendarDayTimelineView *_calendarDayTimelineView;

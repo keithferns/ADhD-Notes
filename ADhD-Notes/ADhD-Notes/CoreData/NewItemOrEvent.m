@@ -1,6 +1,5 @@
 //  NewMemo.m
 //  ADhD-Notes
-//
 //  Created by Keith Fernandes on 11/3/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 
@@ -8,7 +7,7 @@
 
 @implementation NewItemOrEvent
 
-@synthesize delegate, theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote,theList, theString,theTag, addingContext;//note this MOC is an adding MOC passed from the parent.
+@synthesize delegate, theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote,theList, theString,theTag, addingContext, saving;
 @synthesize eventType, collection, priority, text, name, tags, sorter, type, listArray;
 @synthesize aDate, startTime, endTime, editDate, location, recurring, alarm1, alarm2, alarm3, alarm4,  alarmArray, tagArray;
 
@@ -69,20 +68,52 @@
         if (tagArray != nil) {
         theSimpleNote.tags = [NSSet setWithArray:tagArray];
     }    
+    theSimpleNote.editDate = [[NSDate date] timelessDate];
+}
+
+- (Liststring *) createNewListString: (NSString *) thetext {
+     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:addingContext];
+    theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
+    theString.aString = thetext;
+    return theString;
+}
+- (void) createListstringsFromArray {
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:addingContext];
+    theList.aStrings = [[NSSet alloc] init];
+    for (int i = 0; i < [listArray count]; i++) {     
+        theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
+        theString.aString = [listArray objectAtIndex:i];
+        theString.order = [NSNumber numberWithInt:i];
+        theList.aStrings = [theList.aStrings setByAddingObject:theString];
+        theList.editDate = [[NSDate date] timelessDate];
+    }
+}
+
+
+- (void) createNewList{
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"List" inManagedObjectContext:addingContext];
+    theList = [[List alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
+    
+    self.type = [NSNumber numberWithInt:1];
+    theList.type = [NSNumber numberWithInt:1];
+    [self createListstringsFromArray];
+    
+    NSString *tempString = [listArray objectAtIndex:0];
+    
+    for (int i = 1; i<[listArray count]; i++) {
+        ;
+        tempString = [tempString stringByAppendingString:@"\n"];
+        tempString = [tempString stringByAppendingString:[listArray objectAtIndex:i]];
+    }
+    theList.text = tempString;
+    theList.editDate = [[NSDate date] timelessDate];
 }
 
 - (void) createNewStringFromText:(NSString *)mytext withType:(NSInteger) theInt {
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:addingContext];
-     theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
-    theString.aString = mytext;
-    if (theInt == 1){
-        if (listArray == nil) {
-            listArray = [[NSArray alloc] init];
-        }
-        listArray = [listArray arrayByAddingObject:theString];
-        theString.order = [NSNumber numberWithInt:[listArray count]-1];
-    }
-    else if (theInt == 2) {
+    theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
+    
+    if (theInt == 2) {
         if (alarmArray == nil) {
             alarmArray = [[NSArray alloc] init];
         }
@@ -90,6 +121,7 @@
         theString.order = [NSNumber numberWithInt:[alarmArray count]-1];
     }
 }
+
 
 - (void) createNewTagFromText:(NSString *)mytext forType: (NSInteger) myType {
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tag" inManagedObjectContext:addingContext];
@@ -113,23 +145,6 @@
     }
 }
 
-- (void) createNewList{
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"List" inManagedObjectContext:addingContext];
-    theList = [[List alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];    
-    //FIXME: THIS SHOULD TAKE AN ARRAY OF STRING OBJECTS PASSED FROM A TEXT FEILD. 
-    self.type = [NSNumber numberWithInt:1];
-    theList.type = [NSNumber numberWithInt:1];
-    theList.aStrings = [NSSet setWithArray:listArray];
-    Liststring *myString = [listArray objectAtIndex:0];
-    NSString *tempString = myString.aString;
-
-    for (int i = 1; i<[listArray count]; i++) {
-        myString = [listArray objectAtIndex:i];
-        tempString = [tempString stringByAppendingString:@"\n"];
-        tempString = [tempString stringByAppendingString:myString.aString];
-    }
-    theList.text = tempString;
-}
 
 - (void) createNewAppointment{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:addingContext];
@@ -169,13 +184,15 @@
     
 - (void) createNewToDo{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"ToDo" inManagedObjectContext:addingContext];
-    theToDo = [[ToDo alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];                    
-    theToDo.text = self.text;
+    theToDo = [[ToDo alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext];
+    
+    theToDo.list = theList;
     theToDo.type = [NSNumber numberWithInt:3];
     theToDo.aDate = self.aDate;
     theToDo.startTime = self.startTime;
     theToDo.endTime = self.endTime;
     theToDo.recurrence = self.recurring;   
+    
     if (alarmArray != nil) {
         theToDo.alarms = [NSSet setWithArray:alarmArray];
     }  
@@ -209,12 +226,10 @@
         theToDo.aDate = self.aDate;
         theToDo.recurrence = self.recurring;
     }
-    
     NSError *error;
     if(![addingContext save:&error]){ 
         NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
     } 
-
     return;
 }
 
@@ -241,8 +256,6 @@
     if(![addingContext save:&error]){ 
         NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
     } 
-
-    
     return;
 }
 
@@ -255,9 +268,13 @@
     //
 }
 
-- (void) deleteItem:(id)sender{
-    //FIXME
-    //[addingContext deleteObject:theNote];
+- (void) deleteItem:(NSManagedObject *)theObject{
+    [addingContext deleteObject:theObject];
+    /*--Save the MOC--*/
+    NSError *error;
+    if(![addingContext save:&error]){ 
+        NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
+    } 
 }
 
 #pragma mark - Get Values From Event Objects

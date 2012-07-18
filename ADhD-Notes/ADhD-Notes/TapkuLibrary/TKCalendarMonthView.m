@@ -505,7 +505,6 @@
 	if(!startOnSunday && fir == 0) fir = 7;
 	if(!startOnSunday) fir--;
 	
-	
 	if(row==0 && column < fir){
 		day = firstOfPrev + column;
 	}else{
@@ -513,14 +512,11 @@
 		day = row * 7 + column  - firstWeekday+2;
 		if(!startOnSunday) day++;
 		if(!startOnSunday && fir==6) day -= 7;
-
 	}
 	if(portion > 0 && day > daysInMonth){
 		portion = 2;
 		day = day - daysInMonth;
 	}
-	
-	
 	if(portion != 1){
 		self.selectedImageView.image = [UIImage imageWithContentsOfFile:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Date Tile Gray.png")];
 		markWasOnToday = YES;
@@ -547,19 +543,14 @@
 	}else{
 		[self.dot removeFromSuperview];
 	}
-	
-
-	
-	
+    
 	CGRect r = self.selectedImageView.frame;
 	r.origin.x = (column*46);
 	r.origin.y = (row*44)-1;
 	self.selectedImageView.frame = r;
 	
 	if(day == selectedDay && selectedPortion == portion) return;
-	
-	
-	
+		
 	if(portion == 1){
 		selectedDay = day;
 		selectedPortion = portion;

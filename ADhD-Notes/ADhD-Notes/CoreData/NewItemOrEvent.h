@@ -11,7 +11,6 @@
 
 @protocol NewItemOrEventDelegate <NSObject>
 
-
 @end
 
 @interface NewItemOrEvent : NSObject  {
@@ -30,6 +29,7 @@
 
 }
 
+@property (nonatomic, readwrite) BOOL saving;
 @property (nonatomic, retain) NSManagedObjectContext *addingContext;
 @property (unsafe_unretained) id delegate;
 
@@ -60,7 +60,8 @@
 - (void) createNewSimpleNote;
 - (void) createNewStringFromText:(NSString *)mytext withType:(NSInteger) theInt;
 - (void) createNewTagFromText:(NSString *)mytext forType: (NSInteger) myType;
-
+- (Liststring *) createNewListString: (NSString *) thetext;
+- (void) createListstringsFromArray;
 - (void) createNewList;
 - (void) createNewAppointment;
 - (void) createNewToDo;
@@ -71,7 +72,7 @@
 - (void) saveSchedule;
 - (void) updateSchedule;
 - (void) saveNewItem;
-- (void) deleteItem:(id)sender;
+- (void) deleteItem:(NSManagedObject *)theObject;
 - (void) updateText:(NSString *) currentText;
 
 @end

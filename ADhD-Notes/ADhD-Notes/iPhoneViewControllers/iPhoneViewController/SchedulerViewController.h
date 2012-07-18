@@ -15,21 +15,10 @@
 }
 
 
-@property (nonatomic, retain) UIView *alarmView, *tagView, *topView;
-@property (nonatomic, retain) UITextField *dateField, *startTimeField, *endTimeField, *recurringField, *locationField;
-@property (nonatomic, retain) UITextField *alarm1Field, *alarm2Field,*alarm3Field, *alarm4Field;
-@property (nonatomic, retain) UITextField *tag1Field, *tag2Field, *tag3Field;
-@property (nonatomic, retain) UIButton *tagButton;
-@property (nonatomic, retain) UIDatePicker *datePicker,*timePicker;
-@property (nonatomic, retain) NSNumber *editing;
-@property (nonatomic, retain) UIPickerView *recurringPicker, *locationPicker, *alarmPicker, *tagPicker;
-@property (nonatomic, retain) NSArray *recurringArray, *locationArray, *alarmArray, *tagArray;
-@property (nonatomic, retain) CustomToolBar *toolbar;
+
 @property (nonatomic, retain) NewItemOrEvent *theItem;
 
-
 - (void) addReminderFields;
-//- (void) addTagFields;
 - (void) textFieldResignFirstResponder;
 - (void) textFieldBecomeFirstResponder;
 - (void) moveToPreviousField;

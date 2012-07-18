@@ -11,6 +11,7 @@
     </entity>
     <entity name="Document" representedClassName="Document" parentEntity="Collection" syncable="YES">
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="aStrings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Liststring" inverseName="document" inverseEntity="Liststring" syncable="YES"/>
     </entity>
     <entity name="Event" representedClassName="Event" isAbstract="YES" parentEntity="Note" syncable="YES">
         <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
@@ -39,12 +40,15 @@
     <entity name="List" representedClassName="List" parentEntity="Memo" syncable="YES">
         <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="aStrings" optional="YES" toMany="YES" minCount="1" deletionRule="Cascade" destinationEntity="Liststring" inverseName="list" inverseEntity="Liststring" syncable="YES"/>
+        <relationship name="todo" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="ToDo" inverseName="list" inverseEntity="ToDo" syncable="YES"/>
     </entity>
     <entity name="Liststring" representedClassName="Liststring" syncable="YES">
         <attribute name="aString" attributeType="String" syncable="YES"/>
         <attribute name="checked" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <relationship name="list" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="List" inverseName="aStrings" inverseEntity="List" syncable="YES"/>
+        <relationship name="document" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Document" inverseName="aStrings" inverseEntity="Document" syncable="YES"/>
+        <relationship name="list" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="List" inverseName="aStrings" inverseEntity="List" syncable="YES"/>
     </entity>
     <entity name="Location" representedClassName="Location" syncable="YES">
         <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
@@ -79,17 +83,19 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="tags" inverseEntity="Item" syncable="YES"/>
     </entity>
-    <entity name="ToDo" representedClassName="ToDo" parentEntity="Event" syncable="YES"/>
+    <entity name="ToDo" representedClassName="ToDo" parentEntity="Event" syncable="YES">
+        <relationship name="list" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="List" inverseName="todo" inverseEntity="List" syncable="YES"/>
+    </entity>
     <elements>
         <element name="Alarm" positionX="160" positionY="192" width="128" height="75"/>
         <element name="Appointment" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Collection" positionX="160" positionY="192" width="128" height="90"/>
-        <element name="Document" positionX="160" positionY="192" width="128" height="60"/>
+        <element name="Document" positionX="160" positionY="192" width="128" height="75"/>
         <element name="Event" positionX="160" positionY="192" width="128" height="60"/>
         <element name="Folder" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Item" positionX="160" positionY="192" width="128" height="120"/>
         <element name="List" positionX="160" positionY="192" width="128" height="45"/>
-        <element name="Liststring" positionX="160" positionY="192" width="128" height="105"/>
+        <element name="Liststring" positionX="160" positionY="192" width="128" height="135"/>
         <element name="Location" positionX="160" positionY="192" width="128" height="165"/>
         <element name="Memo" positionX="160" positionY="192" width="128" height="45"/>
         <element name="Note" positionX="160" positionY="192" width="128" height="210"/>

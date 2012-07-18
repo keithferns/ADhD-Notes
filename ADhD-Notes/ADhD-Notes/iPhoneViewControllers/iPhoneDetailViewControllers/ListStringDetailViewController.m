@@ -15,7 +15,7 @@
 
 @implementation ListStringDetailViewController
 
-@synthesize textField, theList, theString;
+@synthesize textView, theList, theString;
 
 - (id)init {
     if (self = [super init]) {
@@ -30,60 +30,60 @@
     }
     return self;
 }
-- (void)viewDidLoad
-{
+
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor blackColor];
-    
-    
-    if (textField == nil) {
-        textField = [[UITextField alloc] initWithFrame: CGRectMake (5,kNavBarHeight,310,45)];
-        textField.textColor = [UIColor whiteColor];
-        UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
-        [textField.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
-        textField.layer.cornerRadius = 5.0;
-        textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-        
-        [textField setFont:[UIFont systemFontOfSize:18]];
-        textField.layer.borderWidth = 2.0;
-        textField.layer.borderColor = [UIColor darkGrayColor].CGColor;      
-        [textField setDelegate:self];
-        textField.placeholder = @"tap 'return' to add item";
-        [textField setReturnKeyType:UIReturnKeyDefault];
-    }
-    
+    NSString *theText = @"";
     if (theString != nil) {
-        textField.text = theString.aString;
+         theText= theString.aString;
     }
-    [self.view addSubview:textField];
+    CGSize size = [theText sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:CGSizeMake(300, 60) lineBreakMode:UILineBreakModeWordWrap];
+    CGFloat tfHeight = MAX (size.height+27, 45);
+    NSLog (@"tfHeight = %f", tfHeight);
+    if (textView == nil) {
+        textView = [[UITextView alloc] initWithFrame: CGRectMake (5,kNavBarHeight,300,tfHeight)];
+        textView.textColor = [UIColor whiteColor];
+        UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
+        [textView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
+        textView.layer.cornerRadius = 5.0;
+        [textView setFont:[UIFont systemFontOfSize:14]];
+        textView.layer.borderWidth = 2.0;
+        textView.layer.borderColor = [UIColor darkGrayColor].CGColor;      
+    }
+    textView.text = theText;
+        
+    [self.view addSubview:textView];
+    [textView becomeFirstResponder];
 }
 
-
-
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (void)save:(id)sender {
 	NSLog (@"SAVING");
-    
+    if (![textView hasText]) {
+        return;
+    }
 	NSManagedObjectContext *context = [theList managedObjectContext];
 
     if (!theString) {
         self.theString = [NSEntityDescription insertNewObjectForEntityForName:@"Liststring" inManagedObjectContext:context];
-        self.theString.aString = textField.text;
         [theList addAStringsObject:theString];
 		theString.order = [NSNumber numberWithInteger:[theList.aStrings count]];
     }
-
+    self.theString.aString = textView.text;
+    
+    NSString *theText = [theList.text stringByAppendingString:@"\n"];
+    theList.text = [theText stringByAppendingString:self.theString.aString];
+    theList.editDate = [[NSDate date] timelessDate];
 	NSError *error = nil;
 	if (![context save:&error]) {
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -92,14 +92,8 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-
 - (void)cancel:(id)sender {
-    NSLog (@"CANCELLING");
-
     [self.navigationController popViewControllerAnimated:YES];
 }
-
-
-
 
 @end

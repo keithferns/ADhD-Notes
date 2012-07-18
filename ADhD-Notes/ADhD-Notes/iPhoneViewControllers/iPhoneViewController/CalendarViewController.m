@@ -1,6 +1,5 @@
 //  CalendarViewController.m
 //  ADhD-Notes
-//
 //  Created by Keith Fernandes on 4/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 
@@ -12,6 +11,8 @@
 #import "ToDoDetailViewController.h"
 #import "MemoDetailViewController.h"
 #import "ListDetailViewController.h"
+#import "CustomPopoverView.h"
+
 @interface CalendarViewController ()
 
 @property BOOL saving;
@@ -28,7 +29,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     selectedDate = [NSDate date];
-    self.navigationController.navigationBar.topItem.title = @"Calendar";    
     frontViewIsVisible = YES;
     if (managedObjectContext == nil) { 
         managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
@@ -74,6 +74,8 @@
      */
     
     if (!pushed) {
+        self.navigationController.navigationBar.topItem.title = @"Calendar";    
+
         NSLog (@"Calendar ViewC - NOT pushed");
         UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentActionsPopover:)];
         leftNavButton.tag = 1;
@@ -445,8 +447,6 @@
     }
 }
 
-
-
 #pragma mark - Popover Management
 
 - (void) presentActionsPopover:(id) sender {
@@ -460,11 +460,13 @@
     if(!actionsPopover ) {
         UIViewController *viewCon = [[UIViewController alloc] init];
         switch ([sender tag]) {
-            case 1://ADDING NEW FOLDERS OR FILES
+            case 1:
             {
                 CGSize size = CGSizeMake(140, 160);
                 viewCon.contentSizeForViewInPopover = size;
-                viewCon.view =  [self addItemsView:CGRectMake(0, 0, size.width, size.height)];
+                CustomPopoverView *addView = [[CustomPopoverView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+                [addView addItemsViewForCalendar];
+                viewCon.view =  addView;
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
@@ -472,13 +474,13 @@
                     [actionsPopover presentPopoverFromRect:CGRectMake(80, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view    
                                   permittedArrowDirections:UIPopoverArrowDirectionDown
-                                                  animated:YES name:@"Save"];  
+                                                  animated:YES];  
                 }
                 else if (!saving) {
                     [actionsPopover presentPopoverFromRect:CGRectMake(10, 0, 50, 40)
                                                     inView:self.view    
                                   permittedArrowDirections:UIPopoverArrowDirectionUp
-                                                  animated:YES name:@"Save"];     
+                                                  animated:YES];     
                 }
             }
                 break;
@@ -486,7 +488,9 @@
             {
                 CGSize size = CGSizeMake(140, 260);
                 viewCon.contentSizeForViewInPopover = size;
-                viewCon.view = [self organizerView: CGRectMake(0, 0, size.width, size.height)];
+                CustomPopoverView *addView = [[CustomPopoverView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+                [addView organizerViewForCalendar];
+                viewCon.view =  addView;
                 actionsPopover = [[WEPopoverController alloc] initWithContentViewController:viewCon];
                 [actionsPopover setDelegate:self];
                 
@@ -494,12 +498,12 @@
                     [actionsPopover presentPopoverFromRect:CGRectMake(190, kScreenHeight-kTabBarHeight, 50, 40)
                                                     inView:self.view
                                   permittedArrowDirections: UIPopoverArrowDirectionDown
-                                                  animated:YES name:@"Plan"];
+                                                  animated:YES];
                 }
                 else if (!saving) {
                     [actionsPopover presentPopoverFromRect:CGRectMake(280,0, 50, 40) inView:self.view
                                   permittedArrowDirections: UIPopoverArrowDirectionUp
-                                                  animated:YES name:@"Organize"];
+                                                  animated:YES];
                 }
             }
                 break;
@@ -509,158 +513,17 @@
     }    
 }
 
-- (void) cancelPopover:(id)sender {
-    NSLog(@"CANCELLING POPOVER");
-    return;
+#pragma mark WEPopoverControllerDelegate implementation
+
+- (void)popoverControllerDidDismissPopover:(WEPopoverController *)thePopoverController {
+//Safe to release the popover here
+self.actionsPopover = nil;
 }
 
-- (void)popoverControllerDidDismissPopover:(WEPopoverController *)popoverController {
-    NSLog(@"Did dismiss");
-}
-
-- (BOOL)popoverControllerShouldDismissPopover:(WEPopoverController *)popoverController {
-    NSLog(@"Should dismiss");
-    return YES;
-}
-
-- (UIView *) addItemsView: (CGRect) frame{
-    UIView *oView = [[UIView alloc] initWithFrame:frame];
-    //FIXME: Potential Memory Leak for oView
-    UILabel *addLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 140, 39)];
-    [addLabel setText:@"ADD NEW"];
-    [addLabel setTextAlignment:UITextAlignmentCenter];
-    [addLabel setBackgroundColor:[UIColor clearColor]];
-    addLabel.textColor = [UIColor lightTextColor];
-    addLabel.font = [UIFont boldSystemFontOfSize:18];
-    addLabel.layer.borderWidth = 2;
-    addLabel.layer.borderColor = [UIColor clearColor].CGColor;
-    
-    UIButton *b1 = [[UIButton alloc] initWithFrame:CGRectMake(10, 40, 120, 39)];
-    [b1 setTitle:@"Appointment" forState:UIControlStateNormal];
-    b1.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    //b1.backgroundColor = [UIColor darkGrayColor];
-    b1.alpha = 1.0;
-    [b1 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
-    [b1 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
-    [b1 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b1 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    //b1.layer.cornerRadius = 6.0;
-    //b1.layer.borderWidth = 1.0;
-    [b1 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
-    [b1 setTag:1];
-    
-    UIButton *b2 = [[UIButton alloc] initWithFrame:CGRectMake(10, 80, 120, 39)];
-    // b2.backgroundColor = [UIColor darkGrayColor];
-    b2.alpha = 1.0;
-    [b2 setTitle:@"To Do" forState:UIControlStateNormal];
-    b2.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    [b2 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
-    [b2 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
-    [b2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b2 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    [b2 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
-    //b2.layer.cornerRadius = 6.0;
-    //b2.layer.borderWidth = 1.0;
-    [b2 setTag:2];
-    //b2.layer.borderWidth = 2;
-    //b2.layer.borderColor = [UIColor darkGrayColor].CGColor;
-    
-    UIButton *b3 = [[UIButton alloc] initWithFrame:CGRectMake(10, 120, 120, 39)];
-    [b3 setTitle:@"Note" forState:UIControlStateNormal];
-    b3.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    [b3 setBackgroundImage:[UIImage imageNamed:@"button-normal.png"] forState:UIControlStateNormal];
-    [b3 setBackgroundImage:[UIImage imageNamed:@"button-highlighted.png"] forState:UIControlStateHighlighted];
-    [b3 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b3 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    //b3.backgroundColor = [UIColor darkGrayColor];
-    b3.alpha = 1.0;
-    [b3 addTarget:self action:@selector(startNewItem:) forControlEvents:UIControlEventTouchUpInside];
-    //b3.layer.cornerRadius = 6.0;
-    //b3.layer.borderWidth = 1.0;
-    [b3 setTag:3];
-    
-    [oView addSubview:addLabel];
-    [oView addSubview:b1];
-    [oView addSubview:b2];
-    [oView addSubview:b3];
-    return oView;
-}
-
-- (UIView *)organizerView: (CGRect)frame {
-    UIView *oView = [[UIView alloc] initWithFrame:frame];
-    //FIXME: Potental Memory Leak for oView
-    UILabel *sortLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 140, 29)];
-    [sortLabel setText:@"Sort By"];
-    [sortLabel setBackgroundColor:[UIColor clearColor]];
-    sortLabel.textColor = [UIColor lightTextColor];
-    sortLabel.font = [UIFont boldSystemFontOfSize:18];
-    sortLabel.layer.borderWidth = 2;
-    sortLabel.layer.borderColor = [UIColor clearColor].CGColor;
-    UIButton *b1 = [[UIButton alloc] initWithFrame:CGRectMake(5, 30, 120, 39)];
-    [b1 setTitle:@"Name" forState:UIControlStateNormal];
-    b1.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    b1.backgroundColor = [UIColor darkGrayColor];
-    b1.alpha = 0.4;
-    [b1 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b1 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    //b1.layer.borderWidth = 2;
-    //b1.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    [b1 addTarget:self action:@selector(pushingDetail) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *b2 = [[UIButton alloc] initWithFrame:CGRectMake(5, 70, 120, 39)];
-    b2.backgroundColor = [UIColor darkGrayColor];
-    b2.alpha = 0.4;
-    [b2 setTitle:@"Date Created" forState:UIControlStateNormal];
-    b2.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    [b2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b2 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    //b2.layer.borderWidth = 2;
-    //b2.layer.borderColor = [UIColor darkGrayColor].CGColor;
-    UIButton *b3 = [[UIButton alloc] initWithFrame:CGRectMake(5, 110, 120, 39)];
-    [b3 setTitle:@"Date Modified" forState:UIControlStateNormal];
-    b3.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    [b3 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b3 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    b3.backgroundColor = [UIColor darkGrayColor];
-    b3.alpha = 0.4;
-    
-    //b3.layer.borderWidth = 2;
-    //b3.layer.borderColor = [UIColor darkGrayColor].CGColor;
-    UIButton *b4 = [[UIButton alloc] initWithFrame:CGRectMake(5, 150, 120, 39)];
-    [b4 setTitle:@"Other" forState:UIControlStateNormal];
-    b4.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    b4.backgroundColor = [UIColor darkGrayColor];
-    //b4.layer.borderWidth = 2;
-    //b4.layer.borderColor = [UIColor darkGrayColor].CGColor;
-    [b4 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [b4 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    b4.alpha = 0.4;
-    
-    UILabel *deleteLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 190, 140, 29)];
-    deleteLabel.backgroundColor = [UIColor clearColor];
-    deleteLabel.textColor = [UIColor lightTextColor];
-    [deleteLabel setText:@"Delete"];
-    deleteLabel.font = [UIFont boldSystemFontOfSize:18];
-    
-    UIButton *b5 = [[UIButton alloc] initWithFrame:CGRectMake(5, 220, 120, 39)];
-    [b5 setTitle:@"Delete" forState:UIControlStateNormal];
-    //b5.layer.borderWidth = 2;
-    //b5.layer.borderColor = [UIColor darkGrayColor].CGColor;
-    b5.titleLabel.font = [UIFont italicSystemFontOfSize:15];
-    b5.alpha = 0.4;
-    b5.backgroundColor = [UIColor darkGrayColor];
-    [b5 setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [b5 setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    
-    [oView addSubview:sortLabel];
-    [oView addSubview:b1];
-    [oView addSubview:b2];
-    [oView addSubview:b3];
-    [oView addSubview:b4];
-    [oView addSubview:deleteLabel];
-    [oView addSubview:b5];
-    
-    return oView;
+- (BOOL)popoverControllerShouldDismissPopover:(WEPopoverController *)thePopoverController {
+	//The popover is automatically dismissed if you click outside it, unless you return NO here
+    [self popoverControllerDidDismissPopover:actionsPopover];
+	return YES;
 }
 
 #pragma mark - Details
@@ -674,7 +537,6 @@
         selectedItem.eventType = [NSNumber numberWithInt:2];
         detailViewController.theItem = selectedItem;
         detailViewController.hidesBottomBarWhenPushed = YES;
-
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     } else if ([[notification object] isKindOfClass:[ToDo class]]){
@@ -688,23 +550,27 @@
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     } else if ([[notification object] isKindOfClass:[SimpleNote class]]){
+        NSLog(@"Selected Item is a Simple Note");
         MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
         SimpleNote *selectedSimpleNote = [notification object];
+        NSLog(@"The Simple Note Text is %@", selectedSimpleNote.text);
         NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theSimpleNote = selectedSimpleNote;
         selectedItem.eventType = [NSNumber numberWithInt:0];
         detailViewController.theItem = selectedItem;
+        detailViewController.theSimpleNote = selectedSimpleNote;
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }else if ([[notification object] isKindOfClass:[List class]]){
+        NSLog(@"Selected Item is a List");
         ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStylePlain];
         List *selectedList = [notification object];
         NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theList = selectedList;
         selectedItem.eventType = [NSNumber numberWithInt:1];
         detailViewController.theItem = selectedItem;
+        detailViewController.theList = selectedList;
         detailViewController.hidesBottomBarWhenPushed = YES;
-
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }

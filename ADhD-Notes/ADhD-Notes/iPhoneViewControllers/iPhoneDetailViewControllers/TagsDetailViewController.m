@@ -10,19 +10,20 @@
 
 @interface TagsDetailViewController ()
 
-@property (nonatomic,retain) NSMutableArray *theArray;
 
 @end
 
 @implementation TagsDetailViewController
 
-@synthesize theSimpleNote, theArray;
+@synthesize theArray, theTag, theItem;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
+        UINavigationItem *navigationItem = self.navigationItem;
+        navigationItem.title = @"Edit Tags";
+            
     }
     return self;
 }
@@ -31,12 +32,9 @@
 {
     [super viewDidLoad];
 
-    self.tableView.backgroundColor = [UIColor blackColor];
-    
-    
-    theArray = [[NSMutableArray alloc] initWithArray:[theSimpleNote.tags allObjects]];
-    
+    self.tableView.backgroundColor = [UIColor blackColor];    
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
+
 }
 
 - (void)viewDidUnload
@@ -80,44 +78,72 @@
     return cell;
 }
 
+#pragma mark Editing
 /*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    
+    [super setEditing:editing animated:animated];
+	[self.navigationItem setHidesBackButton:editing animated:YES];
+  
+	if (editing == NO) {
+		NSManagedObjectContext *context = theList.managedObjectContext;
+		NSError *error = nil;
+		if (![context save:&error]) {
+			
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			abort();
+		}
+	}
 }
 */
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL editable;
+    if (indexPath.section == 0) {
+  
+        editable = YES;
+    }
+    return editable;
+}
 
-/*
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCellEditingStyle style = UITableViewCellEditingStyleNone;
+    if (indexPath.section == 0) {
+      
+            style = UITableViewCellEditingStyleDelete;
+    }
+    return style;
+}
+
 // Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
+        // Delete the row from the data source      
+        theTag = [theArray objectAtIndex:indexPath.row];
+        NSManagedObjectContext *context = theTag.managedObjectContext;
+        
+        [theTag removeItemsObject:theItem];
+        //[theItem removeTagsObject:theTag];
+        [theArray removeObject:theTag];
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
+        
+        NSError *error = nil;
+		if (![context save:&error]) {
+			
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			abort();
+		}
+        
+         [self.tableView beginUpdates];
+         
+         [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationTop];
+         [self.tableView endUpdates];
+    }
+}   
 
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
+
+
 
 #pragma mark - Table view delegate
 

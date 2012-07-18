@@ -66,12 +66,22 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{    
     CGFloat hHeight;
     if (section == 1) {
-        hHeight = 0.0;
+        hHeight = 20.0;
     }
     else {
-        hHeight = 0.0;
+        hHeight = 20.0;
     }
     return hHeight;
+}
+
+-(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    NSString *hTitle = @"";
+    if (section == 0) {
+        hTitle = @"Notes, Lists and Documents";
+    } else {
+        hTitle = @"Appointments and To Dos";
+    }
+    return hTitle;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -102,8 +112,7 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     //
 }
 

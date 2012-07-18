@@ -1,5 +1,5 @@
 //
-//  PopupViewController.h
+//  WEPopoverController.h
 //  WEPopover
 //
 //  Created by Werner Altewischer on 02/09/10.
@@ -8,62 +8,60 @@
 
 #import <Foundation/Foundation.h>
 #import "WEPopoverContainerView.h"
+#import "WETouchableView.h"
 
 @class WEPopoverController;
 
-@protocol PopoverControllerDelegate<NSObject>
+@protocol WEPopoverControllerDelegate<NSObject>
 
 - (void)popoverControllerDidDismissPopover:(WEPopoverController *)popoverController;
 - (BOOL)popoverControllerShouldDismissPopover:(WEPopoverController *)popoverController;
 
 @end
 
-@interface WEPopoverController : NSObject {
+/**
+ * @brief Popover controller for the iPhone, mimicing the iPad UIPopoverController interface. See that class for more details.
+ */
+@interface WEPopoverController : NSObject<WETouchableViewDelegate> {
 	UIViewController *contentViewController;
 	UIView *view;
-	NSString *name;
-    
+	WETouchableView *backgroundView;
+	
 	BOOL popoverVisible;
 	UIPopoverArrowDirection popoverArrowDirection;
-	__unsafe_unretained id <PopoverControllerDelegate> delegate;
+	__unsafe_unretained id <WEPopoverControllerDelegate> delegate;
 	CGSize popoverContentSize;
 	WEPopoverContainerViewProperties *containerViewProperties;
 	id <NSObject> context;
-    
-    UITapGestureRecognizer *tapGesture;
-    UIView *parentView;
+	NSArray *passthroughViews;	
 }
 
 @property(nonatomic, retain) UIViewController *contentViewController;
 
 @property (nonatomic, readonly) UIView *view;
-@property (nonatomic, retain) NSString *name;
-
 @property (nonatomic, readonly, getter=isPopoverVisible) BOOL popoverVisible;
 @property (nonatomic, readonly) UIPopoverArrowDirection popoverArrowDirection;
-@property (unsafe_unretained) id <PopoverControllerDelegate> delegate;
+@property (nonatomic, unsafe_unretained) id <WEPopoverControllerDelegate> delegate;
 @property (nonatomic, assign) CGSize popoverContentSize;
 @property (nonatomic, retain) WEPopoverContainerViewProperties *containerViewProperties;
 @property (nonatomic, retain) id <NSObject> context;
-
-- (void) addName:(NSString *)string;
-- (NSString *) returnName;
+@property (nonatomic, copy) NSArray *passthroughViews;
 
 - (id)initWithContentViewController:(UIViewController *)theContentViewController;
 
 - (void)dismissPopoverAnimated:(BOOL)animated;
 
-/*- (void)presentPopoverFromRect:(CGRect)rect 
-						inView:(UIView *)view 
-	  permittedArrowDirections:(UIPopoverArrowDirection)arrowDirections 
-					  animated:(BOOL)animated;
-*/
+- (void)presentPopoverFromBarButtonItem:(UIBarButtonItem *)item 
+			   permittedArrowDirections:(UIPopoverArrowDirection)arrowDirections 
+							   animated:(BOOL)animated;
+
 - (void)presentPopoverFromRect:(CGRect)rect 
 						inView:(UIView *)view 
 	  permittedArrowDirections:(UIPopoverArrowDirection)arrowDirections 
-					  animated:(BOOL)animated name:(NSString *)name;
+					  animated:(BOOL)animated;
+
 - (void)repositionPopoverFromRect:(CGRect)rect
+						   inView:(UIView *)view
 		 permittedArrowDirections:(UIPopoverArrowDirection)arrowDirections;
 
-- (void)parentViewTapped:(UITapGestureRecognizer *)tapGesture;
 @end

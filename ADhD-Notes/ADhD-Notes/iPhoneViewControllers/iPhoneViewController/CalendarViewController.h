@@ -11,7 +11,7 @@
 #import "TKCalendarMonthViewController.h"
 
 
-@interface CalendarViewController : UIViewController <TKCalendarMonthViewDataSource, TKCalendarMonthViewDelegate, PopoverControllerDelegate>
+@interface CalendarViewController : UIViewController <TKCalendarMonthViewDataSource, TKCalendarMonthViewDelegate, WEPopoverControllerDelegate>
 
 
 @property (nonatomic, retain) TKCalendarMonthView *calendarView;

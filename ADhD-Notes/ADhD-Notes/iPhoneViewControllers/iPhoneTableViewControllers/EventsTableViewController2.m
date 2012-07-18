@@ -17,7 +17,7 @@
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize selectedDate, eventType;
 @synthesize calendarIsVisible;
-
+/*
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
@@ -25,7 +25,7 @@
     }
     return self;
 }
-
+*/
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
@@ -39,13 +39,9 @@
     [super viewDidLoad];    
     if (calendarIsVisible) {
         selectedDate = [[NSDate date] timelessDate];
-        eventType = [NSNumber numberWithInt:2];
-
     }
     else if (!calendarIsVisible) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEventTypeNotification:) name:@"GetEventTypeNotification" object:nil];
-        
-        eventType = [NSNumber numberWithInt:2];
     }
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
@@ -99,7 +95,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];    
-    eventType = [NSNumber numberWithInt:2];
+    //eventType = [NSNumber numberWithInt:2];
     self.fetchedResultsController = nil;
     NSError *error;
     if (![[self fetchedResultsController] performFetch:&error]) {
@@ -173,16 +169,15 @@
         return _fetchedResultsController;
     }
     NSFetchRequest *request = [[NSFetchRequest alloc] init];    
-
-    if ([eventType intValue] == 2) {
+    
+    if ([eventType intValue] == 3){
+        [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
+    } else if ([eventType intValue] == 1){
+        [request setEntity:[NSEntityDescription entityForName:@"List" inManagedObjectContext:managedObjectContext]];
+    }  else {
         [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
     }
-    else if ([eventType intValue] == 3){
-                [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
-    }
-    
     NSDate *currentDate;
-    
     if (!calendarIsVisible) { 
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
         [gregorian setLocale:[NSLocale currentLocale]];
@@ -243,14 +238,12 @@
             NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
         [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
         }
-
         else {
             NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:NO];// just here to test the sections and row calls
             
             NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
             [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
         }
-        
     
     /*FIXME:  set Predicate to filter all tasks and appointments for a time after NOW --*/
     
@@ -279,7 +272,6 @@
     return 20;
 }
 
-
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     CGFloat fHeight;
     if (calendarIsVisible) {
@@ -290,7 +282,6 @@
     }
     return fHeight;
 }
-
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     //id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
@@ -310,9 +301,7 @@
      
      } else if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[Memo class]]){
      cellIdentifier = @"mCell";
-     
      } 
-     
      //Use a default table view cell to display the event's title.
      
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -424,8 +413,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     //[tableView deselectRowAtIndexPath:indexPath animated:YES];    
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[_fetchedResultsController objectAtIndexPath:indexPath ]];      
+ 
 }
 
 

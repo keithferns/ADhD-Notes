@@ -99,18 +99,23 @@
 - (NSFetchedResultsController *) fetchedResultsController{
         
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
-    
     if (_fetchedResultsController!=nil) {
 		return _fetchedResultsController;
-	}
-    
+	}    
 	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:[NSEntityDescription entityForName:@"Memo" inManagedObjectContext:managedObjectContext]];
-    selectedDate = [[NSDate date] timelessDate];
-    NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
+    [request setEntity:[NSEntityDescription entityForName:@"Note" inManagedObjectContext:managedObjectContext]];
+    
+    selectedDate = [[[NSDate date] timelessDate] dateByAddingTimeInterval:7*24*60*60];
+    NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"editDate <= %@ AND type < 2", selectedDate];
+
+    //NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"editDate <= %@ AND (type < 2 OR type = 2)", selectedDate];//fixme add start time to all items otherwise getting documents will give an error. easiest fix is to add editTime to items and use that to sort.
+    //FIXME: add an event cell for documemts
+    
     [request setPredicate:checkDate];
+    NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"editDate" ascending:NO];    
+
 	NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];    
-	[request setSortDescriptors:[NSArray arrayWithObjects:timeDescriptor, nil]];
+	[request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
 	[request setFetchBatchSize:10];
 	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
 	newController.delegate = self;
@@ -126,18 +131,18 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 20;
+    return 5.0;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
     return [sectionInfo numberOfObjects]; 
 }
-
+/*
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     return @"Memos";
 }
-
+*/
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString * cellIdentifier = @"EventsCell";
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -202,18 +207,16 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
     }   
 }
-
+/*
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
 }
-
-/*
- // Override to support conditional rearranging of the table view.
+*/
  - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
  // Return NO if you do not want the item to be re-orderable.
- return YES;
+ return NO; 
  }
- */
+ 
 #pragma mark -
 #pragma mark Table view delegate
 
@@ -241,14 +244,14 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
             NSLog(@"MemoTableViewController:FetchedResultsController: ChangeDelete");
             break;            
         case NSFetchedResultsChangeUpdate:
-            [self.tableView cellForRowAtIndexPath:indexPath];
+            //[self.tableView cellForRowAtIndexPath:indexPath];
 			//[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             NSLog(@"MemoTableViewController:FetchedResultsController: ChangeUpdate");
             break;
         case NSFetchedResultsChangeMove:
-            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            //[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             // Reloading the section inserts a new row and ensures that titles are updated appropriately.
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
+            //[self.tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
             NSLog(@"MemoTableViewController:FetchedResultsController ChangeMove");            
             break;
     }

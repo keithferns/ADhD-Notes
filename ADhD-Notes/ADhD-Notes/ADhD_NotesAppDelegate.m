@@ -10,7 +10,7 @@
 #import "ArchiveViewController.h"
 #import "SettingViewController.h"
 #import "Constants.h"
-
+#import "Preferences.h"
 @implementation ADhD_NotesAppDelegate
 
 @synthesize window = _window;
@@ -18,6 +18,16 @@
 @synthesize managedObjectModel = __managedObjectModel;
 @synthesize persistentStoreCoordinator = __persistentStoreCoordinator;
 @synthesize tabBarController = _tabBarController;
+
+
+/*------------------------------------------------------
+ * Read preferences from system
+ *-----------------------------------------------------*/
+-(void) loadPreferences { 
+    saveUsername = [Preferences shouldSaveUsername];
+    preferredIndexInTabbar = [Preferences startupTab]; 
+}
+
 
 - (NSArray *) arrayWithnavigationControllerWrappingsForTabbedViewControllers {
     //Creates the viewController array for the tabBarController
@@ -37,14 +47,16 @@
     tempNavController1.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     [theArray addObject:tempNavController1];
     
-    DiaryViewController *viewController2 = [[DiaryViewController alloc] initWithNibName:nil bundle:nil];
-    viewController2.tabBarItem.title = @"Diary";
-    viewController2.tabBarItem.image = [UIImage imageNamed:@"nav_book.png"];
+    ArchiveViewController *viewController2 = [[ArchiveViewController alloc] initWithNibName:nil bundle:nil];
+        //viewController4.saving = NO;
+    viewController2.tabBarItem.title = @"Archive";
+    viewController2.tabBarItem.image = [UIImage imageNamed:@"nav_cabinet.png"];
     viewController2.tabBarItem.tag = 2;    
     UINavigationController *tempNavController2 = [[UINavigationController alloc] initWithRootViewController:viewController2];
     tempNavController2.navigationBar.barStyle = UIBarStyleBlackTranslucent;
-    [theArray addObject:tempNavController2];
-    
+        [theArray addObject:tempNavController2];
+        
+   
     CalendarViewController *viewController3 = [[CalendarViewController alloc] initWithNibName:nil bundle:nil];
 
     viewController3.tabBarItem.title = @"Calendar";
@@ -53,11 +65,10 @@
     UINavigationController *tempNavController3 = [[UINavigationController alloc] initWithRootViewController:viewController3];
     tempNavController3.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     [theArray addObject:tempNavController3];
-    
-    ArchiveViewController *viewController4 = [[ArchiveViewController alloc] initWithNibName:nil bundle:nil];
-    //viewController4.saving = NO;
-    viewController4.tabBarItem.title = @"Archive";
-    viewController4.tabBarItem.image = [UIImage imageNamed:@"nav_cabinet.png"];
+        
+    DiaryViewController *viewController4 = [[DiaryViewController alloc] initWithNibName:nil bundle:nil];
+    viewController4.tabBarItem.title = @"Diary";
+    viewController4.tabBarItem.image = [UIImage imageNamed:@"nav_book.png"];
     viewController4.tabBarItem.tag = 4;    
     UINavigationController *tempNavController4 = [[UINavigationController alloc] initWithRootViewController:viewController4];
     tempNavController4.navigationBar.barStyle = UIBarStyleBlackTranslucent;
@@ -78,8 +89,29 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [NSTimeZone resetSystemTimeZone];
- 
+    
+    // Load user preferences (notice the default values the first time through)
+    [self loadPreferences];
+    
+    // Show the current values of the preferences
+    NSLog(@"Save user preferences: %s", saveUsername == YES ? "Yes" : "No");
+    NSLog(@"Preferred startup tab: %d", preferredIndexInTabbar);
+    
+    // This is a little contrived, but you get the point...
+    BOOL saveUname = YES;
+    NSInteger index = 3;
+    
+    // Write new values to the sytem
+    [Preferences setPreferences:saveUname startupTab:index];
+    /*
+    // Register the preference defaults early.
+    NSDictionary *appDefaults = [NSDictionary
+                                 dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"CacheDataAgressively"];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+    */
+    
+
+    [NSTimeZone resetSystemTimeZone]; 
     [NSTimeZone setDefaultTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"EST"]];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

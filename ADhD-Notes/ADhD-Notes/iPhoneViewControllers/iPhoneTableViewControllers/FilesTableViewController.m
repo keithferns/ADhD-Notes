@@ -8,13 +8,11 @@
 
 #import "FilesTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
-#import "FileCustomCell.h"
 
 @implementation FilesTableViewController
 
 @synthesize fetchedResultsController = _fetchedResultsController;
-@synthesize managedObjectContext;
-@synthesize searchBar;
+@synthesize managedObjectContext, saving, theItem;
 
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -38,22 +36,16 @@
  
     _fetchedResultsController.delegate = self;
     
-    self.tableView.frame = CGRectMake(0,kNavBarHeight+40,kScreenWidth, kScreenHeight-kNavBarHeight);
+    self.tableView.frame = CGRectMake(0,kNavBarHeight+84,kScreenWidth, kScreenHeight-kNavBarHeight);
     self.tableView.backgroundColor = [UIColor blackColor];
     
-    searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 40)];
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
-    searchBar.delegate = self;
     
-    searchBar.tintColor = [UIColor blackColor];
+    if (saving) {
+        self.managedObjectContext = theItem.addingContext;
+    }
     
-    [searchBar setTranslucent:YES];
-    searchBar.autocorrectionType = UITextAutocorrectionTypeNo;
-    [searchBar setPlaceholder:@"Search for Document"];
-    
-    self.tableView.tableHeaderView = searchBar;
-
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         NSLog(@"After managedObjectContext: %@",  managedObjectContext);
@@ -94,7 +86,7 @@
 
 - (void) searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
 
-    [self.searchBar setShowsCancelButton:YES animated:YES];
+    [searchBar setShowsCancelButton:YES animated:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"StartedSearching_Notification" object:nil];
 }
 
@@ -102,7 +94,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"EndedSearching_Notification" object:nil];
 }
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {    
-    NSString * searchString = self.searchBar.text;
+    NSString * searchString = searchBar.text;
     NSLog(@"Search String is %@", searchString);    
     NSPredicate *searchPredicate = [NSPredicate predicateWithFormat: @"name CONTAINS[c] %@", searchString];
     self.fetchedResultsController = [self fetchedResultsControllerWithPredicate:searchPredicate];
@@ -114,16 +106,15 @@
 }
 
 - (void) searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [self.searchBar resignFirstResponder];
-    self.searchBar.text = @"";
+    [searchBar resignFirstResponder];
+    searchBar.text = @"";
     self.fetchedResultsController = [self fetchedResultsControllerWithPredicate:nil];
     NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
 	}
     
     [self.tableView reloadData];
-    [self.searchBar setShowsCancelButton:NO animated:YES];
-    
+    [searchBar setShowsCancelButton:NO animated:YES];
 }
 
 #pragma mark - Fetched Results Controller
@@ -194,36 +185,33 @@
 }
 
 - (void) configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-	
-	FileCustomCell *mycell;
-	if([cell isKindOfClass:[UITableViewCell class]]){
-		mycell = (FileCustomCell *) cell;
-	}
+    
     Document *theDocument = [_fetchedResultsController objectAtIndexPath:indexPath];	
-        
-    [mycell.fileName setText:theDocument.name];
+    UILabel *docName = [[UILabel alloc] initWithFrame:CGRectMake(5,0,150,30)];
+    docName.textAlignment = UITextAlignmentLeft;
+    docName.backgroundColor = [UIColor clearColor];
+    docName.textColor = [UIColor whiteColor];
+    docName.font = [UIFont boldSystemFontOfSize:18.0];
+    [cell.contentView addSubview:docName];
+    
+    [docName setText:theDocument.name];
 }
     
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
+	static NSString *CellIdentifier = @"DocumentCell";
     
-    static NSString *CellIdentifier = @"FileCustomCell";
+    //Document *theDocument = [_fetchedResultsController objectAtIndexPath:indexPath];	
     
-	FileCustomCell *cell = (FileCustomCell *)[self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-	if (cell == nil) {
-		NSArray *topLevelObjects = [[NSBundle mainBundle]
-									loadNibNamed:@"FileCustomCell"
-									owner:nil options:nil];
-		
-		for (id currentObject in topLevelObjects){
-			if([currentObject isKindOfClass:[UITableViewCell class]]){
-				cell = (FileCustomCell *) currentObject;
-				break;
-			}
-		}
-	}
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:
+                             CellIdentifier];
+    if (cell == nil) {
+        NSLog (@"Creating Cell");
+        
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+       // cell.textLabel.textColor = [UIColor whiteColor];
+        }
 	[self configureCell:cell atIndexPath:indexPath];
-    cell.fileName.textColor = [UIColor whiteColor];
     return cell;
 }
 
@@ -261,11 +249,9 @@
     } 
 }
 
-
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
 }
-
 
 /*
  // Override to support conditional rearranging of the table view.
@@ -277,6 +263,24 @@
  */
 
 
+
+- (void) setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    if (editing==YES) {
+        NSNumber *ev = [NSNumber numberWithInt:3];
+        NSLog(@"FolderTableViewController: editing = YES");
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"EditDoneNotification" object:ev];
+        
+        
+    } else if (editing==NO){
+        NSLog(@"FolderTableViewController: editing = NO");
+        NSNumber *ev = [NSNumber numberWithInt:2];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"EditDoneNotification" object:ev];
+        
+    }
+}
+
+
 #pragma mark -
 #pragma mark Fetched Results Notifications
 
@@ -284,11 +288,9 @@
     // The fetch controller is about to start sending change notifications, so prepare the table view for updates.
     [self.tableView beginUpdates];
 }
-- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-	
-   	
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {	
     switch(type) {
-			
         case NSFetchedResultsChangeInsert:
             [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
             NSLog(@"FetchedResultsController ChangeInsert");
@@ -311,7 +313,6 @@
 }
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
-	
     switch(type) {
         case NSFetchedResultsChangeInsert:
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
@@ -329,47 +330,10 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    //KJF NOTE: POST A NOTIFICATION WITH THE SELECTED ROW AS THE OBJECT PASSED WITH THE NOTIFICATION TO THE VIEW CONTROLLER
-    
-    //if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[Folder class]]) {
-    //    [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderSelectedInTableViewControllerNotification" object:[_fetchedResultsController objectAtIndexPath:indexPath]];
-    //}
-    //else if ([[_fetchedResultsController objectAtIndexPath:indexPath] isKindOfClass:[File class]]){
-        [[NSNotificationCenter defaultCenter] postNotificationName:UITableViewSelectionDidChangeNotification object:[_fetchedResultsController objectAtIndexPath:indexPath]];
-    //}
-    
-    /*VIEWING
-     Folder *selectedFolder = [_fetchedResultsController objectAtIndexPath:indexPath];
-     //  Create another view controller.
-     
-     FolderFilesViewController *detailViewController = [[FolderFilesViewController alloc] initWithNibName:@"FolderFilesViewController" bundle:[NSBundle mainBundle]];
-     
-     NSLog(@"the selectedFolderis %@", selectedFolder);
-     // Pass the selected object to the new view controller.
-     
-     detailViewController.folder = selectedFolder;
-     detailViewController.managedObjectContext = self.managedObjectContext;
-     
-     //Present the new viewController
-     [self presentModalViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
-    /* ADDING
-     newMemo.folder = [_fetchedResultsController objectAtIndexPath:indexPath];	
-     
-     NSLog(@"%@",newMemo.folder);
-     
-     folderTextField.text = newMemo.folder.name;
-     isSelected = YES;
-     
-     NSError *error;
-     if(![managedObjectContext save:&error]){ 
-     NSLog(@"DID NOT SAVE");
-     }
-     */
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderSavingNotification" object:[self.fetchedResultsController objectAtIndexPath:indexPath]];   
 }
+
 @end
 
 //NOTE: THE FOLLOWING IS FROM THE EARLIER VERSION IN WHICH BOTH FOLDER AND FILES TABLE VIEW WERE CONTROLLER BY THE SAME TABLE VIEW CONTROLLER. 

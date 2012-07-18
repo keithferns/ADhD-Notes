@@ -65,27 +65,28 @@
 
 - (UIBarButtonItem *) addLeftArrowButton{
     
-    UIImage *image = [UIImage imageNamed:@"arrow_left_24.png"];
     
-    
-    UIBarButtonItem *leftArrowButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:nil action:@selector(postSelectedDateNotification:)];
+    UIBarButtonItem *leftArrowButton = [[UIBarButtonItem alloc] initWithTitle:@"Today" style:UIBarButtonItemStyleBordered target:nil action:@selector(toggleTodayCalendarView:)];
 
     return leftArrowButton;
 }
 
 - (UIBarButtonItem *) addRightArrowButton{
     
-    UIImage *image = [UIImage imageNamed:@"arrow_right_24.png"];
+    UIImage *rightImage = [UIImage imageNamed:@"Calendar-Month-30x30.png"];
     
-    UIBarButtonItem *rightArrowButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:nil action:@selector(postSelectedDateNotification:)];
+    //UIBarButtonItem *rightArrowButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:nil action:@selector(toggleTodayCalendarView:)];
     
-    return rightArrowButton;
+    UIButton *rightNavButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [rightNavButton setImage:rightImage forState:UIControlStateNormal];
+    [rightNavButton setImage:rightImage forState:UIControlStateHighlighted];
+    rightNavButton.frame = CGRectMake(0, 0, rightImage.size.width, rightImage.size.height);
+    [rightNavButton addTarget:nil action:@selector(toggleTodayCalendarView:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithCustomView:rightNavButton];
+    
+    return rightButton;
 }
-
-
-
-
-
 
 /*
 - (UIBarButtonItem *) addCustomCancelButton{

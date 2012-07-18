@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ADhD_NotesAppDelegate : UIResponder <UIApplicationDelegate, UITabBarControllerDelegate>
-
+@interface ADhD_NotesAppDelegate : UIResponder <UIApplicationDelegate, UITabBarControllerDelegate> {
+    BOOL        saveUsername;
+    NSInteger   preferredIndexInTabbar;
+    UIWindow    *window;
+}
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;

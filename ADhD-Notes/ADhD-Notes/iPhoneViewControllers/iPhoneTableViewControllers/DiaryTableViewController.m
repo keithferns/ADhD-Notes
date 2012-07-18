@@ -35,9 +35,8 @@ return self;
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
-{
-[super viewDidLoad];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
     
@@ -60,19 +59,9 @@ _fetchedResultsController.delegate = self;
 
 /*configure tableView, set its properties and add it to the main view.*/
 
-UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 320, 26)];
-[headerLabel setBackgroundColor:[UIColor lightGrayColor]];
-[headerLabel setText:@"MY STUFF"];
-[headerLabel setTextAlignment:UITextAlignmentCenter];
-[headerView setBackgroundColor:[UIColor blackColor]];
-[headerView addSubview:headerLabel];
 //[tableView setTableHeaderView:headerView];
 //[tableView setSectionFooterHeight:0.0];
 //[tableView setSectionHeaderHeight:15.0];
-
-
-
 //[self.tableView setSeparatorColor:[UIColor blackColor]];
 //[self.tableView setSectionHeaderHeight:18];
 //self.tableView.rowHeight = kCellHeight;

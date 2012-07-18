@@ -9,12 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "NewItemOrEvent.h"
 
-@interface MemoDetailViewController : UITableViewController <UITextViewDelegate>{
+@interface MemoDetailViewController : UITableViewController <UITextViewDelegate, WEPopoverControllerDelegate, UIActionSheetDelegate>{
     
     NewItemOrEvent *theItem;
+    SimpleNote *theSimpleNote;
 }
 
 @property (nonatomic,retain) NewItemOrEvent *theItem;
+@property (nonatomic, retain) SimpleNote *theSimpleNote;
 @property (nonatomic, readwrite) BOOL saving;
 
 @end

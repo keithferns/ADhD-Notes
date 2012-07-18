@@ -1,37 +1,33 @@
-//
 //  CustomToolBar.m
 //  ADhD-Notes
-//
 //  Created by Keith Fernandes on 11/23/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
 
 #import "CustomToolBar.h"
 #import "Constants.h"
 @implementation CustomToolBar
 
-@synthesize firstButton, secondButton, fourthButton, thirdButton, fifthButton, flexSpace, myItems;
+@synthesize firstButton, secondButton, fourthButton, thirdButton, fifthButton, flexSpace,titleView, myItems, searchBar;
 
 - (id)init{
     self = [super init];
     if (self) {
-        NSLog(@"Creating tool bar");
         self.frame = CGRectMake(0, 0, kScreenWidth, 50);
         [self setBarStyle:UIBarStyleBlackTranslucent];
         //[self setTintColor:[UIColor colorWithRed:0.34 green:0.36 blue:0.42 alpha:0.3]];
         [self setTag:0];
         
-        firstButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"save.png"] style:UIBarButtonItemStylePlain target:nil action:nil];
-        [self.firstButton setTitle:@"Save"];
-        [self.firstButton setWidth:40.0];
+        self.firstButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"clock_running.png"]style:UIBarButtonItemStylePlain target:nil action:nil];
+        [self.firstButton setTitle:@"Plan"];
         [self.firstButton setTag:1];
-        [self.firstButton setEnabled:NO];
+        [self.firstButton setWidth:40.0];
         [firstButton setAction:@selector(presentActionsPopover:)];
         
-        secondButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"clock_running.png"]style:UIBarButtonItemStylePlain target:nil action:nil];
-        [self.secondButton setTitle:@"Plan"];
-        [self.secondButton setTag:2];
+        self.secondButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"save.png"] style:UIBarButtonItemStylePlain target:nil action:nil];
+        [self.secondButton setTitle:@"Save"];
         [self.secondButton setWidth:40.0];
+        [self.secondButton setTag:2];
+        [self.secondButton setEnabled:NO];
         [secondButton setAction:@selector(presentActionsPopover:)];
         
         thirdButton = [[UIBarButtonItem alloc] initWithImage:self.flipperImageForDateNavigationItem style:UIBarButtonItemStylePlain target:nil action:nil];
@@ -63,7 +59,6 @@
 }
 
 - (void) changeToSchedulingButtons{
-  
     firstButton.image = [UIImage imageNamed:@"arrow_right_24.png"];
     firstButton.title = @"";
     firstButton.action = @selector(moveToNextField);
@@ -89,21 +84,22 @@
 }
 
 - (void) changeToEditingButtons{
-    firstButton.image = [UIImage imageNamed:@"save.png"];
-    [self.firstButton setTitle:@"Save"];
-    [self.firstButton setTag:1];
-    [firstButton setAction:@selector(presentActionsPopover:)];
-    
-    secondButton.image = [UIImage imageNamed:@"clock_running.png"];
-    [self.secondButton setTitle:@"Plan"];
+    secondButton.image = [UIImage imageNamed:@"save.png"];
+    [self.secondButton setTitle:@"Save"];
     [self.secondButton setTag:2];
     [secondButton setAction:@selector(presentActionsPopover:)];
-    [secondButton setEnabled:YES];
+    [secondButton setEnabled:NO];
+
+    firstButton.image = [UIImage imageNamed:@"clock_running.png"];
+    [self.firstButton setTitle:@"Plan"];
+    [self.firstButton setTag:1];
+    [firstButton setAction:@selector(presentActionsPopover:)];
     
     fourthButton.image = [UIImage imageNamed:@"email_white.png"];
     [self.fourthButton setTitle:@"Send"];
     [self.fourthButton setTag:4];
     [fourthButton setAction:@selector(presentActionsPopover:)];
+    [fourthButton setEnabled:NO];
     
     fifthButton.image = [UIImage imageNamed:@"keyboard_down.png"];
     [self.fifthButton setTitle:@"Drop"];
@@ -112,26 +108,68 @@
 }
 
 - (void) changeToDetailButtons{
-    firstButton.image = [UIImage imageNamed:@"save.png"];
-    [self.firstButton setTitle:@"Save"];
-    [firstButton setAction:@selector(presentActionsPopover:)];
+    firstButton.image = [UIImage imageNamed:@"tab_notepad.png"];
+    [self.firstButton setTitle:@"Write Now"];
+    [firstButton setAction:@selector(goToMain:)];
     
-    secondButton.image = [UIImage imageNamed:@"clock_running.png"];
-    [self.secondButton setTitle:@"Plan"];
+    secondButton.image = [UIImage imageNamed:@"save.png"];
+    [self.secondButton setTitle:@"Save"];
     [secondButton setAction:@selector(presentActionsPopover:)];
     [secondButton setEnabled:YES];
-    
+
     fourthButton.image = [UIImage imageNamed:@"email_white.png"];
     [self.fourthButton setTitle:@"Send"];
     [fourthButton setAction:@selector(presentActionsPopover:)];
-    
+    [fourthButton setEnabled:YES];
+    [self.fourthButton setTag:4];
+
     fifthButton = nil;
     fifthButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
     
-    
     myItems = [NSArray arrayWithObjects:flexSpace, firstButton, flexSpace, secondButton, flexSpace, thirdButton, flexSpace, fourthButton,flexSpace, fifthButton, flexSpace, nil];
     [self setItems:myItems];
+}
 
+
+- (void) changeToTopButtons: (NSString *)type {
+    
+    firstButton.image = [UIImage imageNamed:@"arrow_left_24.png"];
+    firstButton.title = nil;
+    firstButton.action = @selector(firstButtonAction:);
+    firstButton.tag = 1;
+
+    fifthButton.image = [UIImage imageNamed:@"arrow_right_24.png"];
+    fifthButton.title = nil;
+    fifthButton.action = @selector(fifthButtonAction:);
+    fifthButton.tag = 2;    
+    
+    if (type == @"title") {
+        
+        titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth-85, 40)];
+        [titleView setBackgroundColor:[UIColor clearColor]];
+        titleView.textColor = [UIColor whiteColor];
+        titleView.textAlignment = UITextAlignmentCenter;
+        titleView.font = [UIFont systemFontOfSize:20];
+        
+        thirdButton = [[UIBarButtonItem alloc] initWithCustomView:titleView];    
+        
+    }else if (type == @"search"){
+        firstButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:nil action:@selector(firstButtonAction:)];
+        fifthButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:@selector(fifthButtonAction:)];
+        
+        searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth-85, 40)];
+        searchBar.tintColor = [UIColor clearColor];
+        //[searchBar setTranslucent:YES];
+        searchBar.autocorrectionType = UITextAutocorrectionTypeNo;
+        
+        UIView *searchBarContainer = [[UIView alloc] initWithFrame:searchBar.frame];
+        searchBarContainer.backgroundColor = [UIColor clearColor];
+        [searchBarContainer addSubview:searchBar];
+        thirdButton = [[UIBarButtonItem alloc] initWithCustomView:searchBarContainer]; 
+    }
+    
+    myItems = [NSArray arrayWithObjects:firstButton, flexSpace, thirdButton, flexSpace, fifthButton, nil];
+    self.items = myItems;
 }
 
 
@@ -158,7 +196,6 @@
 	font = [UIFont boldSystemFontOfSize:8];
     stringSize = [[imageDateFormatter stringFromDate:[NSDate date]] sizeWithFont:font];
     point = CGPointMake((calendarRectangle.size.width-stringSize.width)/2,9);
-    NSLog(@"date is %@",[imageDateFormatter stringFromDate:[NSDate date]]);
 	[[imageDateFormatter stringFromDate:[NSDate date]] drawAtPoint:point withFont:font];
 	UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();

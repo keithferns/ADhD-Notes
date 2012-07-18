@@ -24,38 +24,27 @@
 @dynamic collection;
 @dynamic tags;
 
-
-
 #pragma mark Init Values for attributes
 
 - (void) awakeFromInsert{
     [super awakeFromInsert];
     
     [self setValue:[NSDate date] forKey:@"creationDate"];
-    [self setValue:[NSDate date] forKey:@"editDate"];
+    [self setValue:[[NSDate date] timelessDate] forKey:@"editDate"];
     
     //Set localTime for Creation Day as a string
-    
-    //NSTimeInterval timeZoneOffset = [[NSTimeZone localTimeZone] secondsFromGMT];
-    
+    //NSTimeInterval timeZoneOffset = [[NSTimeZone localTimeZone] secondsFromGMT];    
     //NSDate *localTime = [[NSDate date] dateByAddingTimeInterval:timeZoneOffset];
-    
     //NSCalendar * calendar = [NSCalendar currentCalendar];
     /*
     NSDateComponents *components = [calendar components:(NSYearCalendarUnit |NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:localTime];
-    
     NSString *localTimeString = [NSString stringWithFormat:@"%d", ([components year] * 1000000) + ([components month] *1000) + [components day]];    
-    */
-    
+    */    
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyyMMdd"];
     NSString *temp = [formatter stringFromDate:[NSDate date]];
     [self setValue:temp forKey:@"creationDay"];
-    
 
-    //FIXME:
-    
- 
 }
 
 #pragma mark Transient Properties

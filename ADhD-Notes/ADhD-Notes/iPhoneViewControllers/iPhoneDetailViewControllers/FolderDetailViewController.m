@@ -33,11 +33,8 @@
     
     self.title = theFolder.name;
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
  
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)viewDidUnload
@@ -60,8 +57,7 @@
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
     NSInteger numberofrows = [self.theFolder.items count];
     NSLog(@"FOLDERSDETAILVIEW Number of Rows = %d", numberofrows);
@@ -69,41 +65,91 @@
     return numberofrows;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CGFloat tfHeight;
     NSArray *tempArray = [theFolder.items allObjects];
+    Note *theNote = [tempArray objectAtIndex:indexPath.row];
+    CGSize size = [theNote.text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:CGSizeMake(300, 60) lineBreakMode:UILineBreakModeWordWrap];
+    tfHeight = MAX (size.height+27, 44);
+    NSLog (@"tfHeight = %f", tfHeight);
+    
+    return tfHeight;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    //NSArray *tempArray = [theFolder.items allObjects];
+    // Note *theNote = [tempArray objectAtIndex:indexPath.row];
+
     static NSString *CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        [cell.textLabel setTextColor:[UIColor whiteColor]];
+        cell.textLabel.numberOfLines = 0;
+        [cell.textLabel setFont:[UIFont boldSystemFontOfSize:14]];
         }
-    Note *theNote = [tempArray objectAtIndex:indexPath.row];
-    cell.textLabel.text = theNote.text;
-    [cell.textLabel setTextColor:[UIColor whiteColor]];
+    //cell.textLabel.text = theNote.text;
+    
+    [self configureCell:cell atIndexPath:indexPath];
+
     return cell;
 }
 
-/*
+- (void) configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath{
+    
+	static NSDateFormatter *dateFormatter = nil;
+	if (dateFormatter == nil) {
+		dateFormatter = [[NSDateFormatter alloc] init];
+		[dateFormatter setDateFormat:@"dd MMMM yyyy h:mm a"];
+        //[dateFormatter setDateFormat:@"EEEE, dd MMMM yyyy h:mm a"]; //This format gives the Day of Week, followed by date and time
+    }
+        NSArray *tempArray = [theFolder.items allObjects];
+        Note *theNote = [tempArray objectAtIndex:indexPath.row];
+    
+	if ([theNote.type intValue] == 0) {
+        cell.textLabel.text = [NSString stringWithFormat:@"%@", theNote.text];	
+		//[cell.detailTextLabel setText:[dateFormatter stringFromDate:theNote.creationDate]];
+         cell.imageView.image = [UIImage imageNamed:@"NotePad_nav.png"];
+    } 
+	else if ([theNote.type intValue] == 1){
+        [cell.textLabel setText:[NSString stringWithFormat:@"%@", theNote.text]];	
+		//[cell.detailTextLabel setText:[dateFormatter stringFromDate:theNote.creationDate]];
+        cell.imageView.image = [UIImage imageNamed:@"list_nav.png"];
+    }
+}
+
+
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return NO if you do not want the specified item to be editable.
     return YES;
 }
-*/
 
-/*
+
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
+        NSManagedObjectContext *context = theFolder.managedObjectContext;
+        NSArray *tempArray = [theFolder.items allObjects];
+
+        [context deleteObject:[tempArray objectAtIndex:indexPath.row]];
+        // Save the context.
+        NSError *error;
+        if (![context save:&error]) {
+            
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            abort();
+        }
+        
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }   
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
 }
-*/
 
 /*
 // Override to support rearranging the table view.

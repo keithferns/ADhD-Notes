@@ -12,7 +12,7 @@
     //
 }
 
-@property (nonatomic, retain) UITextField *textField;
+@property (nonatomic, retain) UITextView *textView;
 @property (nonatomic, retain) List *theList;
 @property (nonatomic, retain) Liststring *theString;
 

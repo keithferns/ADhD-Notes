@@ -16,14 +16,15 @@
 
 @property (nonatomic, retain) DiaryTableViewController *currentTableViewController;
 @property (nonatomic, retain) UITextView *textView;
+@property (nonatomic, retain) UILabel *dateLabel;
+@property NSInteger dateCounter;
+@property (nonatomic, retain) NSDate *selectedDate;
+
 @end
 
 @implementation DiaryViewController
 
-@synthesize currentTableViewController;
-@synthesize dateCounter;
-@synthesize datelabel;
-@synthesize calendarView, textView;
+@synthesize currentTableViewController, dateCounter, dateLabel, calendarView, textView, selectedDate;
 //@synthesize calendarDayTimelineView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -37,37 +38,61 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     dateCounter = 0;
-
+    
+    UIView *dateView = [[UIView alloc] initWithFrame:CGRectMake(0, 44, kScreenWidth, 35)];
+    dateView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:dateView];
+     
     NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
     [dateformatter setDateFormat:@"EEEE, MMMM dd"];
-    UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 0, 160, 35)];
     dateLabel.text = [dateformatter stringFromDate:[NSDate date]];
-    dateLabel.backgroundColor = [UIColor clearColor];
+    dateLabel.backgroundColor = [UIColor blackColor];
     dateLabel.textColor = [UIColor whiteColor];
     dateLabel.textAlignment = UITextAlignmentCenter;
-    self.navigationItem.titleView = dateLabel;
+    //self.navigationItem.titleView = dateLabel;
+    
+    [dateView addSubview:dateLabel];
+    
+    UIButton *leftArrow = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 35)];
+    [leftArrow setImage:[UIImage imageNamed:@"arrow_left_24.png"] forState:UIControlStateNormal];
+    leftArrow.tag = 1;
+    [leftArrow addTarget:self action:@selector(postSelectedDateNotification:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *rightArrow = [[UIButton alloc] initWithFrame:CGRectMake(276, 0, 44, 35)];
+    [rightArrow setImage:[UIImage imageNamed:@"arrow_right_24.png"] forState:UIControlStateNormal];
+    rightArrow.tag = 2;
+    [rightArrow addTarget:self action:@selector(postSelectedDateNotification:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [dateView addSubview:leftArrow];
+    [dateView addSubview:rightArrow];
     
     //Navigation Bar SetUP    
     
-    NSArray *items = [NSArray arrayWithObjects:@"Today", [UIImage imageNamed:@"Calendar-Month-30x30.png"], nil];
-    UISegmentedControl *diaryControl = [[UISegmentedControl alloc] initWithItems:items];
-    [diaryControl setSegmentedControlStyle:UISegmentedControlStyleBar];
-    [diaryControl setWidth:90 forSegmentAtIndex:0];
-    [diaryControl setWidth:90 forSegmentAtIndex:1];
-    [diaryControl setSelectedSegmentIndex:0];
-    [diaryControl addTarget:self action:@selector(toggleTodayCalendarView:)
-           forControlEvents:UIControlEventValueChanged];
-    
-    self.navigationItem.titleView = diaryControl;
+    self.navigationItem.title = @"Diary";
     
     self.navigationItem.leftBarButtonItem = [self.navigationController addLeftArrowButton];
     self.navigationItem.leftBarButtonItem.target = self;
     self.navigationItem.leftBarButtonItem.tag = 1;
-    
-    self.navigationItem.rightBarButtonItem = [self.navigationController addRightArrowButton];
+        
+    //UIBarButtonItem *rightArrowButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:nil action:@selector(toggleTodayCalendarView:)];
+    UIImage *rightImage = [UIImage imageNamed:@"Calendar-Month-30x30.png"];
+    UIButton *rightNavButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [rightNavButton setImage:rightImage forState:UIControlStateNormal];
+    [rightNavButton setImage:rightImage forState:UIControlStateHighlighted];
+    rightNavButton.frame = CGRectMake(0, 0, rightImage.size.width, rightImage.size.height);
+    rightNavButton.tag = 2;
+    [rightNavButton addTarget:self action:@selector(toggleTodayCalendarView:) forControlEvents:UIControlEventTouchUpInside];
+    rightNavButton.layer.cornerRadius = 4.0;
+    rightNavButton.layer.borderWidth = 1.0; 
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithCustomView:rightNavButton];
+    self.navigationItem.rightBarButtonItem = rightButton;
     self.navigationItem.rightBarButtonItem.tag = 2;
-    self.navigationItem.rightBarButtonItem.target = self;
-    /*
+
+    //self.navigationItem.rightBarButtonItem = [self.navigationController addRightArrowButton];
+    //self.navigationItem.rightBarButtonItem.target = self;
+     
+     /*
      scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-kNavBarHeight)];
      scrollView.contentSize = CGSizeMake( scrollView.frame.size.width * 3,scrollView.frame.size.height);
      scrollView.contentOffset = CGPointMake(0, 0);    
@@ -79,14 +104,11 @@
      // nextTableViewController = [[DiaryTableViewController alloc] init];     
      //[self.scrollView addSubview:nextTableViewController.tableView];
      */
-    
-  
-    
+        
     //[self.view addSubview:currentTableViewController.tableView];    
- 
     //[self.view addSubview:self.calendarDayTimelineView];
     
-    textView = [[UITextView alloc] initWithFrame:CGRectMake(0,44,320,420)];
+    textView = [[UITextView alloc] initWithFrame:CGRectMake(0,80,320,420)];
     [self.view addSubview:textView];
     [textView setTextColor:[UIColor whiteColor]];
     [self.textView setFont:[UIFont boldSystemFontOfSize:14]];
@@ -96,19 +118,24 @@
 
     textView.editable = NO;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotesArray:) name:@"GetNotesArrayNotification" object:nil];
-    
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotesArray:) name:@"GetNotesArrayNotification" object:nil];    
+    }
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
     currentTableViewController = [[DiaryTableViewController alloc] init];
     currentTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight, kScreenWidth, kScreenHeight-kNavBarHeight);
+}
 
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:YES];
+    currentTableViewController = nil;
 }
 
 -(void) handleNotesArray: (NSNotification *) notif{
     NSLog(@"GetNotesArrayNotification Received");
     NSArray *notesArray = [NSArray arrayWithArray:[notif object]];
     NSString *theString = @"";
-    NSLog (@"notes array count = %d", [notesArray count]);
     for (int i = 0; i < [notesArray count]; i++) {
         if ([[notesArray objectAtIndex:i] isKindOfClass:[Note class]]){
         Note *theNote  = [notesArray objectAtIndex:i];
@@ -118,34 +145,36 @@
         theString = [theString stringByAppendingString:temp];
         }
     }
-    NSLog(@"the string is %@", theString);
     textView.text = theString;    
 }
 - (void) toggleTodayCalendarView:(id) sender{
-    UISegmentedControl *segControl = (UISegmentedControl *)sender;
-    NSLog(@"DiaryViewController:toggleTodayCalendarView -> Segment %d touched", segControl.selectedSegmentIndex);
-    switch (segControl.selectedSegmentIndex) {
-		case 0:
+    switch ([sender tag]) {
+		case 1:
             NSLog(@"DiaryViewController:toggleTodayCalendarView -> Switching to Today View");
             dateCounter = 0;
-            [self postSelectedDateNotification:nil];            
+            selectedDate = [[NSDate date] timelessDate];
+            [self postSelectedDateNotification:nil];
             [self moveCalendarDown];
 			break;
-        case 1:
-            NSLog(@"DiaryViewController:toggleTodayCalendarView  -> Switching to Calendar View");	            
-            if (calendarView == nil) {
-                calendarView = 	[[TKCalendarMonthView alloc] init];        
-                calendarView.delegate = self;
-                [self.view addSubview:calendarView];
-                [calendarView reload];
-                calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
-                //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-                [UIView beginAnimations:nil context:nil];
-                [UIView setAnimationDuration:0.5];
-                [UIView setAnimationDelegate:self];                
-                calendarView.frame = CGRectMake(0, kNavBarHeight, calendarView.frame.size.width, calendarView.frame.size.height);
-                [UIView commitAnimations];
-            }
+        case 2:
+            NSLog(@"DiaryViewController:toggleTodayCalendarView  -> Switching to Calendar View");	       
+            if (calendarView.superview == nil) {
+                if (calendarView == nil) {
+                    calendarView = 	[[TKCalendarMonthView alloc] init];
+                    }
+                    calendarView.delegate = self;
+                    [self.view addSubview:calendarView];
+                    [calendarView reload];
+                    calendarView.frame = CGRectMake(0, -calendarView.frame.size.height, calendarView.frame.size.width, calendarView.frame.size.height);
+                    //calendarView.frame = CGRectMake(0, kScreenHeight, calendarView.frame.size.width, calendarView.frame.size.height);
+                    [UIView beginAnimations:nil context:nil];
+                    [UIView setAnimationDuration:0.5];
+                    [UIView setAnimationDelegate:self];                
+                    calendarView.frame = CGRectMake(0, kNavBarHeight, calendarView.frame.size.width, calendarView.frame.size.height);
+                    [UIView commitAnimations];
+                }else {
+                    [self moveCalendarDown];
+                }
             break;
 	}
 }
@@ -172,6 +201,8 @@
 - (void)calendarMonthView:(TKCalendarMonthView *)monthView didSelectDate:(NSDate *)d {
 	NSLog(@"calendarMonthView didSelectDate: %@", d);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetDateNotification" object:d userInfo:nil]; 
+    selectedDate = d;
+    [self postSelectedDateNotification:nil];
     [self moveCalendarDown];
 }
 
@@ -199,14 +230,14 @@
     NSDate *currentDate= [[NSDate date] timelessDate];    
     NSDateComponents *addDay = [[NSDateComponents alloc] init];
     addDay.day = dateCounter;
+    if (sender != nil) {
     
-    NSDate *selectedDate = [gregorian dateByAddingComponents:addDay toDate:currentDate options:0];
-    
+    selectedDate = [gregorian dateByAddingComponents:addDay toDate:currentDate options:0];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetSelectedDateNotification" object:selectedDate userInfo:nil];   
     
-    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
+    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];    
     [dateformatter setDateFormat:@"EEEE, MMMM dd"];
-    UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
     dateLabel.text = [dateformatter stringFromDate:selectedDate];
     dateLabel.backgroundColor = [UIColor clearColor];
     dateLabel.textColor = [UIColor whiteColor];
@@ -247,9 +278,8 @@
 - (void)viewDidUnload{
     [super viewDidUnload];
     currentTableViewController  = nil;
-    datelabel = nil;
+    dateLabel = nil;
     calendarView = nil;
-    // Release any retained subviews of the main view.
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
