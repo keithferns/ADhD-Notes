@@ -26,11 +26,6 @@
     if (toolbar == nil) {
         toolbar = [[CustomToolBar alloc] init];
         toolbar.frame = CGRectMake(0, kScreenHeight-kTabBarHeight, kScreenWidth, 50);     
-        [toolbar.firstButton setTarget:self];
-        [toolbar.secondButton setTarget:self];
-        [toolbar.thirdButton setTarget:self];
-        [toolbar.fourthButton setTarget:self];
-        [toolbar.fifthButton setTarget:self];
         [toolbar changeToDetailButtons];
         toolbar.firstButton.enabled = YES;
         toolbar.secondButton.enabled = YES;
@@ -109,7 +104,6 @@
         return;
     }    
 }
-
 
 - (void) deleteSimpleNote {
     UIView *actionView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 320, 240)];

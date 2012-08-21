@@ -11,12 +11,13 @@
 #import "CalendarViewController.h"
 #import "ArchiveViewController.h"
 #import "TodayTableViewController.h"
-#import "ToDoDetailViewController.h"
-#import "AppointmentDetailViewController.h"
-#import "MemoDetailViewController.h"
-#import "ListViewController.h"
 #import "MailComposerViewController.h"
 #import "CustomPopoverView.h"
+#import "ListViewAndTableViewController.h"
+#import "NotesViewController.h"
+#import "EventsTableViewController2.h"
+#import "FilesTableViewController.h"
+#import "CustomTopToolbarView.h"
 
 @interface WriteNowViewController ()
 
@@ -31,19 +32,35 @@
 @property (nonatomic, retain) UISegmentedControl *segmentedControl;
 @property (nonatomic, retain) UITableView *listTableView;
 @property (nonatomic, retain) TodayTableViewController *todayTableViewController;
+@property (nonatomic, retain) EventsTableViewController2 *listTableViewController;
+@property (nonatomic, retain) FilesTableViewController *filesTableViewController;
 @property (nonatomic, readwrite) BOOL saving;
+@property (nonatomic, retain) CustomTopToolbarView *topToolbarView;
 @end
 
 @implementation WriteNowViewController
 
 @synthesize textView, topView, bottomView, toolbar, actionsPopover, textField;
 @synthesize listTableView,todayTableViewController, theItem, managedObjectContext, calendarView, segmentedControl, saving;
+@synthesize listTableViewController, filesTableViewController;
+@synthesize topToolbarView;
 
 #pragma mark - View Management
 
 - (void)viewDidUnload {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
+    self.textView = nil;
+    self.topView = nil;
+    self.bottomView = nil;
+    self.toolbar = nil;
+    self.actionsPopover = nil;
+    self.textField = nil;
+    self.listTableView = nil;
+    self.todayTableViewController = nil;
+    self.theItem = nil;
+    self.managedObjectContext = nil;
+    self.calendarView = nil;
+    self.segmentedControl = nil;
 }
 
 - (void)viewDidLoad{
@@ -108,7 +125,7 @@
         self.textView.bounces = NO;
         UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
         [self.textView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
-    }    
+    }              
     if (textField == nil) {
         textField = [[UITextField alloc] initWithFrame: CGRectMake (320,0,310,45)];
         textField.textColor = [UIColor whiteColor];
@@ -132,6 +149,7 @@
         listTableView.tag = 1;
         listTableView.backgroundColor = [UIColor blackColor];
         listTableView.separatorColor = [UIColor blackColor];
+        listTableView.allowsSelection = NO;
         listTableView.delegate = self;
         listTableView.dataSource = self;
                 
@@ -139,6 +157,7 @@
         [self.bottomView addSubview:todayTableViewController.tableView];
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleStartNewItemNotification:) name:@"StartNewItemNotification" object:nil];    
+    
     
     UISwipeGestureRecognizer *leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipeLeft:)];
     leftSwipe.direction = UISwipeGestureRecognizerDirectionLeft;
@@ -149,9 +168,9 @@
     [self.textView addGestureRecognizer:downSwipe];
     
     if (!theItem) {
-        NSLog(@"Creating New Item");
         [self createNewItem:nil];
     }
+    
 }
 
 -(void)didSwipeLeft:(UISwipeGestureRecognizer *)recognizer {
@@ -174,18 +193,43 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:UITableViewSelectionDidChangeNotification object:nil];    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleListSelection:) name:@"ListSelectedNotification" object:nil];    
+
+    
     [self.actionsPopover dismissPopoverAnimated:YES];
     self.actionsPopover = nil;
     self.navigationItem.backBarButtonItem = nil;
-    self.saving = NO;
+    self.saving = NO;    
+}
+
+- (void) viewDidAppear:(BOOL)animated{
+    NSLog(@"WRITENOWVIEWCONTROLLER: viewWillAppear");
+
+    [super viewDidAppear:animated];
+    if (theItem.saved) {
+        self.theItem = nil;
+        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = nil;
+        self.textView.text = nil;
+        [self toggleNoteListView];
+    } else if (!theItem.saved && [theItem.type intValue] ==2){
+        [self saveItem:nil];
+        NSLog(@"theItem.aDate = %@, theItem.startTime = %@, theItem.endTime = %@", theItem.aDate, theItem.startTime, theItem.endTime);
+
+    }    
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
+    NSLog(@"WRITENOWVIEWCONTROLLER: viewWillDisappear");
     [super viewWillDisappear:animated];
-
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UIKeyboardWillHideNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ListSelectedNotification" object:nil];
+    
     [self.actionsPopover dismissPopoverAnimated:YES];
     self.actionsPopover = nil;
 }
@@ -206,6 +250,7 @@
             [UIView beginAnimations:nil context:nil];
             [UIView setAnimationDelegate:self];
             [UIView setAnimationDuration:0.5];
+            [UIView setAnimationDidStopSelector:@selector(removeViews)];
             UIImage *patternImage = [UIImage imageNamed:@"54700.png"];
             [topView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
             CGRect frame = textView.frame;
@@ -213,14 +258,13 @@
             textView.frame = frame;
             textField.frame = CGRectMake (320,0,310,45);
             listTableView.frame = CGRectMake (320,50,310,topView.frame.size.height-50);
-
+            
             [UIView commitAnimations];
             
             if (![textView hasText]) {
                 self.navigationItem.leftBarButtonItem = nil;
                 self.navigationItem.rightBarButtonItem = nil;
-            }
-             //[textField removeFromSuperview];
+                }
                 }
             break;
         case 1: {
@@ -231,11 +275,13 @@
                 [topView addSubview:textField];
                 [textField becomeFirstResponder];
                 [topView addSubview: listTableView];
+                [self.listTableView reloadData];
             }            
             [UIView beginAnimations:nil context:nil];
             [UIView setAnimationDelegate:self];
             [UIView setAnimationDuration:0.5];
-            
+            [UIView setAnimationDidStopSelector:@selector(removeViews)];
+
             [topView.layer setBackgroundColor:[UIColor blackColor].CGColor];
             CGRect frame = textView.frame;
             frame.origin.x = -320.0;
@@ -248,9 +294,34 @@
     }
 }
 
+- (void) removeView {
+    switch (segmentedControl.selectedSegmentIndex) {
+        case 0:
+            [self.listTableView removeFromSuperview];
+            [self.textField removeFromSuperview];
+            break;
+        case 1:
+            [self.textView removeFromSuperview];
+            break;
+        default:
+            break;
+    }
+}
+
 #pragma mark - TextField Delegate Actions
 
 -(BOOL) textFieldShouldReturn:(UITextField*) textField {
+    if (!self.listTableView) {
+        listTableView = [[UITableView alloc] initWithFrame:CGRectMake (320,50,310,topView.frame.size.height-50)];
+        listTableView.rowHeight = 33.0;
+        listTableView.tag = 1;
+        listTableView.backgroundColor = [UIColor blackColor];
+        listTableView.separatorColor = [UIColor blackColor];
+        listTableView.delegate = self;
+        listTableView.dataSource = self;
+        [self.topView addSubview:listTableView];
+    }
+    
     if (self.navigationItem.leftBarButtonItem == nil) {
         self.navigationItem.rightBarButtonItem = [self.navigationController addDoneButton];
         self.navigationItem.rightBarButtonItem.action = @selector(saveItem:);
@@ -260,7 +331,6 @@
         self.navigationItem.leftBarButtonItem.target = self;    
         self.navigationItem.leftBarButtonItem.tag = 0;
     }
-       
     if (theItem == nil) {
         [self createNewItem:nil];
     }
@@ -275,9 +345,7 @@
         }
     
     self.textField.text = nil;
-
     [listTableView reloadData];
-
     return YES;
 }
 
@@ -392,26 +460,24 @@
     if ([actionsPopover isPopoverVisible]){
         [actionsPopover dismissPopoverAnimated:YES];   
     }
-    MailComposerViewController *detailViewController = [[MailComposerViewController alloc] init];
+    MailComposerViewController *sendViewController = [[MailComposerViewController alloc] init];
     if([sender tag] == 6){
-        detailViewController.sendType = [NSNumber numberWithInt:1];
+        sendViewController.sendType = [NSNumber numberWithInt:1];
     } else if ([sender tag] == 7){
-        detailViewController.sendType = [NSNumber numberWithInt:2];
+        sendViewController.sendType = [NSNumber numberWithInt:2];
     }
-    detailViewController.theText = self.textView.text;
-    [self.navigationController pushViewController: detailViewController animated:YES];
+    sendViewController.theText = self.textView.text;
+    [self.navigationController pushViewController: sendViewController animated:YES];
 }
 
 #pragma mark - Data Management
 
 - (void) createNewItem: (id) sender {
-    if (!theItem) {
-        NSLog(@"Creating New Item");
+        NSLog(@"WRITENOWVIEWCONTROLLER: createNewItem");
         NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];    
         [moc setPersistentStoreCoordinator:[self.managedObjectContext persistentStoreCoordinator]];
         theItem = [[NewItemOrEvent alloc] init];
         theItem.addingContext = moc; 
-        }
         if (segmentedControl.selectedSegmentIndex == 0) {
             theItem.type = [NSNumber numberWithInt:0];
             if ([self.textView isFirstResponder] && ![self.textView hasText] ){
@@ -422,84 +488,86 @@
         }else if (segmentedControl.selectedSegmentIndex == 1){
             theItem.listArray = [[NSArray alloc] init];
             theItem.type = [NSNumber numberWithInt:1];
-        } 
+    } 
 }
 
 - (void) saveItem: (id) sender {
     NSLog (@"The Item Type is %d", [theItem.type intValue]);
     if (!theItem) {
         [self createNewItem:nil];
-    }
-    switch ([theItem.type intValue]) {
-        case 0:
-            if (!saving) {
-                NSLog (@"Creating New SimpleNote");
-
+        }
+    if (!saving) {
+        switch ([theItem.type intValue]) {
+            case 0:{
                 theItem.text = self.textView.text;
                 [theItem createNewSimpleNote];
-                
-                self.textView.text = nil;
+                self.textView.text = nil;                
+                NotesViewController *notesAppointmentsViewController = [[NotesViewController alloc] init];
+                theItem.saved = YES;
+                notesAppointmentsViewController.theItem = theItem;
+                notesAppointmentsViewController.saving = NO;
+                notesAppointmentsViewController.hidesBottomBarWhenPushed = YES;
                 [self.textView resignFirstResponder];
-
-                MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
-                detailViewController.theSimpleNote = self.theItem.theSimpleNote;
-                detailViewController.saving = YES;
-                detailViewController.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:detailViewController animated:YES];
-                
-            }
-            break;
-        case 1:
-            if (!saving) {
-                NSLog(@"Creating new LIST");
+                [self.navigationController pushViewController:notesAppointmentsViewController animated:YES]; 
+                    }
+                break;
+            case 1:{
                 if (!theItem || [self.textField hasText]) {
                     //CASE: user types in textbox, does not RETURN but calls up Archive popover and touches Folder or Document button.
                     [self createNewItem:nil];
                     if (![self.textField.text isEqualToString:@""]){
-                        theItem.listArray = [theItem.listArray arrayByAddingObject:self.textField.text];
+                    theItem.listArray = [theItem.listArray arrayByAddingObject:self.textField.text];
                     }       
                 }
                 [theItem createNewList];
+                [theItem saveNewItem];
+                ListViewAndTableViewController *listC = [[ListViewAndTableViewController alloc] init];
+                theItem.saved = YES;
+                listC.theItem = theItem;
+                listC.saving = NO;
+                listC.appending = NO;
+                listC.hidesBottomBarWhenPushed = YES;
+                
+                [self.navigationController pushViewController:listC animated:YES];    
                 
                 self.textField.userInteractionEnabled = YES;
                 [self.textField resignFirstResponder];
-                [listTableView removeFromSuperview];
-                listTableView = nil;
-                                
-                ListViewController *detailViewController = [[ListViewController alloc] init];            
-                detailViewController.theItem = self.theItem;
-                detailViewController.theList =self.theItem.theList;
-                detailViewController.saving = NO;
-                detailViewController.hidesBottomBarWhenPushed = YES;
-
-                [self.navigationController pushViewController:detailViewController animated:YES];
+                [self.textField removeFromSuperview];
+                [self.listTableView removeFromSuperview];
+                }
+                break;
+            case 2:{
+                theItem.text = self.textView.text;
+                [theItem createNewAppointment];
+                
+                NotesViewController *notesAppointmentsViewController = [[NotesViewController alloc] init];
+                theItem.saved = YES;
+                notesAppointmentsViewController.theItem = theItem;
+                notesAppointmentsViewController.saving = NO;
+                notesAppointmentsViewController.hidesBottomBarWhenPushed = YES;
+                [self.textView resignFirstResponder];
+                [self.navigationController pushViewController:notesAppointmentsViewController animated:YES]; 
+                    }
+                break;
+            case 3:{
+                [theItem createNewToDo];
+                ListViewAndTableViewController *listC = [[ListViewAndTableViewController alloc] init];
+                theItem.saved = YES;
+                listC.theItem = theItem;
+                listC.saving = NO;
+                listC.appending = NO;
+                listC.hidesBottomBarWhenPushed = YES;
+                [self.textView resignFirstResponder];
+                [self.navigationController pushViewController:listC animated:YES]; 
+                    }
+                break;
+            default:
+                break;
             }
-            break;
-        case 2:
-            [theItem createNewAppointment];
-            if (!saving) {
-                AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
-                detailViewController.theItem = self.theItem;
-                detailViewController.saving = YES;
-                detailViewController.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:detailViewController animated:YES];
-            }
-            break;
-        case 3:
-            [theItem createNewToDo];
-            if (!saving) {
-            ToDoDetailViewController *detailViewController =[[ToDoDetailViewController alloc] initWithStyle:UITableViewStylePlain];            
-            detailViewController.theItem = self.theItem;
-            detailViewController.saving = YES;
-            detailViewController.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:detailViewController animated:YES];     
-            }
-            break;
-        default:
-            break;
+        [theItem saveNewItem];
+        theItem.saved = YES;
+        
     }
-    [theItem saveNewItem];
-    
 }
 
 - (void) createEvent: (id) sender {
@@ -527,21 +595,26 @@
     [self.navigationController pushViewController:scheduleViewController animated:YES];
 }
 
-- (void) presentArchiver: (id) sender { 
-    //called by toolbar popover Folder or Document Buttons. 
-    self.saving = YES;
+- (void) handleEventCreatedNotification:(NSNotification *) notification{
+    sleep(1.0);
+    
+        theItem.text = self.textView.text;
+        [theItem createNewAppointment];
+        
+        NotesViewController *notesAppointmentsViewController = [[NotesViewController alloc] init];
+        theItem.saved = YES;
+        notesAppointmentsViewController.theItem = theItem;
+        notesAppointmentsViewController.saving = NO;
+        notesAppointmentsViewController.hidesBottomBarWhenPushed = YES;
+        [self.textView resignFirstResponder];
+        [self.navigationController pushViewController:notesAppointmentsViewController animated:YES]; 
+}
+
+- (void) willSaveToFolderOrProject: (id) sender{
     if ([actionsPopover isPopoverVisible]){
         [actionsPopover dismissPopoverAnimated:YES];   
     }
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:nil action:nil];
-    [backButton setTintColor:[UIColor redColor]];
-    [backButton setAction:@selector(cancelSaving:)];
-    self.navigationItem.backBarButtonItem = backButton;
-
-    if (!theItem) {
-        [self createNewItem:nil];
-    }
-    
+    if (!theItem) { [self createNewItem:nil]; }
     if (segmentedControl.selectedSegmentIndex == 0) {
         theItem.text = self.textView.text;
     }else if (segmentedControl.selectedSegmentIndex == 1){
@@ -553,83 +626,198 @@
             }       
         }
     }
-
-    ArchiveViewController *archiveViewController = [[ArchiveViewController alloc] init];
+    if ([sender tag] == 4) {
+        theItem.appendType = [NSNumber numberWithInt:4];        
+    } else if ([sender tag] == 6){
+        theItem.appendType = [NSNumber numberWithInt:6];
+    }
+    
+    ArchiveViewController *archiveViewController= [[ArchiveViewController alloc] init];
+    archiveViewController.theItem = self.theItem;
     archiveViewController.hidesBottomBarWhenPushed = YES;
     archiveViewController.saving = YES;
-    archiveViewController.theItem = self.theItem;
-    
-    if ([sender tag] == 5) {
-        archiveViewController.appending = YES;
-        archiveViewController.archivingControl.selectedSegmentIndex = 1;
-    }else if ([sender tag] == 3){
-        archiveViewController.appending = NO;
-        archiveViewController.archivingControl.selectedSegmentIndex = 0;
-    }
+    archiveViewController.appending = NO;
     [self.navigationController pushViewController:archiveViewController animated:YES];
 }
 
-- (void) appendToList: (id) sender{
-    if ([actionsPopover isPopoverVisible]){
-        [actionsPopover dismissPopoverAnimated:YES];   
-    }
-    ListViewController *detailViewController = [[ListViewController alloc] init]; 
-    
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:nil action:nil];
-    [backButton setTintColor:[UIColor redColor]];
-    [backButton setAction:@selector(cancelSaving:)];
-    self.navigationItem.backBarButtonItem = backButton;
- 
-    if (segmentedControl.selectedSegmentIndex == 0) {
-        if (!theItem) {
-            [self createNewItem:nil];
-        }
-        if (![self.textView.text isEqualToString:@""]){
-            /*
-            if (theItem.listArray == nil){
-                theItem.listArray = [[NSArray alloc] init];
-            }
-            theItem.listArray = [theItem.listArray arrayByAddingObject:self.textView.text];
-             */
-            theItem.text = self.textView.text;
+#pragma mark - Append to List or Document
 
-            [self.textView resignFirstResponder];
+- (void) willAppendToListOrDocument: (id) sender{
+    NSLog(@"WRITENOWVIEWCONTROLLER: willAppendToListOrDocument");
+    if ([actionsPopover isPopoverVisible]){
+        [actionsPopover dismissPopoverAnimated:YES]; }    
+    [self dismissKeyboard];
+    if (!theItem) { [self createNewItem:nil];}
+    topToolbarView = [[CustomTopToolbarView alloc] init];
+    [self.view addSubview:topToolbarView];
+    [self.topToolbarView setAppendOrSave:@"search"];
+    
+    [self.navigationItem setHidesBackButton:YES animated:NO];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelSaving:)];
+    self.navigationItem.leftBarButtonItem = cancelButton;
+    self.navigationItem.rightBarButtonItem =nil;
+    
+    if ([theItem.appendType intValue] == 1 || [sender tag] == 1) {       
+        NSLog(@"Appending to LIST");
+    listTableViewController = [[EventsTableViewController2 alloc]init];
+        if ([sender tag] == 1) {
+            listTableViewController.tableView.frame = CGRectMake(kScreenWidth, kNavBarHeight+40, kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-44);
+        }else {
+            listTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight+40, kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-40);
         }
+        [listTableViewController.tableView setSeparatorColor:[UIColor blackColor]];
+        [listTableViewController.tableView setSectionHeaderHeight:13];
+        listTableViewController.tableView.rowHeight = kCellHeight;        
+        
+        NSNumber *num = [NSNumber numberWithInt:1];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"GetEventTypeNotification" object:num userInfo:nil];
+        [self.view addSubview:listTableViewController.tableView];     
+    }else if ([theItem.appendType intValue] == 5 || [sender tag] == 5){
+        NSLog(@"Appending to DOC");
+        filesTableViewController =  [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
+        filesTableViewController.theItem = self.theItem;
+        filesTableViewController.saving = YES;
+        filesTableViewController.tableView.rowHeight = 50.0;
+        filesTableViewController.tableView.frame = CGRectMake(kScreenHeight, kNavBarHeight+44,kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-44);
+        filesTableViewController.tableView.tag = 13;
+        filesTableViewController.managedObjectContext = theItem.addingContext;
+        [self.view addSubview:filesTableViewController.tableView];
+        [topToolbarView.searchBar setPlaceholder:@"Search for Document"];
+        topToolbarView.searchBar.delegate = filesTableViewController;
     }
-    else if (segmentedControl.selectedSegmentIndex == 1){
-        if (!theItem || [self.textField hasText]) {
-            //CASE: user types in textbox, does not RETURN but calls up Archive popover and touches Folder or Document button.
-            [self createNewItem:nil];
-            if (![self.textField.text isEqualToString:@""]){
-                //FIXME
-                theItem.listArray = [theItem.listArray arrayByAddingObject:self.textField.text];
-            }       
-        }
-        detailViewController.theList = self.theItem.theList;
-        [self.textField resignFirstResponder];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDuration:0.5];
+    if ([theItem.appendType intValue] == 1 || [sender tag] == 1) {    
+        listTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight+44, kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-44);
+        NSLog(@"Moving TableView into View");
+    }else if ([theItem.appendType intValue] == 5 || [sender tag] == 5){
+        [[self.view viewWithTag:13] setFrame: CGRectMake(0, kNavBarHeight+44, kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-44)];
     }
-    detailViewController.theItem = self.theItem;
-    detailViewController.saving = YES;
-    detailViewController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:detailViewController animated:YES];
+    [UIView commitAnimations];    
 }
+
+
+
+- (void) handleListSelection: (NSNotification *) notification{ 
+    NSLog(@"WRITENOWVIEWCONTROLLER:handleListSelection -> ListSelectedNotification Received");    
+    
+    theItem.theList = [notification object];
+
+    theItem.theList.editDate = [[NSDate date] timelessDate];
+    theItem.saved = NO;
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(chooseList:)]; 
+    
+}
+
+
+- (void) cancelAppending:(id) sender{ 
+    NSLog(@"WRITENOWVIEWCONTROLLER: cancelAppending");
+    // Called by the Cancel Button over the ListsTableView (EventsTableViewController2)
+    if (theItem.saved == NO) {
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+    
+    self.navigationItem.leftBarButtonItem = nil;
+    [self.navigationItem setHidesBackButton:NO animated:YES];
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItem.target = self;
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDidStopSelector:@selector(removeViews)];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDuration:0.5];
+    
+    listTableViewController.tableView.frame=CGRectMake(kScreenWidth, kNavBarHeight+44, kScreenWidth, kScreenHeight-kNavBarHeight-kTabBarHeight-44);
+    
+    [UIView commitAnimations];        
+}
+
+
+- (void) chooseList:(id)sender{
+    // Called by the Done Button over the ListsTableView (EventsTableViewController2)    
+    switch (segmentedControl.selectedSegmentIndex) {
+        case 0:
+            [self.textView resignFirstResponder];
+            theItem.addingContext = theItem.theList.managedObjectContext;
+            [theItem createNewListString:theItem.text];
+            theItem.theString.order = [NSNumber numberWithInt:[theItem.theList.aStrings count]];            
+            break;
+        case 1:
+            {
+            [self.textField resignFirstResponder]; 
+
+            if (![textField.text isEqualToString:@""]){
+                if (!theItem.listArray){
+                //CASE: user types in textbox, does not RETURN but calls up Archive popover and touches Folder or Document button.
+                    theItem.listArray = [[NSArray alloc] init];
+                }  
+                //add the textField.text to the listArray
+                theItem.listArray = [theItem.listArray arrayByAddingObject:self.textField.text];
+            }
+            theItem.addingContext = theItem.theList.managedObjectContext;
+            NSArray *tempArray = [[NSArray alloc] init];
+            for (int i = 0; i<[theItem.listArray count]; i++) {
+                [theItem createNewListString:[theItem.listArray objectAtIndex:i]];
+                theItem.theString.order = [NSNumber numberWithInt:[theItem.theList.aStrings count]];
+                tempArray = [tempArray arrayByAddingObject:theItem.theString];
+                    //theItem.theList.aStrings = [theItem.theList.aStrings setByAddingObject:theItem.theString];
+                }
+                tempArray = [tempArray arrayByAddingObjectsFromArray:[theItem.theList.aStrings allObjects]];
+            }
+            break;
+        default:
+            break;
+        }    
+        switch ([sender tag]) {
+            case 1:
+            {theItem.appendType = [NSNumber numberWithInt:1];   
+                ListViewAndTableViewController *listC = [[ListViewAndTableViewController alloc] init];
+                listC.theItem = self.theItem;
+                listC.saving = YES;
+                listC.appending = YES;
+                listC.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:listC animated:YES];}
+                
+                break;
+            case 5:
+            {theItem.appendType = [NSNumber numberWithInt:5];
+                ArchiveViewController *archiveViewController = [[ArchiveViewController alloc] init]; 
+                archiveViewController.theItem = self.theItem;
+                NSLog(@"Appending: theItem.text is %@", self.theItem.text);
+                archiveViewController.saving = YES;
+                archiveViewController.appending = YES;
+                archiveViewController.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:archiveViewController animated:YES];}                
+                break;    
+            default:
+                break;
+        }
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveAppended)];    
+}
+
+
+#pragma  mark - START NEW ITEM
+
 
 - (void) handleStartNewItemNotification: (NSNotification *) notification {
     if (segmentedControl.selectedSegmentIndex == 0) {
-        NSLog(@"WriteNowViewController: handleStartNewItemNotification received -> SegControlIndex = 0");
-        //if ([self.textView hasText]) {
-        //    NSLog (@"TEXTVIEW HAS TEXT");    
             [self startNewItem:nil];
             [self.textView resignFirstResponder];
-        //}
-        self.textView.text = nil;
-        [self.textView setEditable:YES];
+            self.textView.text = nil;
+            [self.textView setEditable:YES];
     } else if (segmentedControl.selectedSegmentIndex == 1){
-        NSLog(@"WriteNowViewController: handleStartNewItemNotification -> SegControlIndex = 1");
         [self startNewItem:nil];
         textField.text = nil;
         [self.textField resignFirstResponder];
     } 
+    
+    CGRect frame = self.bottomView.frame;
+    frame.origin.y = kBottomViewRect.origin.y;
+    self.bottomView.frame = frame;
+
     /*
     NSDictionary *theDict = [notification userInfo];
     NSManagedObjectContext *addingContext = [[NSManagedObjectContext alloc] init];    
@@ -642,19 +830,14 @@
 }
 
 - (void) startNewItem: (id) sender{
-    NSLog(@"Call Start New Item");
        if (theItem == nil && sender != nil) {
-           NSLog (@"STARTNEWITEM: SAVING ITEM");
            [self saveItem:nil];
         }
         //clear the current instance of theItem
         if (segmentedControl.selectedSegmentIndex == 0) {
             self.textView.text = nil;
             [self.textView setEditable:YES];
-            if ([sender tag] == 0) {
-                [self.textView becomeFirstResponder];
-                }
-            }
+        }
         else if (segmentedControl.selectedSegmentIndex == 1){
             self.textField.text =nil;
             if (listTableView == nil){
@@ -674,7 +857,6 @@
             }
     }
     self.theItem = nil;
-    NSLog(@"Starting New Item");
     //remove the nav Buttons
     self.navigationItem.leftBarButtonItem = nil;
     self.navigationItem.rightBarButtonItem = nil;
@@ -834,46 +1016,55 @@
 #pragma mark - Details
 - (void) handleTableRowSelection:(NSNotification *) notification {
     NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
-
+    [selectedItem initWithObject:[notification object]];
+    
     if ([[notification object] isKindOfClass:[Appointment class]]) {
-        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];
-        Appointment *selectedAppointment = [notification object];
-        selectedItem.theAppointment = selectedAppointment;
+        NotesViewController *notesAppointmentsViewController = [[NotesViewController alloc] init];
+        selectedItem.theAppointment = [notification object];
+        
         selectedItem.type = [NSNumber numberWithInt:2];
-        detailViewController.theItem = selectedItem;
-        detailViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:detailViewController animated:YES];
+        selectedItem.text = selectedItem.theAppointment.text;
+        selectedItem.aDate = selectedItem.theAppointment.aDate;
+        notesAppointmentsViewController.theItem = selectedItem;
+        notesAppointmentsViewController.hidesBottomBarWhenPushed = YES;
+        
+        [self.navigationController pushViewController:notesAppointmentsViewController animated:YES];
         return;
     } else if ([[notification object] isKindOfClass:[ToDo class]]){
-        ToDoDetailViewController *detailViewController = [[ToDoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
-        ToDo *selectedToDo = [notification object];
-        selectedItem.theToDo = selectedToDo;
+        ListViewAndTableViewController *listToDoViewController = [[ListViewAndTableViewController alloc] init];
+        selectedItem.theToDo = [notification object];
         selectedItem.type = [NSNumber numberWithInt:3];
-        detailViewController.theItem = selectedItem;
-        detailViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:detailViewController animated:YES];
+        selectedItem.text = selectedItem.theToDo.text;
+        selectedItem.aDate = selectedItem.theToDo.aDate;
+        selectedItem.startTime = selectedItem.theAppointment.startTime;
+        selectedItem.endTime = selectedItem.theAppointment.endTime;
+        listToDoViewController.theItem = selectedItem;
+        listToDoViewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:listToDoViewController animated:YES];
         return;
     }
     else if ([[notification object] isKindOfClass:[SimpleNote class]]){
-        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
-        SimpleNote *selectedMemo = [notification object];
-        selectedItem.theSimpleNote = selectedMemo;
+        NotesViewController *notesAppointmentsViewController = [[NotesViewController alloc] init];
+        selectedItem.theSimpleNote = [notification object];
         selectedItem.type = [NSNumber numberWithInt:0];
-        selectedItem.text = selectedMemo.text;
-        detailViewController.theItem = selectedItem;
-        detailViewController.theSimpleNote = selectedItem.theSimpleNote;
-        detailViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:detailViewController animated:YES];
+        selectedItem.text = selectedItem.theSimpleNote.text;
+        notesAppointmentsViewController.theItem = selectedItem;
+        notesAppointmentsViewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:notesAppointmentsViewController animated:YES];
         return;
     }else if ([[notification object] isKindOfClass:[List class]]){
-        ListViewController *detailViewController = [[ListViewController alloc] init];  
-        List *selectedList = [notification object];
-        selectedItem.theList = selectedList;
-        selectedItem.type = [NSNumber numberWithInt:1];
-        detailViewController.theList = selectedItem.theList;
-        detailViewController.theItem = selectedItem;
-        detailViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:detailViewController animated:YES];
+        
+        //detailViewController = [[DetailContainerViewController alloc] init];
+        ListViewAndTableViewController *listC = [[ListViewAndTableViewController alloc] init];
+        selectedItem.theList = [notification object];
+        //selectedItem.type = [NSNumber numberWithInt:1];
+        listC.theItem = selectedItem;
+        listC.hidesBottomBarWhenPushed = YES;
+        listC.saving = NO;
+        //detailViewController.theItem = selectedItem;
+        //detailViewController.hidesBottomBarWhenPushed = YES;
+        //[self.navigationController pushViewController:detailViewController animated:YES];
+        [self.navigationController pushViewController:listC animated:YES];
         return;
     }
 }

@@ -181,7 +181,7 @@
 			break;
 	}
 	[self dismissModalViewControllerAnimated:YES];
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
@@ -204,7 +204,7 @@
 			break;
 	}
 	[self dismissModalViewControllerAnimated:YES];
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 

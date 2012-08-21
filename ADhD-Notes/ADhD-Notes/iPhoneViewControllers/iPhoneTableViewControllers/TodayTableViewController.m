@@ -10,11 +10,11 @@
 #import "HorizontalCells.h"
 
 @interface TodayTableViewController ()
-
+@property (nonatomic, readwrite) NSInteger theType;
 @end
 
 @implementation TodayTableViewController
-
+@synthesize theType;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -40,6 +40,28 @@
     */
     
      self.clearsSelectionOnViewWillAppear = YES;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchType:) name:@"HandleTypeSelectionNotification" object:nil];
+
+}
+- (void) switchType: (NSNotification *) notif{
+    
+    switch ([[notif object] intValue]) {
+        case 0://Revert Back to Normal
+            theType = 0;
+            break;
+        case 1:
+            // Switch to Appending
+            theType = 1;
+            
+            break;    
+        default:
+            break;
+    }
+    
+
+    [self.tableView reloadData];
+    
 }
 
 - (void)viewDidUnload {
@@ -59,6 +81,7 @@
 
 #pragma mark - Table view data source
 
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
@@ -76,10 +99,19 @@
 
 -(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     NSString *hTitle = @"";
+    if (theType == 1) {
+        if (section == 0) {
+            hTitle = @"Lists";
+        } else {
+            hTitle = @"Documents";
+        }
+    }else {
+       
     if (section == 0) {
         hTitle = @"Notes, Lists and Documents";
     } else {
         hTitle = @"Appointments and To Dos";
+    }
     }
     return hTitle;
 }
@@ -90,11 +122,13 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
     NSString *cellIdentifier = @"";
+   
     if (indexPath.section == 0){
         cellIdentifier = @"firstCell";
     } else if (indexPath.section == 1){
         cellIdentifier = @"secondCell";
-    }     
+    }    
+
     HorizontalCells *cell;
     if (cellIdentifier == @"firstCell"){
         cell = (HorizontalCells *)[self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];

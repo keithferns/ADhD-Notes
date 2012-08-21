@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NewItemOrEvent.h"
 
 @interface EventsTableViewController2 : UITableViewController <NSFetchedResultsControllerDelegate, UISearchBarDelegate, UINavigationControllerDelegate> {
     
@@ -23,7 +24,6 @@
 @property (nonatomic, retain) NSDate *selectedDate;
 @property (nonatomic, readwrite) BOOL calendarIsVisible;
 @property (nonatomic, readwrite) NSNumber *eventType;
-
 
 - (void) getSelectedCalendarDate: (NSNotification *) notification;
 

@@ -29,7 +29,7 @@
 
 }
 
-@property (nonatomic, readwrite) BOOL saving;
+@property (nonatomic, readwrite) BOOL saved;
 @property (nonatomic, retain) NSManagedObjectContext *addingContext;
 @property (unsafe_unretained) id delegate;
 
@@ -39,13 +39,12 @@
 @property (nonatomic, retain) NSNumber * sorter;
 @property (nonatomic, retain) NSDate * editDate;
 @property (nonatomic, retain) NSNumber * priority;
-@property (nonatomic, retain) NSNumber * type;
+@property (nonatomic, retain) NSNumber * type, *appendType;
 @property (nonatomic, retain) NSDate * aDate, *startTime, *endTime;
 @property (nonatomic, retain) NSSet *collection;
 @property (nonatomic, retain) NSSet *tags;
 @property (nonatomic, retain) NSString *recurring, *location, *alarm1, *alarm2, *alarm3, *alarm4;
 @property (nonatomic, retain) NSArray *listArray, *alarmArray, *tagArray;
-
 @property (nonatomic, retain) Appointment *theAppointment;
 @property (nonatomic, retain) ToDo *theToDo;
 @property (nonatomic, retain) Memo *theMemo;
@@ -57,11 +56,14 @@
 @property (nonatomic, retain) Liststring *theString;
 @property (nonatomic, retain) Tag *theTag;
 
+- (void) initWithObject: (id)object;
+
+
 - (void) createNewSimpleNote;
 - (void) createNewStringFromText:(NSString *)mytext withType:(NSInteger) theInt;
 - (void) createNewTagFromText:(NSString *)mytext forType: (NSInteger) myType;
 - (Liststring *) createNewListString: (NSString *) thetext;
-- (void) createListstringsFromArray;
+- (NSArray *) createListstringsFromArray:(NSArray *) theArray;
 - (void) createNewList;
 - (void) createNewAppointment;
 - (void) createNewToDo;

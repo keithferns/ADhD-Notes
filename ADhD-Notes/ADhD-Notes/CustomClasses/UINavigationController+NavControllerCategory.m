@@ -43,8 +43,7 @@
 
 - (UIBarButtonItem *) addCancelButton {
     
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:nil action:@selector(toggleTextAndScheduleView:)];
-    
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:nil action:@selector(cancelSaving:)];
     return cancelButton;
     
 }
@@ -61,6 +60,7 @@
     [temp setImage:image forState:UIControlStateNormal];
     UIBarButtonItem *listButton = [[UIBarButtonItem alloc] initWithCustomView:temp];
     return listButton;
+    self.navigationItem.rightBarButtonItem = listButton;
 }
 
 - (UIBarButtonItem *) addLeftArrowButton{

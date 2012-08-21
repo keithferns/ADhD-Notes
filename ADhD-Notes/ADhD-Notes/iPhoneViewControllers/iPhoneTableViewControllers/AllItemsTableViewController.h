@@ -19,5 +19,7 @@ NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 
 
+- (void) switchType: (NSInteger) type;
+
 
 @end

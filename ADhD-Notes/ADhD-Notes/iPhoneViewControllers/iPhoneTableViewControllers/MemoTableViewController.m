@@ -6,13 +6,13 @@
 #import "MemoTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
 #import "EventsCell.h"
-#import "MemoDetailViewController.h"
 
 @implementation MemoTableViewController
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize selectedDate;
+@synthesize theType;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -34,7 +34,7 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    
+    theType = 0;
     selectedDate = nil;
     [NSFetchedResultsController deleteCacheWithName:@"Root"];
     _fetchedResultsController.delegate = self;
@@ -49,12 +49,35 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getSelectedCalendarDate:) name:@"GetDateNotification" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchType:) name:@"HandleTypeSelectionNotification" object:nil];
 	}
     
 	NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
         NSLog(@"FETCHING ERROR");
 	}
+}
+
+- (void) switchType: (NSNotification *) notif{
+    
+    switch ([[notif object] intValue]) {
+        case 0://Revert Back to Normal
+            theType = 0;
+            break;
+        case 1:
+            // Switch to Appending
+            theType = 1;
+            break;    
+        default:
+            break;
+    }
+    
+    self.fetchedResultsController = nil;
+    NSError *error;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+	}
+    [self.tableView reloadData];
+    
 }
 
 - (void)handleDidSaveNotification:(NSNotification *)notification {
@@ -102,9 +125,18 @@
     if (_fetchedResultsController!=nil) {
 		return _fetchedResultsController;
 	}    
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:[NSEntityDescription entityForName:@"Note" inManagedObjectContext:managedObjectContext]];
-    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+
+    switch (theType) {
+        case 0:
+            [request setEntity:[NSEntityDescription entityForName:@"Note" inManagedObjectContext:managedObjectContext]];
+            break;
+        case 1:
+            [request setEntity:[NSEntityDescription entityForName:@"List" inManagedObjectContext:managedObjectContext]];
+            break;
+        default:
+            break;
+    }    
     selectedDate = [[[NSDate date] timelessDate] dateByAddingTimeInterval:7*24*60*60];
     NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"editDate <= %@ AND type < 2", selectedDate];
 
@@ -159,7 +191,6 @@
         UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         cell.myTextView.image = theImage;
-        //cell.myTextLabel.text = currentMemo.text;
         cell.dateLabel.text = [dateFormatter stringFromDate:currentMemo.creationDate];
     }
     return cell;

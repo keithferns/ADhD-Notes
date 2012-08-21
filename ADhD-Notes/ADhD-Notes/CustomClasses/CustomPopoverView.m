@@ -368,8 +368,8 @@
     //button1.layer.borderWidth = 1.0;
     button1.titleLabel.text = @"Folder";
     [button1 setTitle:@"Folder" forState:UIControlStateNormal];
-    [button1 addTarget:nil action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
-    [button1 setTag:2];
+    [button1 addTarget:nil action:@selector(willSaveToFolderOrProject:) forControlEvents:UIControlEventTouchUpInside];
+    [button1 setTag:4];
     
     button3 = [[UIButton alloc] init];
     button3.frame = CGRectMake(100, 35, 100, 39);
@@ -384,8 +384,8 @@
     //button1.layer.borderWidth = 1.0;
     button3.titleLabel.text = @"List";
     [button3 setTitle:@"List" forState:UIControlStateNormal];
-    [button3 addTarget:nil action:@selector(appendToList:) forControlEvents:UIControlEventTouchUpInside];
-    [button3 setTag:4];
+    [button3 addTarget:nil action:@selector(willAppendToListOrDocument:) forControlEvents:UIControlEventTouchUpInside];
+    [button3 setTag:1];
     
     button2 = [[UIButton alloc] init];
     button2.frame = CGRectMake(0, 80, 100, 39);
@@ -400,8 +400,8 @@
     //button2.layer.borderWidth = 1.0;
     button2.titleLabel.text = @"Project";
     [button2 setTitle:@"Project" forState:UIControlStateNormal];
-    [button2 addTarget:nil action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
-    [button2 setTag:3];
+    [button2 addTarget:nil action:@selector(willSaveToFolderOrProject:) forControlEvents:UIControlEventTouchUpInside];
+    [button2 setTag:6];
     
     button4 = [[UIButton alloc] init];
     button4.frame = CGRectMake(100, 80, 100, 39);
@@ -416,7 +416,7 @@
     //button4.layer.borderWidth = 1.0;
     button4.titleLabel.text = @"Document";
     [button4 setTitle:@"Document" forState:UIControlStateNormal];
-    [button4 addTarget:nil action:@selector(presentArchiver:) forControlEvents:UIControlEventTouchUpInside];
+    [button4 addTarget:nil action:@selector(willAppendToListOrDocument:) forControlEvents:UIControlEventTouchUpInside];
     [button4 setTag:5];
     
     [self addSubview:label1];

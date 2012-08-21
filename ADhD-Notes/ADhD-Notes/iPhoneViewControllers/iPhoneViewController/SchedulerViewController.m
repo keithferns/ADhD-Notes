@@ -8,6 +8,7 @@
 #import "SchedulerViewController.h"
 #import "EventsTableViewController2.h"
 
+
 @interface SchedulerViewController ()
 @property (nonatomic, retain) EventsTableViewController2 *tableViewController;
 @property (nonatomic, retain) UIView *alarmView, *tagView, *topView;
@@ -309,9 +310,8 @@
     
 }
 
-- (void) finishedAlarmTransition{
+- (void) finishedAlarmTransition {
     [tableViewController.tableView removeFromSuperview];
-    //[tagView removeFromSuperview];
 }
 
 
@@ -320,15 +320,15 @@
 - (void) saveSchedule {
     self.saving = YES;
     theItem.recurring  = recurringField.text;
-    if (alarm2Field.text != nil) {
-    [theItem createNewStringFromText:self.alarm1Field.text withType:2];
-    } else if (alarm1Field.text != nil){
-    [theItem createNewStringFromText:self.alarm2Field.text withType:2];
-    }
     
+    if (alarm2Field.text != nil) {
+        [theItem createNewStringFromText:self.alarm1Field.text withType:2];
+    } else if (alarm1Field.text != nil){
+        [theItem createNewStringFromText:self.alarm2Field.text withType:2];
+    }
     [theItem saveSchedule];
     
-    [theItem updateSchedule];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"EventCreatedNotification" object:nil];
     
     //Programmatically return to parentViewController//
     [self.navigationController popViewControllerAnimated:YES];
@@ -362,18 +362,7 @@
         case 8:
             [self.alarm3Field resignFirstResponder];
             break;
-     
-        /*
-        case 10:
-            [self.tag1Field resignFirstResponder];
-            break;
-        case 11:
-            [self.tag2Field resignFirstResponder];
-            break;
-        case 12:
-            [self.tag3Field resignFirstResponder];
-            break;
-         */
+  
         default:
             break;
     }    
@@ -407,17 +396,6 @@
             [self.alarm3Field becomeFirstResponder];
             break;
 
-        /*
-        case 10:
-            [self.tag1Field becomeFirstResponder];
-            break;
-        case 11:
-            [self.tag2Field becomeFirstResponder];
-            break;
-        case 12:
-            [self.tag3Field becomeFirstResponder];
-            break;
-         */
         default:
             break;
     }
@@ -540,23 +518,6 @@
         case 4:
             self.dayField.text = [dayArray objectAtIndex:row];
             break;
-        /*
-        case 4:
-            switch ([editing intValue]) {
-                case 10:
-                    self.tag1Field.text = [tagArray objectAtIndex:row];
-                    break;
-                case 11:
-                    self.tag2Field.text = [tagArray objectAtIndex:row];
-                    break;
-                case 12:
-                    self.tag3Field.text = [tagArray objectAtIndex:row];
-                    break;
-                default:
-                    break;
-            }
-            break;
-         */
         default:
             break;
     }
@@ -578,11 +539,7 @@
         case 4:
             numberofrows = [dayArray count];
             break;
-        /*
-        case 4:
-            numberofrows = [tagArray count];
-            break;
-         */
+     
         default:
             break;
     }
@@ -608,11 +565,6 @@
             break;
         case 4:
             titleforrow = [dayArray objectAtIndex:row];
-        /*
-        case 4:
-            titleforrow = [tagArray objectAtIndex:row];
-            break;
-         */
         default:
             break;
     }

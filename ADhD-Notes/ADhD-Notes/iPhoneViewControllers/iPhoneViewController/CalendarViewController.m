@@ -7,11 +7,11 @@
 #import "ADhD_NotesAppDelegate.h"
 #import "EventsTableViewController2.h"
 
-#import "AppointmentDetailViewController.h"
+#import "NotesViewController.h"
 #import "ToDoDetailViewController.h"
-#import "MemoDetailViewController.h"
-#import "ListDetailViewController.h"
 #import "CustomPopoverView.h"
+#import "ListViewAndTableViewController.h"
+
 
 @interface CalendarViewController ()
 
@@ -530,7 +530,7 @@ self.actionsPopover = nil;
 
 - (void) handleTableRowSelection:(NSNotification *) notification {
     if ([[notification object] isKindOfClass:[Appointment class]]) {
-        AppointmentDetailViewController *detailViewController = [[AppointmentDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        NotesViewController *detailViewController = [[NotesViewController alloc] init];
         Appointment *selectedAppointment = [notification object];
         NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theAppointment = selectedAppointment;
@@ -551,25 +551,23 @@ self.actionsPopover = nil;
         return;
     } else if ([[notification object] isKindOfClass:[SimpleNote class]]){
         NSLog(@"Selected Item is a Simple Note");
-        MemoDetailViewController *detailViewController = [[MemoDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        NotesViewController *detailViewController = [[NotesViewController alloc] init];
         SimpleNote *selectedSimpleNote = [notification object];
         NSLog(@"The Simple Note Text is %@", selectedSimpleNote.text);
         NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theSimpleNote = selectedSimpleNote;
         selectedItem.eventType = [NSNumber numberWithInt:0];
         detailViewController.theItem = selectedItem;
-        detailViewController.theSimpleNote = selectedSimpleNote;
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;
     }else if ([[notification object] isKindOfClass:[List class]]){
         NSLog(@"Selected Item is a List");
-        ListDetailViewController *detailViewController = [[ListDetailViewController alloc] initWithStyle:UITableViewStylePlain];
+        ListViewAndTableViewController *detailViewController = [[ListViewAndTableViewController alloc] init];
         List *selectedList = [notification object];
         NewItemOrEvent *selectedItem = [[NewItemOrEvent alloc] init];
         selectedItem.theList = selectedList;
         selectedItem.eventType = [NSNumber numberWithInt:1];
         detailViewController.theItem = selectedItem;
-        detailViewController.theList = selectedList;
         detailViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detailViewController animated:YES];
         return;

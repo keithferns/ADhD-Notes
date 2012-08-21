@@ -7,9 +7,26 @@
 
 @implementation NewItemOrEvent
 
-@synthesize delegate, theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote,theList, theString,theTag, addingContext, saving;
-@synthesize eventType, collection, priority, text, name, tags, sorter, type, listArray;
-@synthesize aDate, startTime, endTime, editDate, location, recurring, alarm1, alarm2, alarm3, alarm4,  alarmArray, tagArray;
+@synthesize delegate, theMemo, theToDo, theAppointment, theProject, theFolder, theDocument, theSimpleNote,theList, theString,theTag, addingContext, saved;
+@synthesize appendType, listArray;
+@synthesize eventType, collection, priority, text, name, tags, sorter, type,aDate, startTime, endTime, editDate, location, recurring, alarm1, alarm2, alarm3, alarm4,  alarmArray, tagArray;
+
+#pragma mark - Init
+
+- (void) initWithObject: (id)object{
+    
+    Item *theItem = (Item *) object;
+    
+    self.type = theItem.type;
+    self.name = theItem.name;
+    self.aDate = theItem.aDate;
+    self.endTime = theItem.editDate;
+    self.collection = theItem.collection;
+    self.priority = theItem.priority;
+    self.sorter = theItem.sorter;
+    self.addingContext = theItem.managedObjectContext;
+}
+
 
 #pragma mark - DATA 
 
@@ -77,16 +94,19 @@
     theString.aString = thetext;
     return theString;
 }
-- (void) createListstringsFromArray {
+- (NSArray *) createListstringsFromArray:(NSArray *) theArray {
+    //Creates an Array of Liststrings from an Array of NString objects
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:addingContext];
-    theList.aStrings = [[NSSet alloc] init];
-    for (int i = 0; i < [listArray count]; i++) {     
+  
+    NSArray *tempArray = [[NSArray alloc] init];
+
+    for (int i = 0; i < [theArray count]; i++) {     
         theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:addingContext]; 
-        theString.aString = [listArray objectAtIndex:i];
+        theString.aString = [theArray objectAtIndex:i];
         theString.order = [NSNumber numberWithInt:i];
-        theList.aStrings = [theList.aStrings setByAddingObject:theString];
-        theList.editDate = [[NSDate date] timelessDate];
+        tempArray = [tempArray arrayByAddingObject:theString];
     }
+    return tempArray;
 }
 
 
@@ -96,17 +116,21 @@
     
     self.type = [NSNumber numberWithInt:1];
     theList.type = [NSNumber numberWithInt:1];
-    [self createListstringsFromArray];
+    //Create an Array of Liststrings.
+    NSArray *temp =  [self createListstringsFromArray:self.listArray];
+    //Add contents of this array of Liststrings to the List.aStrings set
+    theList.aStrings = [[NSSet alloc] initWithArray:temp];
     
-    NSString *tempString = [listArray objectAtIndex:0];
-    
+    NSString *tempString = @"• ";
+    tempString = [tempString stringByAppendingString:[listArray objectAtIndex:0]];
     for (int i = 1; i<[listArray count]; i++) {
         ;
-        tempString = [tempString stringByAppendingString:@"\n"];
+        tempString = [tempString stringByAppendingString:@"\n• "];
         tempString = [tempString stringByAppendingString:[listArray objectAtIndex:i]];
     }
     theList.text = tempString;
     theList.editDate = [[NSDate date] timelessDate];
+    theList.name = @"Add Item";
 }
 
 - (void) createNewStringFromText:(NSString *)mytext withType:(NSInteger) theInt {
@@ -265,7 +289,6 @@
     if(![addingContext save:&error]){ 
         NSLog(@"NEWITEMOREVENT ADDING MOC: DID NOT SAVE");
     } 
-    //
 }
 
 - (void) deleteItem:(NSManagedObject *)theObject{

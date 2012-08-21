@@ -8,26 +8,26 @@
 #import "FoldersTableViewController.h"
 #import "FilesTableViewController.h"
 #import "FolderDetailViewController.h"
-#import "MemoDetailViewController.h"
-#import "ListDetailViewController.h"
 #import "DocumentDetailViewController.h"
 #import "CustomPopoverView.h"
 #import "WEPopoverController.h"
-
+#import "CustomTopToolbarView.h"
+#import "NotesViewController.h"
+#import "ListViewAndTableViewController.h"
 
 @interface ArchiveViewController ()
 @property (nonatomic, retain) FoldersTableViewController *foldersTableViewController;
 @property (nonatomic, retain) FilesTableViewController *filesTableViewController;
 @property (nonatomic, retain) Folder *theFolder;
 @property (nonatomic, retain) Document *theDocument;
-@property (nonatomic, retain) UISearchBar *searchBar;
 @property (nonatomic, retain) WEPopoverController *actionsPopover;
+@property (nonatomic, retain) CustomTopToolbarView *topToolbarView;
 
 @end;
 
 @implementation ArchiveViewController
 
-@synthesize actionsPopover, archivingControl, saving, theItem, foldersTableViewController, filesTableViewController, managedObjectContext, searchBar, theFolder, theDocument, appending;
+@synthesize actionsPopover, archivingControl, saving, theItem, foldersTableViewController, filesTableViewController, managedObjectContext, theFolder, theDocument, appending, topToolbarView;
 
 #pragma mark - Memory Management
 - (void)viewDidUnload {
@@ -54,44 +54,36 @@
     
     self.title =@"Archive";    
 
-    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,kNavBarHeight, kScreenWidth,44)];
-    [toolbar setBarStyle:UIBarStyleBlackTranslucent];
-    [self.view addSubview: toolbar];
+    topToolbarView = [[CustomTopToolbarView alloc] init];
+    [self.view addSubview:topToolbarView];
+    [self.topToolbarView setAppendOrSave:@"search"];
+
     
-    //Init the SearchBar
-    searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth-85, 40)];
-    searchBar.tintColor = [UIColor blackColor];
-    [searchBar setTranslucent:YES];
-    searchBar.autocorrectionType = UITextAutocorrectionTypeNo;
-    UIView *searchBarContainer = [[UIView alloc] initWithFrame:searchBar.frame];
-    [searchBarContainer addSubview:searchBar];
+    //UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showTextBox:)];
+    //leftNavButton.tag = 1;
     
-    UIBarButtonItem *leftNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showTextBox:)];
-    leftNavButton.tag = 1;
+    //UIBarButtonItem *rightNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:self action:@selector(presentActionsPopover:)];
+    //rightNavButton.tag = 2;    
     
-    UIBarButtonItem *rightNavButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:self action:@selector(presentActionsPopover:)];
-    rightNavButton.tag = 2;    
     
-    UIBarButtonItem *searchBarItem = [[UIBarButtonItem alloc] initWithCustomView:searchBarContainer];    
-    NSArray *myItems = [NSArray arrayWithObjects:leftNavButton, searchBarItem, rightNavButton, nil];
-    toolbar.items = myItems;
-    
+
     
     if (foldersTableViewController == nil) {
         foldersTableViewController = [[FoldersTableViewController alloc] init];
+        foldersTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight+40, kScreenWidth, kScreenHeight);
         foldersTableViewController.theItem = self.theItem;
         foldersTableViewController.tableView.rowHeight = 35.0;
-        
+        foldersTableViewController.managedObjectContext = self.managedObjectContext;
     }
     if (filesTableViewController == nil) {
         filesTableViewController =  [[FilesTableViewController alloc] init];
+        foldersTableViewController.tableView.frame = CGRectMake(0, kNavBarHeight+40, kScreenWidth, kScreenHeight);
         filesTableViewController.theItem = self.theItem;
         filesTableViewController.tableView.rowHeight = 35.0;
+        filesTableViewController.managedObjectContext = self.managedObjectContext; 
     }
     
-    if (!saving) {
-        
-        if (managedObjectContext == nil){
+    if (managedObjectContext == nil){
             /*-- Point current instance of the MOC to the main managedObjectContext --*/
             managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
         }     
@@ -112,77 +104,18 @@
         foldersTableViewController.saving = NO;
         filesTableViewController.saving = NO;
         
-        if (foldersTableViewController == nil) {
-            foldersTableViewController = [[FoldersTableViewController alloc] init];
-            foldersTableViewController.theItem = self.theItem;
-            foldersTableViewController.tableView.rowHeight = 35.0;
-            foldersTableViewController.managedObjectContext = self.managedObjectContext;
-
-        }
-        if (filesTableViewController == nil) {
-            filesTableViewController =  [[FilesTableViewController alloc] init];
-            filesTableViewController.theItem = self.theItem;
-            filesTableViewController.tableView.rowHeight = 35.0;
-            filesTableViewController.managedObjectContext = self.managedObjectContext; 
-        }
-        
         [self.view addSubview:foldersTableViewController.tableView];
-        [searchBar setPlaceholder:@"Search for Folder"];//
-        searchBar.delegate = foldersTableViewController;
-        
-        } else if (saving){ NSLog(@"ARCHIVEVIEWCONTROLLER:SAVING");
-  
-            if (theItem.addingContext == nil){
-                if ([theItem.type intValue] == 0) {
-                    theItem.addingContext = theItem.theSimpleNote.managedObjectContext;
-                }else if ([theItem.type intValue] == 1) {
-                    theItem.addingContext = theItem.theList.managedObjectContext;
-                }else if ([theItem.type intValue] == 3){
-                    theItem.addingContext = theItem.theDocument.managedObjectContext;
-                }
-            }
-       
-        if (appending) {
-                NSLog(@"Appending to Document");
-                filesTableViewController =  [[FilesTableViewController alloc] init];
-                filesTableViewController.theItem = self.theItem;
-                filesTableViewController.saving = YES;
-                filesTableViewController.tableView.rowHeight = 50.0;
-                filesTableViewController.managedObjectContext = theItem.addingContext;
-                [self.view addSubview:filesTableViewController.tableView];
-                [archivingControl setSelectedSegmentIndex:1];
-                [searchBar setPlaceholder:@"Search for Document"];
-                searchBar.delegate = filesTableViewController;
-            }else {
-                NSLog(@"Saving to Folder");
-                foldersTableViewController = [[FoldersTableViewController alloc] init];
-                foldersTableViewController.theItem = self.theItem;
-                foldersTableViewController.saving = YES;
-                NSLog(@"ArchiveViewController. theItem.addingcontext is %@", theItem.addingContext);
-                foldersTableViewController.managedObjectContext = theItem.addingContext;
-                foldersTableViewController.tableView.rowHeight = 50.0;
-                [self.view addSubview:foldersTableViewController.tableView];
-                [archivingControl setSelectedSegmentIndex:0];
-                searchBar.delegate = foldersTableViewController;
-                [searchBar setPlaceholder:@"Search for Folder"];
-                
-                self.navigationItem.rightBarButtonItem =[self.navigationController addDoneButton];
-                [self.navigationItem.rightBarButtonItem setTarget:self];
-                [self.navigationItem.rightBarButtonItem setAction:@selector(saveItemToFolder:)];
-    
-        }
-        //self.navigationItem.leftBarButtonItem = [self.navigationController addCancelButton];
-        //self.navigationItem.leftBarButtonItem.target = self;
-        //self.navigationItem.leftBarButtonItem.action = @selector(cancelSaving:);
-    }
+        [topToolbarView.searchBar setPlaceholder:@"Search for Folder"];//
+        topToolbarView.searchBar.delegate = foldersTableViewController;        
 }
 
 - (void) viewWillAppear:(BOOL)animated{
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ViewWillAppearNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:UITableViewSelectionDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:@"FolderFileSelectedNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleFolderFileSelection:) name: @"FolderSavingNotification" object:nil];   
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doneEditing:) name:@"EditDoneNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleTableRowSelection:) name:@"FolderFileSelectedNotification" object:nil];
+
 
    // NSIndexPath *tableSelection = [foldersTableViewController.tableView indexPathForSelectedRow];
     //[foldersTableViewController.tableView deselectRowAtIndexPath:tableSelection animated:NO];
@@ -190,10 +123,12 @@
 
 - (void) viewDidDisappear:(BOOL)animated{
     //[[NSNotificationCenter defaultCenter] removeObserver:self name: UITableViewSelectionDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"FolderFileSelectedNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ViewWillAppearNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITableViewSelectionDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"FolderSavingNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"EditDoneNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"FolderFileSelectedNotification" object:nil];
+
 
     if([actionsPopover isPopoverVisible]) {
         [actionsPopover dismissPopoverAnimated:YES];
@@ -228,9 +163,6 @@
         default:
             break;
     }
-  
-
-
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -240,8 +172,9 @@
 - (void) toggleFoldersFilesView:(id) sender{
     switch (archivingControl.selectedSegmentIndex) {
         case 0:
-            searchBar.placeholder = @"Search for Folder";
-            searchBar.delegate = foldersTableViewController;
+            topToolbarView.searchBar.placeholder = @"Search for Folder";
+            topToolbarView.searchBar.delegate = foldersTableViewController;
+            [topToolbarView.leftButton setImage:[UIImage imageNamed:@"addFolder_nav.png"] forState:UIControlStateNormal];
 
             [filesTableViewController.tableView removeFromSuperview];
             [self.view addSubview:foldersTableViewController.tableView];
@@ -250,11 +183,13 @@
             }else {
             self.navigationItem.rightBarButtonItem.target = foldersTableViewController;
             }
-            searchBar.delegate = foldersTableViewController;
+            topToolbarView.searchBar.delegate = foldersTableViewController;
             break;
         case 1:
-            searchBar.placeholder = @"Search for Document";
-            searchBar.delegate = filesTableViewController;
+            topToolbarView.searchBar.placeholder = @"Search for Document";
+            topToolbarView.searchBar.delegate = filesTableViewController;
+            [topToolbarView.leftButton setImage:[UIImage imageNamed:@"addDoc_nav.png"] forState:UIControlStateNormal];
+
 
             [foldersTableViewController.tableView removeFromSuperview];
             [self.view addSubview:filesTableViewController.tableView];
@@ -263,7 +198,7 @@
             }else {
             self.navigationItem.rightBarButtonItem.target = filesTableViewController;
             }
-            searchBar.delegate = filesTableViewController;
+            topToolbarView.searchBar.delegate = filesTableViewController;
             break;
     }
 }
@@ -328,29 +263,7 @@
 
 - (void) handleFolderFileSelection:(NSNotification *)notification{
     NSLog(@"ArchiveViewController:handleFolderFileSelection - FolderSavingNotification notification received");    
-    if (saving){
-        if ([[notification object] isKindOfClass:[Folder class]]) {
-            theFolder = [notification object];
-            }
-        else if ([[notification object] isKindOfClass:[Document class]]) {
-            theDocument = [notification object];
-            
-            if (theItem.text != nil){
-                NSEntityDescription *entity = [NSEntityDescription entityForName:@"Liststring" inManagedObjectContext:theDocument.managedObjectContext];
-                Liststring *theString = [[Liststring alloc] initWithEntity:entity insertIntoManagedObjectContext:theDocument.managedObjectContext]; 
-                theString.aString = theItem.text;       
-                theString.order = [NSNumber numberWithInt:[theDocument.aStrings count]];
-                theDocument.editDate = [[NSDate date] timelessDate];
-                DocumentDetailViewController *detailViewController = [[DocumentDetailViewController alloc] init];
-                detailViewController.theDocument = theDocument;
-                detailViewController.theString = theString;
-                detailViewController.appending = YES;
-                detailViewController.theItem = theItem;
-                detailViewController.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:detailViewController animated:YES];
-            }
-        }
-    } else if (!saving){
+   if (!saving){
          if ([[notification object] isKindOfClass:[Document class]]) {
         NSLog(@"ArchiveViewController:handleTableRowSelection -  document");
         Document *thedocument = [notification object];
@@ -376,8 +289,8 @@
         NSLog(@"ArchiveViewController:handleTableRowSelection -  simplenote");
 
         SimpleNote *theNote = [notification object];
-        MemoDetailViewController *detailViewController =[[MemoDetailViewController alloc] init];
-        detailViewController.theSimpleNote = theNote;
+        NotesViewController *detailViewController =[[NotesViewController alloc] init];
+        detailViewController.theItem.theSimpleNote = theNote;
         detailViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detailViewController animated:YES];
     } 
@@ -385,63 +298,16 @@
         NSLog(@"ArchiveViewController:handleTableRowSelection -  list");
 
         List *theList  = [notification object];
-        ListDetailViewController *detailViewController =[[ListDetailViewController alloc] init];
-        detailViewController.theList = theList;
+        ListViewAndTableViewController *detailViewController =[[ListViewAndTableViewController alloc] init];
+        detailViewController.theItem.theList = theList;
         detailViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detailViewController animated:YES];
     }     
 }
 
--(void)saveItemToFolder:(id) sender{
-    NSLog(@"ArchiveViewController: saveFolderFile - saving");
-    NSLog(@"theFolder.ManagedOC = %@", theFolder.managedObjectContext);
-    if (theItem.theSimpleNote == nil && [theItem.type intValue] == 0){
-        theItem.addingContext = theFolder.managedObjectContext;
-        NSLog(@"Creating SimpleNote");
-        [theItem createNewSimpleNote];
-        NSLog(@"simplenoteManagedOC = %@", theItem.theSimpleNote.managedObjectContext);
-    }else if (theItem.theList == nil && [theItem.type intValue] == 1){
-        theItem.addingContext = theFolder.managedObjectContext;
-        NSLog(@"Creating List");
-        [theItem createNewList];
-    }
-    if (theFolder != nil) {
-     if (theItem.theSimpleNote != nil){
-     NSLog(@"ArchiveViewController: theSimpleNote text = %@", theItem.theSimpleNote.text);
-     if (theFolder.items == nil) {
-     theFolder.items = [NSSet setWithObject:theItem.theSimpleNote];
-     } else {
-     theFolder.items = [theFolder.items setByAddingObject:theItem.theSimpleNote];
-        }
-         theItem.theSimpleNote.editDate = [[NSDate date] timelessDate];
-
-     }
-     else if (theItem.theList != nil){
-     NSLog(@"ArchiveViewController: theList text = %@", theItem.theList.text);
-     if (theFolder.items == nil) {
-         theFolder.items = [NSSet setWithObject:theItem.theList];
-        } else {
-         theFolder.items = [theFolder.items setByAddingObject:theItem.theList];
-        }
-         theItem.theList.editDate = [[NSDate date] timelessDate];
-     }
-        [self.navigationController popViewControllerAnimated:YES];
-
-    }
-           
-    saving = NO;
-    NSError *error;
-    if(![managedObjectContext save:&error]){ 
-    NSLog(@"ARCHIVE VIEW MOC:SaveFolderFile -> DID NOT SAVE");
-    }
-    [theItem saveNewItem];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil];
-
-}
-
 - (void) cancelSaving:(id) sender{
     NSLog(@"Cancelling Saving");
-    theItem.saving = NO;
+    theItem.saved = NO;
     saving = NO;
     [self.navigationController popViewControllerAnimated:YES];
 }

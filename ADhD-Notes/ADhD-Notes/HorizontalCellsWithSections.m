@@ -121,6 +121,8 @@
     if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[Appointment class]]) {
         //
           } else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[ToDo class]]){
+              
+              
     } else if ([[myObjects objectAtIndex:indexPath.row] isKindOfClass:[List class]]) {
         
         NSLog(@"EventsTableViewController: didSelectRow");

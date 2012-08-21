@@ -17,4 +17,25 @@
 @dynamic aStrings;
 @dynamic todo;
 
+- (void) awakeFromFetch{
+    [super awakeFromFetch];
+ 
+}
+
+- (void) willSave{
+    /*
+     NSArray *listStrings = [self.aStrings allObjects];
+     NSString *tempString = [[listStrings objectAtIndex:0] aString];
+     
+     for (int i = 1; i<[listStrings count]; i++) {
+     ;
+     tempString = [tempString stringByAppendingString:@"\n"];
+     tempString = [tempString stringByAppendingString:[listStrings objectAtIndex:i]];
+     }
+     self.text = tempString;   
+     */
+    
+}
+
+
 @end

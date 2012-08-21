@@ -8,15 +8,24 @@
 
 #import "AllItemsTableViewController.h"
 #import "ADhD_NotesAppDelegate.h"
-
 @interface AllItemsTableViewController ()
+
+@property (nonatomic, retain) NSDate *selectedDate;
+@property (nonatomic, readwrite) NSInteger eventType;
+@property (nonatomic, readwrite) BOOL calendarIsVisible;
 @end
 
 @implementation AllItemsTableViewController
 
 
+
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
+@synthesize selectedDate;
+@synthesize eventType;
+@synthesize calendarIsVisible;
+
+
 
 - (void)viewDidLoad
 {
@@ -27,10 +36,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];    
     if (managedObjectContext == nil) { 
 		managedObjectContext = [(ADhD_NotesAppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-        NSLog(@"CURRENT TABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
+        NSLog(@"AllItems TABLEVIEWCONTROLLER After managedObjectContext: %@",  managedObjectContext);
 	}
 	NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
+        NSLog(@"FETCHING ERROR");
 	}                                                            
     
 }
@@ -47,8 +57,10 @@
 
 - (void)viewDidUnload{
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    
+    self.managedObjectContext = nil;
+	self.fetchedResultsController.delegate = nil;
+	self.fetchedResultsController = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
@@ -58,6 +70,49 @@
 #pragma mark -
 #pragma mark Fetched results controller
 
+- (void) getSelectedCalendarDate: (NSNotification *) notification{
+    // if (!calendarIsVisible){
+    //     return;
+    // }
+    selectedDate = [notification object];
+    self.fetchedResultsController = nil;
+    
+    NSError *error;
+    if (![[self fetchedResultsController] performFetch:&error]) {
+    }
+    [self.tableView reloadData];
+}
+
+-(void) switchType: (NSInteger) type{    
+
+    self.fetchedResultsController = nil;
+    self.eventType = type;
+    
+    NSPredicate *eventTypePredicate = [NSPredicate predicateWithFormat: @"aType == %d", type];
+    self.fetchedResultsController = [self fetchedResultsControllerWithPredicate:eventTypePredicate];
+    
+ 	NSError *error;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+	}
+    [self.tableView reloadData];
+}
+
+- (NSFetchedResultsController *) fetchedResultsController {
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];
+    
+    if(_fetchedResultsController != nil){
+        return _fetchedResultsController;
+    }
+    self.fetchedResultsController = [self fetchedResultsControllerWithPredicate:nil];
+    NSError *error = nil;
+    if (![_fetchedResultsController performFetch:&error]){
+        NSLog(@"Error Fetching:%@", error);
+    }	
+    return _fetchedResultsController;
+}
+
+
+/*
 - (NSFetchedResultsController *) fetchedResultsController {
 	if (_fetchedResultsController!=nil) {
 		return _fetchedResultsController;
@@ -70,16 +125,126 @@
 	NSSortDescriptor *textDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];// just here to test the sections and row calls
     
 	[request setSortDescriptors:[NSArray arrayWithObjects:typeDescriptor,textDescriptor, nil]];
-
+    
 	[request setFetchBatchSize:10];
     
 	NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"type" cacheName:@"Root"];
     
 	newController.delegate = self;
 	self.fetchedResultsController = newController;
-
+    
 	return _fetchedResultsController;
 }
+*/
+- (NSFetchedResultsController *) fetchedResultsControllerWithPredicate: (NSPredicate *) aPredicate {
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];
+    if (_fetchedResultsController!=nil) {
+        return _fetchedResultsController;
+    }
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];    
+    switch (eventType) {
+        case 0:
+             [request setEntity:[NSEntityDescription entityForName:@"SimpleNote" inManagedObjectContext:managedObjectContext]];
+            break;
+        case 1:
+            [request setEntity:[NSEntityDescription entityForName:@"List" inManagedObjectContext:managedObjectContext]];
+            break;
+        case 2:
+            [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:managedObjectContext]];
+            break;
+        case 3:
+            //
+            break;
+        default:
+            break;
+    }
+
+    NSDate *currentDate;
+    if (!calendarIsVisible) { 
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];    
+        [gregorian setLocale:[NSLocale currentLocale]];
+        [gregorian setTimeZone:[NSTimeZone localTimeZone]];
+        
+        NSDateComponents *timeComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];  
+        [timeComponents setYear:[timeComponents year]];
+        [timeComponents setMonth:[timeComponents month]];
+        [timeComponents setDay:[timeComponents day]];
+        [timeComponents setHour:0];
+        [timeComponents setMinute:0];
+        [timeComponents setSecond:0];
+        currentDate = [gregorian dateFromComponents:timeComponents];
+        //NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"type = %@ AND aDate >= %@", eventType, currentDate];
+        if (eventType  == 2) {
+            
+            NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate >= %@", currentDate];
+            [request setPredicate:checkDate];
+        }
+    }
+    else if (calendarIsVisible){
+        /*
+         if (selectedDate == nil) {
+         NSLog(@"Selected Date is nil");
+         NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate >= %@", currentDate];
+         [request setPredicate:checkDate];
+         checkDate = nil;
+         }
+         else {
+         */
+        
+        NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"aDate == %@", selectedDate];
+        [request setPredicate:checkDate];
+        checkDate = nil;
+        //     }
+    }
+    /*
+     
+     NSSortDescriptor *typeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"type" ascending:YES  comparator:^NSComparisonResult(id obj1, id obj2) {
+     NSComparisonResult compR;
+     if ([[obj1 type] intValue] == 0 && [[obj1 type] intValue] < [[obj2 type] intValue]) { 
+     compR =  NSOrderedAscending; 
+     }
+     else if ([[obj2 type] intValue] == 0 && [[obj1 type] intValue] > [[obj2 type] intValue])
+     { compR =  NSOrderedDescending;}
+     else if (obj1 == 0 && obj2 == 0){
+     compR =  NSOrderedSame;}
+     else if (obj1 != 0 && obj2 != 0){
+     compR =  NSOrderedSame;
+     }
+     return compR;
+     }];
+     */
+    if (eventType == 2) {
+        
+        NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:YES];// just here to test the sections and row calls
+        
+        NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+        [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
+    }
+    else {
+        NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"aDate" ascending:NO];// just here to test the sections and row calls
+        
+        NSSortDescriptor *timeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+        [request setSortDescriptors:[NSArray arrayWithObjects:dateDescriptor, timeDescriptor, nil]];
+    }
+    
+    /*FIXME:  set Predicate to filter all tasks and appointments for a time after NOW --*/
+    
+    //NSArray *checkDateArray = [NSArray arrayWithObjects:@"memotext.savedAppointment.doDate",@"memotext.saveMemo.doDate", @"memotext.saveTask.doDate", nil];
+    //NSPredicate *checkDate = [NSPredicate predicateWithFormat:@"'[NSDate date]' < %@" argumentArray:checkDateArray];
+    //[request setPredicate:checkDate];
+    /* -- --*/
+    
+    [request setFetchBatchSize:10];
+    
+    NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
+    // NSFetchedResultsController *newController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:managedObjectContext sectionNameKeyPath:@"sectionIdentifier" cacheName:@"Root"];
+    
+    newController.delegate = self;
+    self.fetchedResultsController = newController;    
+    return _fetchedResultsController;
+}
+
+
 
 #pragma mark -
 #pragma mark Table view data source

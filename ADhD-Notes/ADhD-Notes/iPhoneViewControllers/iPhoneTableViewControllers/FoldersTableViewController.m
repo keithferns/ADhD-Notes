@@ -7,12 +7,21 @@
 #import "FoldersTableViewController.h"
 #import "HorizontalCellsWithSections.h"
 
+@interface FoldersTableViewController ()
+@property (nonatomic, retain) NSIndexPath *lastIndexPath;
+@property (nonatomic, retain) NSNumber *deleting;
+
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+
+@end
+
 @implementation FoldersTableViewController
-@synthesize selectedFolder, lastIndexPath, fetchedResultsController = _fetchedResultsController, managedObjectContext, saving, deleting, theItem;
+@synthesize lastIndexPath, fetchedResultsController = _fetchedResultsController, managedObjectContext, saving, deleting, theItem;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
+        //
     }
     return self;
 }
@@ -38,8 +47,11 @@
     [self.tableView setDataSource:self];
     self.tableView.separatorColor = [UIColor clearColor];
     if (saving) {
+        NSLog(@"FolderTableViewController:viewDidLoad -> managedObjectContext is %@", self.managedObjectContext);
         self.managedObjectContext = [[NSManagedObjectContext alloc] init];
         self.managedObjectContext = theItem.addingContext;
+        NSLog(@"FolderTableViewController:viewDidLoad -> theItem.addingContext is %@", self.managedObjectContext);
+        NSLog(@"FolderTableViewController:viewDidLoad -> managedObjectContext is %@", self.managedObjectContext);
     }
     
     if (managedObjectContext == nil) { 
@@ -52,7 +64,7 @@
 	if (![[self fetchedResultsController] performFetch:&error]) {
 	}
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewWillAppear:) name:@"ViewWillAppearNotification" object:nil];
-
+    
 }
 /*
  - (void)fetchFiles:(NSNotification *)notification{
@@ -92,12 +104,12 @@
     [super viewWillAppear:animated];
         NSLog(@"VIEW WILL APPEAR");
     NSIndexPath *tableSelection = [self.tableView indexPathForSelectedRow];
+    NSLog(@"IndexPath.row for selected Row = %d", tableSelection.row);
 	[self.tableView deselectRowAtIndexPath:tableSelection animated:NO];
     if (lastIndexPath != nil){
         NSLog(@"APPEARING AND RELOADING");
-    selectedFolder = @"";
-    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:lastIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-        lastIndexPath = nil;
+    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:tableSelection, lastIndexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
+    lastIndexPath = nil;
     }
 }
 
@@ -107,6 +119,23 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    if (theItem.theSimpleNote != nil){
+        NSLog(@"ArchiveViewController: theSimpleNote text = %@", theItem.theSimpleNote.text);
+        if (theItem.theFolder.items == nil) {
+            theItem.theFolder.items = [NSSet setWithObject:theItem.theSimpleNote];
+        } else {
+            theItem.theFolder.items = [theItem.theFolder.items setByAddingObject:theItem.theSimpleNote];
+        }
+        theItem.theSimpleNote.editDate = [[NSDate date] timelessDate];
+    } 
+    NSLog(@"The Item text is %@", theItem.theSimpleNote.text);
+    
+    saving = NO;
+    NSError *error;
+    if(![managedObjectContext save:&error]){ 
+        NSLog(@"Folders VIEW MOC:SaveFolderFile -> DID NOT SAVE");
+    }
+    [theItem saveNewItem];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -131,7 +160,6 @@
     NSLog(@"Search String is %@", searchString);    
     NSPredicate *searchPredicate = [NSPredicate predicateWithFormat: @"name CONTAINS[c] %@", searchString];
     self.fetchedResultsController = [self fetchedResultsControllerWithPredicate:searchPredicate];
-    
  	NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
 	}
@@ -204,14 +232,8 @@
 	}
     return count;
 }
-/*
- - (NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
- //id<NSFetchedResultsSectionInfo>  sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
- 
- //return [sectionInfo name];
- return @"My Folders";
- }
- */
+
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSInteger numberOfRows = 0;
     if ([[_fetchedResultsController sections] count] > 0) {
@@ -224,41 +246,36 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat rowh = 0;
     Folder *theFolder = [_fetchedResultsController objectAtIndexPath:indexPath];
-    if ([self.selectedFolder isEqualToString:theFolder.name]) {
+    if ([self.theItem.theFolder.name isEqualToString:theFolder.name]) {
         rowh =110;
     }else{
-        rowh = 40;
+        rowh = 80;
     }
     return rowh;
-
 }
-
+/*
 - (void) configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-   NSLog (@"Configuring Cell");
     Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"folder.png"]];
-    imageView.frame = CGRectMake (0,0,120,40);
+    imageView.frame = CGRectMake (0,0,120,80);
     [cell.contentView addSubview:imageView];
 
-    UILabel *folderName = [[UILabel alloc] initWithFrame:CGRectMake(5,0,100,30)];
+    UILabel *folderName = [[UILabel alloc] initWithFrame:CGRectMake(20,0,100,40)];
     folderName.textAlignment = UITextAlignmentCenter;
     folderName.backgroundColor = [UIColor clearColor];
+    folderName.textColor = [UIColor whiteColor];
+    folderName.font = [UIFont boldSystemFontOfSize:20];
     [cell.contentView addSubview:folderName];
     
     [folderName setText:aFolder.name];    
 }
- 
+ */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
     static NSString *CellIdentifier = @"FolderCell";
     Folder *aFolder = [_fetchedResultsController objectAtIndexPath:indexPath];	
     UILabel *folderName;
-    
-    NSLog(@"RELOADING CELLS");
-
-    
 	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if ([[tableView cellForRowAtIndexPath:indexPath] isSelected]) {
-        NSLog(@"CELL SELECTED");
         usleep(150000);
         
         static NSString * CellIdentifier = @"HorizontalCell";
@@ -272,13 +289,11 @@
         cell.name = aFolder.name;
 
         return cell;
-    }else if (cell == nil) {
-        NSLog (@"Creating Cell");
-		
+    }else if (cell == nil) {		
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"folder.png"]];
-        imageView.frame = CGRectMake (0,0,120,40);
+        UIImage *folderImage = [[UIImage imageNamed:@"folder.png"] stretchableImageWithLeftCapWidth:60 topCapHeight:10];
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:folderImage];
+        imageView.frame = CGRectMake (0,0,200,80);
         [cell.contentView addSubview:imageView];
         
         UIImage *image = [UIImage imageNamed:@"folder_open_go.png"];
@@ -293,15 +308,16 @@
 
         cell.accessoryView = button;
         
-                folderName = [[UILabel alloc] initWithFrame:CGRectMake(5,5,100,30)];
-                folderName.backgroundColor = [UIColor clearColor];
-                folderName.textAlignment = UITextAlignmentCenter;
-                [cell.contentView addSubview:folderName];
+        folderName = [[UILabel alloc] initWithFrame:CGRectMake(5,20,180,40)];
+        folderName.textAlignment = UITextAlignmentCenter;
+        folderName.backgroundColor = [UIColor clearColor];
+        folderName.textColor = [UIColor whiteColor];
+        folderName.font = [UIFont boldSystemFontOfSize:20];
+        [cell.contentView addSubview:folderName];
 			}          
             [folderName setText:aFolder.name];    
     return cell;
 }
-
 /*
  // Override to support conditional editing of the table view.
  - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -310,7 +326,6 @@
  return YES;
  }
  */
-
 
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     NSLog(@"Button Index is %d", buttonIndex);
@@ -328,7 +343,7 @@
         [context deleteObject:[_fetchedResultsController objectAtIndexPath:indexPath]];
         // Save the context.
         NSError *error;
-        if (![managedObjectContext save:&error]) {
+        if (![context save:&error]) {
             
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
@@ -343,8 +358,6 @@
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
     //
 }
-
-
 /*
  // Override to support conditional rearranging of the table view.
  - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
@@ -366,10 +379,8 @@
         NSLog(@"FolderTableViewController: editing = NO");
         NSNumber *ev = [NSNumber numberWithInt:0];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"EditDoneNotification" object:ev];
-
     }
 }
-
 
 #pragma mark - Table view delegate
 
@@ -384,26 +395,32 @@
 }
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {	
-    
 	 [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderFileSelectedNotification" object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
 }
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"FOLDER SELECTED");
+    theItem.theFolder = [self.fetchedResultsController objectAtIndexPath:indexPath];
+
+    if (saving) {
+    self.theItem.saved = YES;
+    if (theItem.theSimpleNote == nil && [theItem.type intValue] == 0){
+        theItem.addingContext = theItem.theFolder.managedObjectContext;
+        NSLog(@"Creating SimpleNote");
+        [theItem createNewSimpleNote];
+        }
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderSavingNotification" object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"FolderSelectedNotification" object:[self.fetchedResultsController objectAtIndexPath:indexPath ]];   
 
     [self.tableView deselectRowAtIndexPath:lastIndexPath animated:YES];
 
-    Folder *myFolder = [self.fetchedResultsController objectAtIndexPath:indexPath ];
-    self.selectedFolder = myFolder.name;
-    NSLog (@"%@ %@", self.selectedFolder, lastIndexPath);
     
     //[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, lastIndexPath, nil] withRowAnimation:UITableViewRowAnimationLeft];
     self.lastIndexPath = indexPath;
 }
-
 
 #pragma mark -
 #pragma mark Fetched Results Notifications
@@ -425,7 +442,8 @@
             NSLog(@"FetchedResultsController ChangeDelete");            
             break;
         case NSFetchedResultsChangeUpdate:
-			[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+            [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationMiddle];
+			//[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             NSLog(@"FetchedResultsController ChangeUpdate");
             break;
         case NSFetchedResultsChangeMove:

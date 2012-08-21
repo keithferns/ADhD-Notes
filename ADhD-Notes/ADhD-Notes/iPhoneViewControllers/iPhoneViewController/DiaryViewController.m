@@ -9,6 +9,7 @@
 #import "DiaryViewController.h"
 #import "HorizontalCells.h"
 #import "DiaryTableViewController.h"
+#import "CustomTopToolbarView.h"
 
 //#import "TKCalendarDayEventView.h"
 
@@ -19,12 +20,13 @@
 @property (nonatomic, retain) UILabel *dateLabel;
 @property NSInteger dateCounter;
 @property (nonatomic, retain) NSDate *selectedDate;
+@property (nonatomic, retain) CustomTopToolbarView *topToolbarView;
 
 @end
 
 @implementation DiaryViewController
 
-@synthesize currentTableViewController, dateCounter, dateLabel, calendarView, textView, selectedDate;
+@synthesize currentTableViewController, dateCounter, dateLabel, calendarView, textView, selectedDate, topToolbarView;
 //@synthesize calendarDayTimelineView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -37,35 +39,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    dateCounter = 0;
-    
-    UIView *dateView = [[UIView alloc] initWithFrame:CGRectMake(0, 44, kScreenWidth, 35)];
-    dateView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:dateView];
-     
-    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
-    [dateformatter setDateFormat:@"EEEE, MMMM dd"];
-    dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 0, 160, 35)];
-    dateLabel.text = [dateformatter stringFromDate:[NSDate date]];
-    dateLabel.backgroundColor = [UIColor blackColor];
-    dateLabel.textColor = [UIColor whiteColor];
-    dateLabel.textAlignment = UITextAlignmentCenter;
-    //self.navigationItem.titleView = dateLabel;
-    
-    [dateView addSubview:dateLabel];
-    
-    UIButton *leftArrow = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 35)];
-    [leftArrow setImage:[UIImage imageNamed:@"arrow_left_24.png"] forState:UIControlStateNormal];
-    leftArrow.tag = 1;
-    [leftArrow addTarget:self action:@selector(postSelectedDateNotification:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *rightArrow = [[UIButton alloc] initWithFrame:CGRectMake(276, 0, 44, 35)];
-    [rightArrow setImage:[UIImage imageNamed:@"arrow_right_24.png"] forState:UIControlStateNormal];
-    rightArrow.tag = 2;
-    [rightArrow addTarget:self action:@selector(postSelectedDateNotification:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [dateView addSubview:leftArrow];
-    [dateView addSubview:rightArrow];
+    dateCounter = 0;    
     
     //Navigation Bar SetUP    
     
@@ -74,8 +48,11 @@
     self.navigationItem.leftBarButtonItem = [self.navigationController addLeftArrowButton];
     self.navigationItem.leftBarButtonItem.target = self;
     self.navigationItem.leftBarButtonItem.tag = 1;
-        
-    //UIBarButtonItem *rightArrowButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:nil action:@selector(toggleTodayCalendarView:)];
+    
+    topToolbarView = [[CustomTopToolbarView alloc] init];
+    [self.view addSubview:topToolbarView];
+    [self.topToolbarView setDiaryDate:[NSDate date]];
+    
     UIImage *rightImage = [UIImage imageNamed:@"Calendar-Month-30x30.png"];
     UIButton *rightNavButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [rightNavButton setImage:rightImage forState:UIControlStateNormal];
@@ -236,12 +213,9 @@
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetSelectedDateNotification" object:selectedDate userInfo:nil];   
     
-    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];    
-    [dateformatter setDateFormat:@"EEEE, MMMM dd"];
-    dateLabel.text = [dateformatter stringFromDate:selectedDate];
-    dateLabel.backgroundColor = [UIColor clearColor];
-    dateLabel.textColor = [UIColor whiteColor];
-    dateLabel.textAlignment = UITextAlignmentCenter;
+    [self.topToolbarView setDiaryDate:selectedDate];
+    
+
 }
 
 /*

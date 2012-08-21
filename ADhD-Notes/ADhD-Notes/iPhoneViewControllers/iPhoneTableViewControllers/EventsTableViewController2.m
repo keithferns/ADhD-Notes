@@ -120,6 +120,7 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+
 #pragma mark -
 #pragma mark Fetched results controller
 

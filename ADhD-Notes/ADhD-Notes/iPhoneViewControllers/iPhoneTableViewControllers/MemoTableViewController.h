@@ -18,6 +18,7 @@
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSDate *selectedDate;
+@property (nonatomic, readwrite) NSInteger theType;
 
 
 

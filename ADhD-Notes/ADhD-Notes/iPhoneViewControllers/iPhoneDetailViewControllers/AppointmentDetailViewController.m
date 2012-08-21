@@ -23,23 +23,23 @@
 
 @synthesize theItem, saving, theTextView, toolbar, actionsPopover;
 
+CGFloat tfHeight;
+
+
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
-    }
-    return self;
+        self.tableView.backgroundColor = [UIColor blackColor];
+        self.tableView.bounces = NO;
+        self.tableView.separatorColor = [UIColor blackColor];
+        self.tableView.allowsSelection = NO;
+        self.tableView.allowsSelectionDuringEditing = YES;    }
+        return self;
 }
 
 - (void)viewDidLoad{
     [super viewDidLoad];    
-    self.tableView.backgroundColor = [UIColor blackColor];
-    self.tableView.bounces = NO;
-    self.tableView.separatorColor = [UIColor blackColor];
-    self.tableView.allowsSelection = NO;
-    self.tableView.allowsSelectionDuringEditing = YES;
-    
-    UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 24)];
+       UITextField *headerText = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 140, 24)];
    // headerText.delegate = self;
     headerText.borderStyle = UITextBorderStyleNone;
     headerText.backgroundColor = [UIColor clearColor];
@@ -53,13 +53,17 @@
     self.navigationItem.titleView = headerText;
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
-    theTextView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,105)];
+    CGSize size = [theItem.text sizeWithFont:[UIFont boldSystemFontOfSize:16.0f] constrainedToSize:CGSizeMake(300, 200) lineBreakMode:UILineBreakModeWordWrap];
+    tfHeight = MAX (size.height, 45);
+    
+    theTextView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,tfHeight)];
     theTextView.delegate = self;
     theTextView.editable = NO;
     theTextView.font = [UIFont fontWithName:@"TimesNewRomanPS-BoldItalicMT" size:(16.0)];
     theTextView.textColor = [UIColor whiteColor];
-    UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
-    [theTextView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
+    //UIImage *patternImage = [[UIImage imageNamed:@"lined_paper4.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+    //[theTextView.layer setBackgroundColor:[UIColor colorWithPatternImage:patternImage].CGColor];
+    theTextView.backgroundColor = [UIColor clearColor];
     
     theItem.addingContext = theItem.theAppointment.managedObjectContext;
     theItem.aDate = theItem.theAppointment.aDate;
@@ -116,7 +120,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"StartNewItemNotification" object:nil];
 }
 
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -127,13 +130,13 @@
 {
     NSInteger rows = 0;
             switch (section) {
-                case 0://DateTime
+                case 0://TEXT
                     rows = 1;
                     break;
-                case 1: //Recurring
+                case 1: //INFO
                     rows = 1;
                     break;
-                case 2: //Alarms
+                case 2: //TAGS
                     rows = 1;
                     break;
                 default:
@@ -146,10 +149,10 @@
     CGFloat result;
     switch (indexPath.section) {
         case 0:
-            result = 50;
+            result = tfHeight;
             break;
         case 1:
-            result = 110;
+            result = 50;
             break;
         case 2: 
             result = 33;
@@ -228,6 +231,12 @@
            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     if (indexPath.section == 0){
+       cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+       
+       [theTextView setText:theItem.theAppointment.text];
+       [cell.contentView addSubview: theTextView];
+        }
+    else if (indexPath.section == 1){
         cell.editingAccessoryType = UITableViewCellAccessoryDetailDisclosureButton;
 
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -302,12 +311,6 @@
         alarm2.textColor = [UIColor whiteColor];
         [cell.contentView addSubview:alarm2];   
         }
-    else if (indexPath.section == 1){
-        cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
-
-        [theTextView setText:theItem.theAppointment.text];
-        [cell.contentView addSubview: theTextView];
-        }
     else if (indexPath.section == 2){
         cell.editingAccessoryType = UITableViewCellAccessoryDetailDisclosureButton;
 
@@ -342,7 +345,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 1) {
+    if (indexPath.section == 0) {
         cell.backgroundColor = [UIColor colorWithPatternImage:[[UIImage imageNamed:@"54700.png"]stretchableImageWithLeftCapWidth:320 topCapHeight:110]];;        
     }
 }

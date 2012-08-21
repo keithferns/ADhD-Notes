@@ -12,12 +12,12 @@
 @interface CustomToolBar : UIToolbar {
     
     UIBarButtonItem *firstButton, *secondButton, *thirdButton, *fourthButton, *fifthButton, *flexSpace;
-    UILabel *titleView;
+    UIButton *titleButton;
     UISearchBar *searchBar;
 }
 
 @property (nonatomic, retain) UIBarButtonItem *firstButton,  *secondButton, *thirdButton, *fourthButton, *fifthButton, *flexSpace;
-@property (nonatomic, retain) UILabel *titleView;
+@property (nonatomic, retain) UIButton *titleButton;
 @property (nonatomic, retain) UISearchBar *searchBar;
 @property (readonly) UIImage *flipperImageForDateNavigationItem;
 @property (nonatomic, retain) NSArray *myItems;
